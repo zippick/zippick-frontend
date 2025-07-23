@@ -3,17 +3,27 @@
 
     <item
         android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_home"/>
+        android:icon="@drawable/ic_home_selector"
+        android:title="홈" />
 
     <item
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_dashboard"/>
+        android:id="@+id/navigation_category"
+        android:icon="@drawable/ic_category_selector"
+        android:title="카테고리" />
 
     <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_notifications"/>
+        android:id="@+id/navigation_size"
+        android:icon="@drawable/ic_size_selector"
+        android:title="사이즈" />
+
+    <item
+        android:id="@+id/navigation_photo"
+        android:icon="@drawable/ic_photo_selector"
+        android:title="사진" />
+
+    <item
+        android:id="@+id/navigation_my"
+        android:icon="@drawable/ic_my_selector"
+        android:title="MY" />
 
 </menu>
