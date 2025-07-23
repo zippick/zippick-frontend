@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">zippick</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_category">Category</string>
+    <string name="title_size">Size</string>
+    <string name="title_photo">Photo</string>
+    <string name="title_my">My</string>
 </resources>
