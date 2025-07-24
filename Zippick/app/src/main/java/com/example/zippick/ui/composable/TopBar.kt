@@ -1,6 +1,7 @@
 package com.example.zippick.ui.composable
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,6 +19,7 @@ import androidx.navigation.NavController
 import com.example.zippick.R
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.Alignment
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,20 +33,26 @@ fun TopBar(
 
     TopAppBar(
         title = {
-            Text(
-                text = when (currentRoute) {
-                    "home" -> "홈"
-                    "category" -> "카테고리"
-                    "size" -> "사이즈"
-                    "photo" -> "사진"
-                    "my" -> "마이페이지"
-                    "search" -> "검색"
-                    "alarm" -> "알림함"
-                    else -> "상세페이지"
-                },
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 50.dp), // 오른쪽 액션 아이콘 공간만큼 패딩
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = when (currentRoute) {
+                        "home" -> "홈"
+                        "category" -> "카테고리"
+                        "size" -> "사이즈"
+                        "photo" -> "사진"
+                        "my" -> "마이페이지"
+                        "search" -> "검색"
+                        "notifications" -> "알림함"
+                        else -> "상세페이지"
+                    },
+                    textAlign = TextAlign.Center
+                )
+            }
         },
         navigationIcon = {
             if (isBottomTab) {
