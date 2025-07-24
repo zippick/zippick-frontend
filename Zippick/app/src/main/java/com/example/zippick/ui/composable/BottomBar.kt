@@ -8,6 +8,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.zippick.R
 import com.example.zippick.ui.model.BottomNavItem
 import com.example.zippick.ui.theme.MainBlue
@@ -25,21 +27,29 @@ val bottomNavItems = listOf(
     BottomNavItem("my", "MY", R.drawable.ic_my_selected, R.drawable.ic_my_unselected),
 )
 
-
 @Composable
-fun BottomBar(
-    selectedRoute: String,
-    onItemSelected: (String) -> Unit
-) {
+fun BottomBar(navController: NavHostController) {
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
     NavigationBar(containerColor = Color.White) {
         bottomNavItems.forEach { item ->
             NavigationBarItem(
-                selected = item.route == selectedRoute,
-                onClick = { onItemSelected(item.route) },
+                selected = item.route == currentRoute,
+                onClick = {
+                    if (currentRoute != item.route) {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                },
                 icon = {
                     Icon(
                         painter = painterResource(
-                            id = if (item.route == selectedRoute) item.selectedIcon else item.unselectedIcon
+                            id = if (item.route == currentRoute) item.selectedIcon else item.unselectedIcon
                         ),
                         contentDescription = item.label
                     )

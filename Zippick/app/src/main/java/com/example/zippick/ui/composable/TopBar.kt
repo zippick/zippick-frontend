@@ -1,0 +1,90 @@
+package com.example.zippick.ui.composable
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.zippick.R
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    navController: NavController,
+    currentRoute: String
+) {
+    val bottomTabs = listOf("home", "category", "size", "photo", "my")
+    val isBottomTab = currentRoute in bottomTabs
+
+    TopAppBar(
+        title = {
+            Text(
+                text = when (currentRoute) {
+                    "home" -> "홈"
+                    "category" -> "카테고리"
+                    "size" -> "사이즈"
+                    "photo" -> "사진"
+                    "my" -> "마이페이지"
+                    "search" -> "검색"
+                    "alarm" -> "알림함"
+                    else -> "상세페이지"
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        },
+        navigationIcon = {
+            if (isBottomTab) {
+                Image(
+                    painter = painterResource(R.drawable.ic_logo),
+                    contentDescription = "로고",
+                    modifier = Modifier.padding(start = 16.dp).size(32.dp)
+                )
+            } else {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_back),
+                        contentDescription = "뒤로가기",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate("search") }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = "검색",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            IconButton(onClick = { navController.navigate("notifications") }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_alarm),
+                    contentDescription = "알림함",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.White,
+            titleContentColor = Color.Black,
+            navigationIconContentColor = Color.Black,
+            actionIconContentColor = Color.Black
+        )
+    )
+}
+

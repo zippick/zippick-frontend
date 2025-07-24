@@ -5,31 +5,56 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Scaffold
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.zippick.ui.screen.CategoryScreen
+import com.example.zippick.ui.screen.DetailScreen
 import com.example.zippick.ui.screen.HomeScreen
 import com.example.zippick.ui.screen.MyScreen
+import com.example.zippick.ui.screen.NotificationScreen
 import com.example.zippick.ui.screen.PhotoScreen
+import com.example.zippick.ui.screen.SearchScreen
 import com.example.zippick.ui.screen.SizeScreen
 
 @Composable
-fun MainScreenWithBottomNav() {
-    var selectedRoute by remember { mutableStateOf("home") }
+fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route ?: "home"
+
+    val bottomTabs = listOf("home", "category", "size", "photo", "my")
 
     Scaffold(
+        topBar = {
+            TopBar(navController = navController, currentRoute = currentRoute)
+        },
         bottomBar = {
-            BottomBar(
-                selectedRoute = selectedRoute,
-                onItemSelected = { selectedRoute = it }
-            )
+            if (currentRoute in bottomTabs) {
+                BottomBar(navController = navController)
+            }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            when (selectedRoute) {
-                "home" -> HomeScreen()
-                "category" -> CategoryScreen()
-                "size" -> SizeScreen()
-                "photo" -> PhotoScreen()
-                "my" -> MyScreen()
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable("home") { HomeScreen(navController) }
+            composable("category") { CategoryScreen(navController) }
+            composable("size") { SizeScreen(navController) }
+            composable("photo") { PhotoScreen(navController) }
+            composable("my") { MyScreen(navController) }
+
+            // 검색/알림/상세 페이지 등 추가
+            composable("search") { SearchScreen(navController) }
+            composable("notifications") { NotificationScreen(navController) }
+            composable("detail/{itemId}") { backStackEntry ->
+                DetailScreen(
+                    navController = navController,
+                    itemId = backStackEntry.arguments?.getString("itemId") ?: ""
+                )
             }
         }
     }
