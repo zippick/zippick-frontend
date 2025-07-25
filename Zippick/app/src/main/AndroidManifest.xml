@@ -27,6 +27,9 @@
             android:name=".ui.screen.PaymentComposeActivity"
             android:theme="@style/Theme.Zippick"
             android:exported="false" />
+        <activity
+            android:name=".ui.screen.PaymentMethodActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

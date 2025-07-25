@@ -1,7 +1,7 @@
 package com.example.zippick.ui.screen
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -15,28 +15,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.tosspayments.paymentsdk.PaymentWidget
-import com.tosspayments.paymentsdk.model.PaymentCallback
-import com.tosspayments.paymentsdk.model.TossPaymentResult
 import com.tosspayments.paymentsdk.view.PaymentMethod
 import com.tosspayments.paymentsdk.view.Agreement
 import java.util.UUID
 
 class PaymentComposeActivity : AppCompatActivity() {
-    private val clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm"
+    private val clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm" // 토스 클라이언트 키
     private lateinit var widget: PaymentWidget
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         widget = PaymentWidget(this, clientKey, UUID.randomUUID().toString())
 
-        // 1) JS 기반 결제 위젯 초기 로드 (오프스크린)
+        // 1) 결제수단 선택 뷰 생성
         val methodView = PaymentMethod(this).also {
             widget.renderPaymentMethods(
                 method = it,
-                amount = PaymentMethod.Rendering.Amount(10000),
+                amount = PaymentMethod.Rendering.Amount(10000), // 결제금액
                 options = null
             )
         }
+        // 1-1) 약관 뷰 생성
         val agreementView = Agreement(this).also {
             widget.renderAgreement(
                 it,
@@ -88,26 +87,11 @@ fun PaymentScreen(widget: PaymentWidget) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // 결제 요청 버튼 (항상 활성화)
-        Button(
-            onClick = {
-                widget.requestPayment(
-                    paymentInfo = PaymentMethod.PaymentInfo(
-                        orderId = orderId,
-                        orderName = orderName
-                    ),
-                    paymentCallback = object : PaymentCallback {
-                        override fun onPaymentSuccess(success: TossPaymentResult.Success) {
-                            Toast.makeText(context, "결제 성공: ${success.paymentKey}", Toast.LENGTH_SHORT).show()
-                        }
-                        override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
-                            Toast.makeText(context, "결제 실패: ${fail.errorMessage}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("결제하기")
+        Button(onClick = {
+            val intent = Intent(context, PaymentMethodActivity::class.java)
+            context.startActivity(intent)
+        }) {
+            Text("결제수단 선택으로 이동")
         }
     }
 }
