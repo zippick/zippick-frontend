@@ -1,5 +1,7 @@
 package com.example.zippick.ui.composable
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Divider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Icon
@@ -8,6 +10,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.zippick.R
@@ -30,39 +33,45 @@ val bottomNavItems = listOf(
 @Composable
 fun BottomBar(navController: NavHostController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-
-    NavigationBar(containerColor = Color.White) {
-        bottomNavItems.forEach { item ->
-            NavigationBarItem(
-                selected = item.route == currentRoute,
-                onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+    Column {
+        // 상단 선 추가
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp
+        )
+        NavigationBar(containerColor = Color.White) {
+            bottomNavItems.forEach { item ->
+                NavigationBarItem(
+                    selected = item.route == currentRoute,
+                    onClick = {
+                        if (currentRoute != item.route) {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(
-                            id = if (item.route == currentRoute) item.selectedIcon else item.unselectedIcon
-                        ),
-                        contentDescription = item.label
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(
+                                id = if (item.route == currentRoute) item.selectedIcon else item.unselectedIcon
+                            ),
+                            contentDescription = item.label
+                        )
+                    },
+                    label = { Text(item.label) },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent,
+                        selectedIconColor = MainBlue,
+                        unselectedIconColor = Color.Gray,
+                        selectedTextColor = MainBlue,
+                        unselectedTextColor = Color.Gray
                     )
-                },
-                label = { Text(item.label) },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.Transparent,
-                    selectedIconColor = MainBlue,
-                    unselectedIconColor = Color.Gray,
-                    selectedTextColor = MainBlue,
-                    unselectedTextColor = Color.Gray
                 )
-            )
+            }
         }
     }
 }
