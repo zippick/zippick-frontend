@@ -8,13 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.zippick.ui.composable.home.CategoryGrid
 
 @Composable
 fun HomeScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize()) {
         CarouselSection()
-        Spacer(modifier = Modifier.height(16.dp))
-        // 이후 다른 콘텐츠...
+        Spacer(modifier = Modifier.height(36.dp))
+        CategoryGrid()
     }
 }
 
