@@ -9,6 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.example.zippick.ui.composable.category.CategoryFilterBar
 import com.example.zippick.ui.composable.category.ProductFilterHeader
+import com.example.zippick.ui.composable.category.ProductGrid
+import com.example.zippick.ui.model.dummy.sampleProducts
 
 import com.example.zippick.ui.model.SortOption
 @Composable
@@ -39,5 +41,6 @@ fun CategoryScreen(
             onMinPriceChange = { minPrice = it },
             onMaxPriceChange = { maxPrice = it }
         )
+        ProductGrid(products = sampleProducts)
     }
 }
