@@ -5,6 +5,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -63,7 +65,6 @@ fun PaymentMethodScreen(widget: PaymentWidget, orderName: String, productPrice: 
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
         )
 
         // 약관 동의 뷰
