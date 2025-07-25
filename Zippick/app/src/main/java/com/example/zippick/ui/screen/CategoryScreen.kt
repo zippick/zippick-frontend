@@ -41,6 +41,6 @@ fun CategoryScreen(
             onMinPriceChange = { minPrice = it },
             onMaxPriceChange = { maxPrice = it }
         )
-        ProductGrid(products = sampleProducts)
+        ProductGrid(products = sampleProducts, navController = navController)
     }
 }

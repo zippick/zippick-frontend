@@ -8,10 +8,15 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.zippick.ui.model.Product
 
 @Composable
-fun ProductGrid(products: List<Product>, modifier: Modifier = Modifier) {
+fun ProductGrid(
+    products: List<Product>,
+    navController: NavController,
+    modifier: Modifier = Modifier
+    ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(24.dp),
@@ -20,7 +25,7 @@ fun ProductGrid(products: List<Product>, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         items(products) { product ->
-            ProductItem(product)
+            ProductItem(product, navController = navController)
         }
     }
 }

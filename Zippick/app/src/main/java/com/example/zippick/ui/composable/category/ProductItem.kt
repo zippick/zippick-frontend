@@ -3,6 +3,7 @@ package com.example.zippick.ui.composable.category
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
@@ -18,15 +19,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.zippick.ui.model.Product
 import com.example.zippick.ui.theme.HeartRed
 import com.example.zippick.util.LikedPreferences
 
 @Composable
-fun ProductItem(product: Product) {
+fun ProductItem(
+    product: Product,
+    navController: NavController
+) {
     val context = LocalContext.current
 
     // 좋아요 상태를 저장하는 상태 변수. 초기 값은 SharedPreferences 에서 가져옴
@@ -41,6 +45,9 @@ fun ProductItem(product: Product) {
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f) // 정사각형 비율 유지
+                .clickable {
+                    navController.navigate("detail/${product.id}")
+                }
         ) {
             // 제품 이미지 표시
             Image(
@@ -83,14 +90,14 @@ fun ProductItem(product: Product) {
             maxLines = 2,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(45.dp)
+                .height(50.dp)
         )
 
         Spacer(modifier = Modifier.height(8.dp)) // 간격 추가
 
         // 제품 가격 텍스트
         Text(
-            text = "${product.price}원",
+            text = "%,d원".format(product.price),
             fontWeight = FontWeight.Normal,
             color = Color.DarkGray
         )
