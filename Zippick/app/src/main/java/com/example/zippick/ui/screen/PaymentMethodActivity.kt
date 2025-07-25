@@ -25,23 +25,25 @@ class PaymentMethodActivity : AppCompatActivity() {
     private lateinit var widget: PaymentWidget
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // PaymentComposeActivity에서 전달받은 데이터
+        val orderName = intent.getStringExtra("orderName") ?: ""
+        val productPrice = intent.getIntExtra("productPrice", 0)
+        val productAmount = intent.getIntExtra("productAmount", 1)
+
         super.onCreate(savedInstanceState)
         widget = PaymentWidget(this, clientKey, UUID.randomUUID().toString())
 
         setContent {
-            PaymentMethodScreen(widget)
+            PaymentMethodScreen(widget, orderName, productPrice, productAmount)
         }
     }
 }
 
 @Composable
-fun PaymentMethodScreen(widget: PaymentWidget) {
+fun PaymentMethodScreen(widget: PaymentWidget, orderName: String, productPrice: Int, productAmount: Int) {
     val context = LocalContext.current
-
-    // 실제 결제 UI만 표시 (주문 정보는 intent로 전달받거나 하드코딩)
     val orderId = "order_${System.currentTimeMillis()}"
-    val orderName = "Android Kotlin 테스트"
-    val amount = 10000
+    val amount = productPrice * productAmount // 총가격
 
     Column(
         modifier = Modifier

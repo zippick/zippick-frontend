@@ -30,7 +30,7 @@ fun PhotoScreen(
                 .fillMaxWidth(0.6f)
                 .height(48.dp)
         ) {
-            Text("결제하기")
+            Text("상품 선택 페이지로 이동")
         }
     }
 }

@@ -29,9 +29,10 @@ class PaymentComposeActivity : AppCompatActivity() {
 
         // 1) 결제수단 선택 뷰 생성
         val methodView = PaymentMethod(this).also {
+            // 결제 수단 위젯 초기화
             widget.renderPaymentMethods(
                 method = it,
-                amount = PaymentMethod.Rendering.Amount(10000), // 결제금액
+                amount = PaymentMethod.Rendering.Amount(0),
                 options = null
             )
         }
@@ -50,13 +51,16 @@ class PaymentComposeActivity : AppCompatActivity() {
     }
 }
 
+/* [결제하기] 버튼 렌더링 페이지 */
 @Composable
 fun PaymentScreen(widget: PaymentWidget) {
     val context = LocalContext.current
+    // 1. 상품명, 가격 변수 선언 (고정)
+    val productName = "테스트상품명"
+    val productPrice = 2000
 
-    var orderId by remember { mutableStateOf("order_${System.currentTimeMillis()}") }
-    var orderName by remember { mutableStateOf("Android Kotlin 테스트") }
-    var amount by remember { mutableStateOf("10000") }
+    // 2. 수량 입력값 상태로 관리
+    var productAmount by remember { mutableStateOf("1") }
 
     Column(
         modifier = Modifier
@@ -64,34 +68,28 @@ fun PaymentScreen(widget: PaymentWidget) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 주문 정보 입력
-        OutlinedTextField(
-            value = orderId,
-            onValueChange = { orderId = it },
-            label = { Text("주문 번호") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = orderName,
-            onValueChange = { orderName = it },
-            label = { Text("상품명") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = amount,
-            onValueChange = { amount = it.filter { ch -> ch.isDigit() } },
-            label = { Text("금액") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        // 3. 상품명, 가격 출력
+        Text("상품명 : $productName")
+        Text("가격 : $productPrice")
 
-        // 결제 요청 버튼 (항상 활성화)
+        // 4. 수량 입력창 (숫자만 입력 가능)
+        OutlinedTextField(
+            value = productAmount,
+            onValueChange = { productAmount = it },
+            label = { Text("수량") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        // 결제 요청 버튼
         Button(onClick = {
-            val intent = Intent(context, PaymentMethodActivity::class.java)
-            context.startActivity(intent)
+            val intent = Intent(context, PaymentMethodActivity::class.java).apply {
+                putExtra("orderName", productName)
+                putExtra("productPrice", productPrice)
+                putExtra("productAmount", productAmount.toIntOrNull() ?: 1)
+            }
+            context.startActivity(intent) // 화면 이동 시 intent 같이 보냄
         }) {
-            Text("결제수단 선택으로 이동")
+            Text("결제하기")
         }
     }
 }
