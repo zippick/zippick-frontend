@@ -2,12 +2,14 @@ package com.example.zippick.ui.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,7 +33,9 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
     Scaffold(
         topBar = {
-            TopBar(navController = navController, currentRoute = currentRoute)
+            Column(modifier = Modifier.padding(top = 8.dp)) {
+                TopBar(navController = navController, currentRoute = currentRoute)
+            }
         },
         bottomBar = {
             if (currentRoute in bottomTabs) {

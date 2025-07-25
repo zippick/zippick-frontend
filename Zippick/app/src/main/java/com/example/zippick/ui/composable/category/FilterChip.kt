@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.zippick.ui.theme.MainBlue
@@ -35,8 +36,9 @@ fun FilterChip(
         ) {
             Text(
                 text = text,
-                color = if (isSelected) Color.White else Color(0xFF005B7F),
-                fontSize = 16.sp
+                color = if (isSelected) Color.White else MainBlue,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Medium
             )
         }
     }

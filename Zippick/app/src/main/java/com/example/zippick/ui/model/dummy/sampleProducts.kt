@@ -6,7 +6,7 @@ import com.example.zippick.ui.model.Product
 val sampleProducts = listOf(
     Product(
         id = "1",
-        name = "모던 원목 테이블",
+        name = "모던 원목 테이블 모던 원목 테이블",
         price = "89,000",
         imageUrl = R.drawable.product
     ),
