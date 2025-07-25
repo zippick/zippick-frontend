@@ -1,6 +1,11 @@
 package com.example.zippick.ui.screen
 
+import android.app.Activity
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -17,33 +22,65 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.zippick.R
+import com.example.zippick.network.FakeAiCombineApi
 import com.example.zippick.ui.composable.BottomBar
 import com.example.zippick.ui.theme.MainBlue
-import kotlinx.coroutines.delay
+import com.example.zippick.ui.model.dummy.AiCombineRequest
 import kotlinx.coroutines.launch
-import com.example.zippick.R
 
 @Composable
 fun AiCombinedScreen(navController: NavHostController) {
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            selectedImageUri = it
-            isLoading = true
-            coroutineScope.launch {
-                delay(2000)
-                isLoading = false
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var resultImageUrl by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // uploadImage 함수
+    fun uploadImage(uri: Uri) {
+        isLoading = true
+        coroutineScope.launch {
+            val request = AiCombineRequest(
+                furnitureImageUrl = "https://example.com/images/chair.png",
+                category = "의자"
+            )
+            val response = FakeAiCombineApi.postComposeRequest(uri, request)
+            resultImageUrl = response.resultImageUrl
+            isLoading = false
+        }
+    }
+
+    // 카메라 촬영용 URI 생성
+    fun createImageUri(context: Context): Uri {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, "camera_photo.jpg")
+        }
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )!!
+    }
+
+    // 시스템 공유 시트 결과 처리
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data ?: cameraImageUri
+            if (uri != null) {
+                selectedImageUri = uri
+                uploadImage(uri)
             }
         }
     }
@@ -100,14 +137,12 @@ fun AiCombinedScreen(navController: NavHostController) {
                     }
                 }
 
-                selectedImageUri != null -> {
+                resultImageUrl != null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(30.dp))
@@ -125,8 +160,8 @@ fun AiCombinedScreen(navController: NavHostController) {
                             Spacer(modifier = Modifier.height(12.dp))
 
                             AsyncImage(
-                                model = selectedImageUri,
-                                contentDescription = "선택한 이미지",
+                                model = resultImageUrl,
+                                contentDescription = "AI 합성 결과 이미지",
                                 modifier = Modifier
                                     .fillMaxWidth(0.9f)
                                     .height(250.dp)
@@ -168,6 +203,7 @@ fun AiCombinedScreen(navController: NavHostController) {
                 }
             }
 
+            // 시스템 공유 시트 띄우기 버튼
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,7 +211,22 @@ fun AiCombinedScreen(navController: NavHostController) {
                     .padding(bottom = 32.dp, start = 20.dp, end = 20.dp)
             ) {
                 Button(
-                    onClick = { galleryLauncher.launch("image/*") },
+                    onClick = {
+                        val imageUri = createImageUri(context)
+                        cameraImageUri = imageUri
+
+                        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                            putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                        }
+
+                        val galleryIntent = Intent(Intent.ACTION_PICK).apply {
+                            type = "image/*"
+                        }
+
+                        val chooser = Intent.createChooser(galleryIntent, "사진 업로드")
+                        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
+                        launcher.launch(chooser)
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
                     modifier = Modifier
                         .fillMaxWidth()

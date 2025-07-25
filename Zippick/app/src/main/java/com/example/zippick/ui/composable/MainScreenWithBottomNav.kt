@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.zippick.ui.screen.AiCombinedScreen
 import com.example.zippick.ui.screen.CategoryScreen
 import com.example.zippick.ui.screen.DetailScreen
 import com.example.zippick.ui.screen.HomeScreen
@@ -46,7 +47,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
         ) {
             NavHost(
                 navController = navController,
-                startDestination = "home",
+                startDestination = "Function…",
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen(navController) }
@@ -54,6 +55,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 composable("size") { SizeScreen(navController) }
                 composable("photo") { PhotoScreen(navController) }
                 composable("my") { MyScreen(navController) }
+                composable("aiCombine") { AiCombinedScreen(navController) }
 
                 // 검색/알림/상세 페이지 등 추가
                 composable("search") { SearchScreen(navController) }
