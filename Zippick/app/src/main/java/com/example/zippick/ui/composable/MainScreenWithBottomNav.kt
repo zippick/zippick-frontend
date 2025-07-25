@@ -1,10 +1,13 @@
 package com.example.zippick.ui.composable
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,25 +39,31 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
             }
         }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = "home",
-            modifier = Modifier.padding(innerPadding)
+        Box(
+            modifier = Modifier
+                .background(Color.White) // 원하는 색상 적용
+                .fillMaxSize()
         ) {
-            composable("home") { HomeScreen(navController) }
-            composable("category") { CategoryScreen(navController) }
-            composable("size") { SizeScreen(navController) }
-            composable("photo") { PhotoScreen(navController) }
-            composable("my") { MyScreen(navController) }
+            NavHost(
+                navController = navController,
+                startDestination = "home",
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable("home") { HomeScreen(navController) }
+                composable("category") { CategoryScreen(navController) }
+                composable("size") { SizeScreen(navController) }
+                composable("photo") { PhotoScreen(navController) }
+                composable("my") { MyScreen(navController) }
 
-            // 검색/알림/상세 페이지 등 추가
-            composable("search") { SearchScreen(navController) }
-            composable("notifications") { NotificationScreen(navController) }
-            composable("detail/{itemId}") { backStackEntry ->
-                DetailScreen(
-                    navController = navController,
-                    itemId = backStackEntry.arguments?.getString("itemId") ?: ""
-                )
+                // 검색/알림/상세 페이지 등 추가
+                composable("search") { SearchScreen(navController) }
+                composable("notifications") { NotificationScreen(navController) }
+                composable("detail/{itemId}") { backStackEntry ->
+                    DetailScreen(
+                        navController = navController,
+                        itemId = backStackEntry.arguments?.getString("itemId") ?: ""
+                    )
+                }
             }
         }
     }
