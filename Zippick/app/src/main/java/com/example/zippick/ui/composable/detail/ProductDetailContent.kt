@@ -1,5 +1,6 @@
 package com.example.zippick.ui.composable.detail
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,25 +10,35 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.zippick.R
 import com.example.zippick.ui.model.ProductDetail
+import com.example.zippick.ui.screen.PaymentMethodActivity
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailContent(product: ProductDetail, navController: NavController) {
     val productCode = remember { "P" + (10000000..99999999).random() }
+    val context = LocalContext.current
+    val bottomSheetState = remember { mutableStateOf(false) } //바텀시트
+    var productAmount by remember { mutableStateOf(1) } // [추가] 수량 상태
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             Button(
-                onClick = { /* 구매하기 처리 */ },
+                onClick = {
+                    bottomSheetState.value = true // 바텀시트 열기
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(66.dp)
@@ -101,6 +112,82 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
                 )
+            }
+        }
+        // 바텀시트
+        if (bottomSheetState.value) {
+            ModalBottomSheet(
+                onDismissRequest = { bottomSheetState.value = false },
+                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+            ) {
+                // 수량 선택 및 결제하기 UI
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // 상품 요약
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.thumnail),
+                            contentDescription = "상품 썸네일",
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(product.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(product.category, color = Color.Gray, fontSize = 13.sp)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // 수량 조절
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = { if (productAmount > 1) productAmount-- }) {
+                            Text("-", fontSize = 24.sp)
+                        }
+                        Text("$productAmount", fontSize = 20.sp, modifier = Modifier.width(40.dp), textAlign = TextAlign.Center)
+                        IconButton(onClick = { productAmount++ }) {
+                            Text("+", fontSize = 24.sp)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // 가격
+                    Text(
+                        text = "%,d원".format(product.price * productAmount),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // 결제하기 버튼
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, PaymentMethodActivity::class.java).apply {
+                                putExtra("productName", product.name)
+                                putExtra("productPrice", product.price)
+                                putExtra("productAmount", productAmount)
+                            }
+                            context.startActivity(intent)
+                            bottomSheetState.value = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("%,d원 결제하기".format(product.price * productAmount), fontSize = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
