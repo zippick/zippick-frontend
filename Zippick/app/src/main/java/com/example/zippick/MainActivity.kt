@@ -16,8 +16,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AndroidLabTheme {
-//                MainScreenWithBottomNav()
-                SignUpScreen()
+                MainScreenWithBottomNav()
             }
         }
     }
