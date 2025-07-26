@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,25 +26,23 @@ import com.example.zippick.ui.composable.photo.CategorySelector
 import com.example.zippick.ui.composable.photo.PhotoUploadSection
 
 @Composable
-fun PhotoScreen(
-    navController: NavController
-) {
+fun PhotoScreen(navController: NavController) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
-    val selectedCategory = remember { mutableStateOf<String?>(null) }
+    val selectedCategory = remember { mutableStateOf<String?>("의자") }
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
     val categoryList = listOf("의자", "소파", "식탁", "책상", "옷장", "침대")
 
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri -> selectedImageUri.value = uri }
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            selectedImageUri.value = it
         }
     }
 
     fun launchGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        galleryLauncher.launch(intent)
+        galleryLauncher.launch("image/*")
     }
 
     Column(
@@ -85,26 +84,14 @@ fun PhotoScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            AnalyzeButton(onClick = {
-                // 분석하기 처리
+            AnalyzeButton(
+                label = "분석하기",
+                onClick = {
+                val imageUriEncoded = Uri.encode(selectedImageUri.value.toString())
+                navController.navigate("photoAnalysis/$imageUriEncoded")
             })
 
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
-
-
-
-//val context = LocalContext.current
-//Button(
-//    onClick = {
-//        val intent = Intent(context, PaymentComposeActivity::class.java)
-//        context.startActivity(intent)
-//    },
-//    modifier = Modifier
-//        .fillMaxWidth(0.6f)
-//        .height(48.dp)
-//) {
-//    Text("결제하기")
-//}

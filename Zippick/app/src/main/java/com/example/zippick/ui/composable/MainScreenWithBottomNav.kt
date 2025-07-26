@@ -1,5 +1,6 @@
 package com.example.zippick.ui.composable
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.zippick.ui.screen.AiCombinedScreen
 import com.example.zippick.ui.screen.CategoryScreen
 import com.example.zippick.ui.screen.CategorySelectionScreen
@@ -26,6 +28,8 @@ import com.example.zippick.ui.screen.PhotoScreen
 import com.example.zippick.ui.screen.SizeSearchResultScreen
 import com.example.zippick.ui.screen.SearchScreen
 import com.example.zippick.ui.screen.SizeInputScreen
+import androidx.core.net.toUri
+import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
@@ -41,7 +45,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
             }
         },
         bottomBar = {
-            if (currentRoute in bottomTabs) {
+            if (bottomTabs.any { currentRoute.startsWith(it) }) {
                 BottomBar(navController = navController)
             }
         }
@@ -82,6 +86,16 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 }
                 composable("sizeSearchResult") { SizeSearchResultScreen(navController) }
 
+                // 사진 기반 검색 결과
+                composable(
+                    route = "photoAnalysis/{imageUri}",
+                    arguments = listOf(navArgument("imageUri") { defaultValue = "" })
+                ) { backStackEntry ->
+                    val uriStr = backStackEntry.arguments?.getString("imageUri") ?: ""
+                    val decodedUri = Uri.decode(uriStr).toUri()
+
+                    PhotoAnalysisResultScreen(navController, decodedUri)
+                }
             }
         }
     }
