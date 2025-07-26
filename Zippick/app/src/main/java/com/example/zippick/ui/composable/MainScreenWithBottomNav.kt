@@ -17,12 +17,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.zippick.ui.screen.AiCombinedScreen
 import com.example.zippick.ui.screen.CategoryScreen
+import com.example.zippick.ui.screen.CategorySelectionScreen
 import com.example.zippick.ui.screen.DetailScreen
 import com.example.zippick.ui.screen.HomeScreen
 import com.example.zippick.ui.screen.MyScreen
 import com.example.zippick.ui.screen.NotificationScreen
 import com.example.zippick.ui.screen.PhotoScreen
+import com.example.zippick.ui.screen.SizeSearchResultScreen
 import com.example.zippick.ui.screen.SearchScreen
+import com.example.zippick.ui.screen.SizeInputScreen
 import com.example.zippick.ui.screen.SizeScreen
 
 @Composable
@@ -51,15 +54,14 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
         ) {
             NavHost(
                 navController = navController,
-                startDestination = "Function…",
+                startDestination = "home",
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen(navController) }
                 composable("category") { CategoryScreen(navController) }
-                composable("size") { SizeScreen(navController) }
+                composable("size") { CategorySelectionScreen(navController) }
                 composable("photo") { PhotoScreen(navController) }
                 composable("my") { MyScreen(navController) }
-                composable("aiCombine") { AiCombinedScreen(navController) }
 
                 // 검색/알림/상세 페이지 등 추가
                 composable("search") { SearchScreen(navController) }
@@ -70,6 +72,17 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                         itemId = backStackEntry.arguments?.getString("itemId") ?: ""
                     )
                 }
+
+                // ai 가구 배치
+                composable("aiCombine") { AiCombinedScreen(navController) }
+
+                // 사이즈 기반 검색
+                composable("sizeInput/{category}") { backStackEntry ->
+                    val category = backStackEntry.arguments?.getString("category") ?: "의자"
+                    SizeInputScreen(navController, category)
+                }
+                composable("sizeSearchResult") { SizeSearchResultScreen(navController) }
+
             }
         }
     }

@@ -42,14 +42,17 @@ fun TopBar(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = when (currentRoute) {
-                        "home" -> "홈"
-                        "category" -> "카테고리"
-                        "size" -> "사이즈"
-                        "photo" -> "사진"
-                        "my" -> "마이페이지"
-                        "search" -> "검색"
-                        "notifications" -> "알림함"
+                    text = when {
+                        currentRoute == "home" -> "홈"
+                        currentRoute == "category" -> "카테고리"
+                        currentRoute == "size" -> "사이즈 검색"
+                        currentRoute == "photo" -> "사진"
+                        currentRoute == "my" -> "마이페이지"
+                        currentRoute == "search" -> "검색"
+                        currentRoute == "notifications" -> "알림함"
+                        currentRoute == "aiCombine" -> "AI 가구 배치"
+                        currentRoute.startsWith("sizeInput") -> "사이즈 검색"
+                        currentRoute == "sizeSearchResult" -> "검색 결과"
                         else -> "상세페이지"
                     },
                     textAlign = TextAlign.Center,

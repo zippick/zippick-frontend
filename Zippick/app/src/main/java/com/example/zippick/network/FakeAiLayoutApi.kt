@@ -5,7 +5,7 @@ import com.example.zippick.ui.model.dummy.AiCombineRequest
 import com.example.zippick.ui.model.dummy.AiCombineResponse
 import kotlinx.coroutines.delay
 
-object FakeAiCombineApi {
+object FakeAiLayoutApi {
     suspend fun postComposeRequest(
         roomImageUri: Uri,
         request: AiCombineRequest

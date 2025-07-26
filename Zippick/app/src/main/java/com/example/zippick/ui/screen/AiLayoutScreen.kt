@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +29,7 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.zippick.R
-import com.example.zippick.network.FakeAiCombineApi
+import com.example.zippick.network.FakeAiLayoutApi
 import com.example.zippick.ui.composable.BottomBar
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.model.dummy.AiCombineRequest
@@ -54,7 +53,7 @@ fun AiCombinedScreen(navController: NavHostController) {
                 furnitureImageUrl = "https://example.com/images/chair.png",
                 category = "의자"
             )
-            val response = FakeAiCombineApi.postComposeRequest(uri, request)
+            val response = FakeAiLayoutApi.postComposeRequest(uri, request)
             resultImageUrl = response.resultImageUrl
             isLoading = false
         }
@@ -186,7 +185,7 @@ fun AiCombinedScreen(navController: NavHostController) {
                         verticalArrangement = Arrangement.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.ai_combine),
+                            painter = painterResource(id = R.drawable.ai_layout),
                             contentDescription = "AI 가구 배치 안내 이미지",
                             modifier = Modifier
                                 .fillMaxWidth(0.85f)

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.zippick.ui.model.Product
 import com.example.zippick.ui.theme.HeartRed
 import com.example.zippick.util.LikedPreferences
@@ -50,8 +51,8 @@ fun ProductItem(
                 }
         ) {
             // 제품 이미지 표시
-            Image(
-                painter = painterResource(id = product.imageUrl),
+            AsyncImage(
+                model = product.imageUrl,
                 contentDescription = product.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
