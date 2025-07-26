@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.zippick.ui.theme.DarkGray
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.theme.Typography
 
@@ -153,10 +154,15 @@ fun LoginScreen(
 // 🔹 밑줄 제거 TextField 스타일
 @Composable
 fun noLineTextFieldColors() = TextFieldDefaults.colors(
-    unfocusedIndicatorColor = Color.Transparent,
+    focusedTextColor = DarkGray,
+    unfocusedTextColor = DarkGray,
     focusedIndicatorColor = Color.Transparent,
+    unfocusedIndicatorColor = Color.Transparent,
     disabledIndicatorColor = Color.Transparent,
-    unfocusedContainerColor = Color.Transparent,
     focusedContainerColor = Color.Transparent,
-    disabledContainerColor = Color.Transparent
+    unfocusedContainerColor = Color.Transparent,
+    disabledContainerColor = Color.Transparent,
+    cursorColor = DarkGray,
+    focusedPlaceholderColor = DarkGray,
+    unfocusedPlaceholderColor = DarkGray
 )
