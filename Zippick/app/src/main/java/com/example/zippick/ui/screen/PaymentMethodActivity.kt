@@ -1,5 +1,6 @@
 package com.example.zippick.ui.screen
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -90,6 +91,12 @@ fun PaymentMethodScreen(widget: PaymentWidget, orderName: String, productPrice: 
                     paymentCallback = object : PaymentCallback {
                         override fun onPaymentSuccess(success: TossPaymentResult.Success) {
                             Toast.makeText(context, "결제 성공: ${success.paymentKey}", Toast.LENGTH_SHORT).show()
+                            // 1. 서버에 요청 보내기
+
+
+                            // 2. 결제 완료 페이지로 이동
+                            val intent = Intent(context, OrderCompleteActivity::class.java)
+                            context.startActivity(intent)
                         }
                         override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
                             Toast.makeText(context, "결제 실패: ${fail.errorMessage}", Toast.LENGTH_SHORT).show()
