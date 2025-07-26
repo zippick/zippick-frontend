@@ -10,15 +10,19 @@ import androidx.compose.ui.unit.dp
 import com.example.zippick.ui.theme.MainBlue
 
 @Composable
-fun AnalyzeButton(onClick: () -> Unit) {
+fun AnalyzeButton(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
         border = BorderStroke(1.8.dp, MainBlue),
         shape = RoundedCornerShape(13.dp)
     ) {
-        Text(text = "분석하기")
+        Text(text = label)
     }
 }
