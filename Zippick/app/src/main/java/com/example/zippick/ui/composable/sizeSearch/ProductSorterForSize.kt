@@ -11,8 +11,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.zippick.ui.composable.category.FilterToggle
-import com.example.zippick.ui.composable.category.SortFilterBottomSheet
-import com.example.zippick.ui.model.SortOption
+import com.example.zippick.ui.model.SizeSortOption
 import com.example.zippick.ui.theme.MainBlue
 import kotlinx.coroutines.launch
 
@@ -20,13 +19,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProductSorterForSize(
     productCount: Int,
-    selectedSort: SortOption,
-    onSortChange: (SortOption) -> Unit
+    selectedSort: SizeSortOption,
+    onSortChange: (SizeSortOption) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var isSortFilterChecked by remember { mutableStateOf(false) }
+    var isSortFilterChecked by remember { mutableStateOf(false) } // 처음엔 OFF
     var showSortSheet by remember { mutableStateOf(false) }
 
     Row(
@@ -51,26 +50,26 @@ fun ProductSorterForSize(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // 정렬 상태 표시: 초기에는 OFF, 한 번 누르면 ON 고정
             FilterToggle(
                 label = "정렬",
                 isChecked = isSortFilterChecked,
                 onToggle = {
-                    isSortFilterChecked = it
-                    showSortSheet = it
+                    showSortSheet = true
                 }
             )
         }
     }
 
     if (showSortSheet) {
-        SortFilterBottomSheet(
+        SortFilterForSizeBottomSheet(
             sheetState = sortSheetState,
             selectedSort = selectedSort,
             onSortChange = {
                 onSortChange(it)
                 coroutineScope.launch { sortSheetState.hide() }
                 showSortSheet = false
-                isSortFilterChecked = true
+                isSortFilterChecked = true // 여기서 ON 상태로 고정
             },
             onDismiss = {
                 coroutineScope.launch { sortSheetState.hide() }

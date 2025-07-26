@@ -7,13 +7,14 @@ class ProductRepository {
     private val api = RetrofitInstance.retrofit.create(ProductApi::class.java)
 
     suspend fun getProductsBySize(
+        category: String,
         width: Int,
         depth: Int,
         height: Int,
         sort: String,
         offset: Int
     ): ProductResponse {
-        return api.getProductsBySize(width, depth, height, sort, offset)
+        return api.getProductsBySize(category, width, depth, height, sort, offset)
     }
 
     suspend fun getProductsByKeyword(

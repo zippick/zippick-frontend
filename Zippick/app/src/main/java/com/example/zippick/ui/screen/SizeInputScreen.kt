@@ -44,7 +44,6 @@ fun SizeInputScreen(navController: NavHostController, category: String, viewMode
     }
 
     Scaffold(
-        bottomBar = { BottomBar(navController) },
         containerColor = Color.White
     ) { padding ->
         Column(
