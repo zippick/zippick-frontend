@@ -34,8 +34,18 @@ val bottomNavItems = listOf(
 @Composable
 fun BottomBar(navController: NavHostController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val selectedTab = when {
+        currentRoute == null -> ""
+        currentRoute.startsWith("size") -> "size"
+        currentRoute.startsWith("category") -> "category"
+        currentRoute.startsWith("photo") -> "photo"
+        currentRoute.startsWith("my") -> "my"
+        currentRoute.startsWith("home") -> "home"
+        else -> ""
+    }
+
     Column {
-        // 상단 선 추가
         Divider(
             color = Color.LightGray,
             thickness = 1.dp
@@ -43,9 +53,9 @@ fun BottomBar(navController: NavHostController) {
         NavigationBar(containerColor = Color.White) {
             bottomNavItems.forEach { item ->
                 NavigationBarItem(
-                    selected = item.route == currentRoute,
+                    selected = item.route == selectedTab, // ← 이 줄만 바뀜
                     onClick = {
-                        if (currentRoute != item.route) {
+                        if (selectedTab != item.route) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true
@@ -58,7 +68,7 @@ fun BottomBar(navController: NavHostController) {
                     icon = {
                         Icon(
                             painter = painterResource(
-                                id = if (item.route == currentRoute) item.selectedIcon else item.unselectedIcon
+                                id = if (item.route == selectedTab) item.selectedIcon else item.unselectedIcon
                             ),
                             contentDescription = item.label
                         )
