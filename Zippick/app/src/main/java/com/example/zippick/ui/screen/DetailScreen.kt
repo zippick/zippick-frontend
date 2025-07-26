@@ -7,16 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.example.zippick.ui.composable.detail.ProductDetailContent
+import com.example.zippick.ui.model.dummy.dummyProductDetail
 
 @Composable
 fun DetailScreen(
     navController: NavController,
     itemId: String
-){
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "제품 상세 화면입니다")
-    }
+) {
+    val product = dummyProductDetail
+
+    ProductDetailContent(product, navController)
 }

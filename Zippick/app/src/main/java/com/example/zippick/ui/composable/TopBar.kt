@@ -20,6 +20,8 @@ import com.example.zippick.R
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +52,9 @@ fun TopBar(
                         "notifications" -> "알림함"
                         else -> "상세페이지"
                     },
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 20.sp
                 )
             }
         },
