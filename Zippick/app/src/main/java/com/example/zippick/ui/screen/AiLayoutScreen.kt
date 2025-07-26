@@ -26,40 +26,38 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.zippick.R
-import com.example.zippick.network.FakeAiLayoutApi
 import com.example.zippick.ui.composable.BottomBar
+import com.example.zippick.ui.model.AiLayoutRequest
 import com.example.zippick.ui.theme.MainBlue
-import com.example.zippick.ui.model.dummy.AiCombineRequest
+import com.example.zippick.ui.viewmodel.ProductViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun AiCombinedScreen(navController: NavHostController) {
+fun AiLayoutScreen(navController: NavHostController) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val viewModel: ProductViewModel = viewModel()
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var resultImageUrl by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // uploadImage 함수
+    val resultImageUrl by viewModel.aiImageUrl.collectAsState()
+    val isLoading by viewModel.loading.collectAsState()
+
     fun uploadImage(uri: Uri) {
-        isLoading = true
         coroutineScope.launch {
-            val request = AiCombineRequest(
-                furnitureImageUrl = "https://example.com/images/chair.png",
+            val request = AiLayoutRequest(
+                furnitureImageUrl = "https://example.com/images/chair.png", // 실제 이미지 URL로 대체
                 category = "의자"
             )
-            val response = FakeAiLayoutApi.postComposeRequest(uri, request)
-            resultImageUrl = response.resultImageUrl
-            isLoading = false
+            viewModel.requestAiLayout(request)
         }
     }
 
-    // 카메라 촬영용 URI 생성
     fun createImageUri(context: Context): Uri {
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
@@ -71,7 +69,6 @@ fun AiCombinedScreen(navController: NavHostController) {
         )!!
     }
 
-    // 시스템 공유 시트 결과 처리
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -202,7 +199,6 @@ fun AiCombinedScreen(navController: NavHostController) {
                 }
             }
 
-            // 시스템 공유 시트 띄우기 버튼
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

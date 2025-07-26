@@ -17,7 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.zippick.ui.screen.AiCombinedScreen
+import com.example.zippick.ui.screen.AiLayoutScreen
 import com.example.zippick.ui.screen.CategoryScreen
 import com.example.zippick.ui.screen.CategorySelectionScreen
 import com.example.zippick.ui.screen.DetailScreen
@@ -28,6 +28,8 @@ import com.example.zippick.ui.screen.PhotoScreen
 import com.example.zippick.ui.screen.SizeSearchResultScreen
 import com.example.zippick.ui.screen.SearchScreen
 import com.example.zippick.ui.screen.SizeInputScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.zippick.ui.viewmodel.ProductViewModel
 import androidx.core.net.toUri
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 
@@ -37,6 +39,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val bottomTabs = listOf("home", "category", "size", "photo", "my")
+    val productViewModel: ProductViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -77,14 +80,16 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 }
 
                 // ai 가구 배치
-                composable("aiCombine") { AiCombinedScreen(navController) }
+                composable("aiLayout") { AiLayoutScreen(navController) }
 
                 // 사이즈 기반 검색
                 composable("sizeInput/{category}") { backStackEntry ->
                     val category = backStackEntry.arguments?.getString("category") ?: "의자"
-                    SizeInputScreen(navController, category)
+                    SizeInputScreen(navController, category, productViewModel)
                 }
-                composable("sizeSearchResult") { SizeSearchResultScreen(navController) }
+                composable("sizeSearchResult") {
+                    SizeSearchResultScreen(navController, productViewModel)
+                }
 
                 // 사진 기반 검색 결과
                 composable(

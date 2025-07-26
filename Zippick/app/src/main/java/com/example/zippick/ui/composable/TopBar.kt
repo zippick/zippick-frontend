@@ -50,7 +50,7 @@ fun TopBar(
                         currentRoute == "my" -> "마이페이지"
                         currentRoute == "search" -> "검색"
                         currentRoute == "notifications" -> "알림함"
-                        currentRoute == "aiCombine" -> "AI 가구 배치"
+                        currentRoute == "aiLayout" -> "AI 가구 배치"
                         currentRoute.startsWith("sizeInput") -> "사이즈 검색"
                         currentRoute == "sizeSearchResult" -> "검색 결과"
                         currentRoute.startsWith("photoAnalysis") -> "분석 결과"
