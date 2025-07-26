@@ -83,7 +83,7 @@ fun PaymentScreen(widget: PaymentWidget) {
         // 결제 요청 버튼
         Button(onClick = {
             val intent = Intent(context, PaymentMethodActivity::class.java).apply {
-                putExtra("orderName", productName)
+                putExtra("productName", productName)
                 putExtra("productPrice", productPrice)
                 putExtra("productAmount", productAmount.toIntOrNull() ?: 1)
             }

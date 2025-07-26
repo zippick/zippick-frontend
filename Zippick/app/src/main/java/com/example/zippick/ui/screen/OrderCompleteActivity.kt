@@ -30,21 +30,23 @@ import androidx.activity.compose.setContent
 
 class OrderCompleteActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val orderNumber = intent.getStringExtra("orderNumber")?:""
+        val orderDate = intent.getStringExtra("orderDate")?: ""
+        val productName = intent.getStringExtra("productName") ?: ""
+        val productPrice = intent.getIntExtra("productPrice", 0)
+        val productAmount = intent.getIntExtra("productAmount", 0)
+        val totalPrice = intent.getIntExtra("totalPrice", 0)
+
         super.onCreate(savedInstanceState)
         setContent {
-            OrderCompleteScreen()
+            OrderCompleteScreen(orderNumber, orderDate, productName, productPrice,  productAmount, totalPrice)
         }
     }
 }
 
 @Composable
-fun OrderCompleteScreen() {
-    val orderDate = "2025년 07월 21일" //주문일시
-    val orderNumber = "202507220123" //주문번호
-    val productName = "테스트상품명" //상품명
-    val productPrice = 2000 //가격
-    val productAmount = 1 //수량
-    val productImage = R.drawable.chair // 상품 이미지
+fun OrderCompleteScreen(orderNumber: String, orderDate: String, productName: String, productPrice: Int, productAmount: Int, totalPrice: Int) {
+    val productImage = R.drawable.chair // 샘플 상품 이미지
 
     Box(
         modifier = Modifier

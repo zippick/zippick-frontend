@@ -6,8 +6,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -20,6 +18,9 @@ import com.tosspayments.paymentsdk.model.PaymentCallback
 import com.tosspayments.paymentsdk.model.TossPaymentResult
 import com.tosspayments.paymentsdk.view.PaymentMethod
 import com.tosspayments.paymentsdk.view.Agreement
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
 /* 결제 수단 렌더링 페이지 */
@@ -29,7 +30,7 @@ class PaymentMethodActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // PaymentComposeActivity에서 전달받은 데이터
-        val orderName = intent.getStringExtra("orderName") ?: ""
+        val productName = intent.getStringExtra("productName") ?: ""
         val productPrice = intent.getIntExtra("productPrice", 0)
         val productAmount = intent.getIntExtra("productAmount", 1)
 
@@ -37,16 +38,16 @@ class PaymentMethodActivity : AppCompatActivity() {
         widget = PaymentWidget(this, clientKey, UUID.randomUUID().toString())
 
         setContent {
-            PaymentMethodScreen(widget, orderName, productPrice, productAmount)
+            PaymentMethodScreen(widget, productName, productPrice, productAmount)
         }
     }
 }
 
 @Composable
-fun PaymentMethodScreen(widget: PaymentWidget, orderName: String, productPrice: Int, productAmount: Int) {
+fun PaymentMethodScreen(widget: PaymentWidget, productName: String, productPrice: Int, productAmount: Int) {
     val context = LocalContext.current
     val orderId = "order_${System.currentTimeMillis()}"
-    val amount = productPrice * productAmount // 총가격
+    val totalPrice = productPrice * productAmount // 총가격
 
     Column(
         modifier = Modifier
@@ -60,7 +61,7 @@ fun PaymentMethodScreen(widget: PaymentWidget, orderName: String, productPrice: 
             update = { view ->
                 widget.renderPaymentMethods(
                     method = view,
-                    amount = PaymentMethod.Rendering.Amount(amount),
+                    amount = PaymentMethod.Rendering.Amount(totalPrice),
                     options = null
                 )
             },
@@ -86,7 +87,7 @@ fun PaymentMethodScreen(widget: PaymentWidget, orderName: String, productPrice: 
                 widget.requestPayment(
                     paymentInfo = PaymentMethod.PaymentInfo(
                         orderId = orderId,
-                        orderName = orderName
+                        orderName = productName
                     ),
                     paymentCallback = object : PaymentCallback {
                         override fun onPaymentSuccess(success: TossPaymentResult.Success) {
@@ -95,7 +96,18 @@ fun PaymentMethodScreen(widget: PaymentWidget, orderName: String, productPrice: 
 
 
                             // 2. 결제 완료 페이지로 이동
+                            val now = System.currentTimeMillis()
+                            val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())
+                            val orderDate = sdf.format(Date(now))
+
                             val intent = Intent(context, OrderCompleteActivity::class.java)
+                            intent.putExtra("orderNumber", success.paymentKey)
+                            intent.putExtra("orderDate", orderDate)
+                            intent.putExtra("productName", productName)
+                            intent.putExtra("productPrice", productPrice)
+                            intent.putExtra("productAmount", productAmount)
+                            intent.putExtra("totalPrice", totalPrice)
+
                             context.startActivity(intent)
                         }
                         override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
