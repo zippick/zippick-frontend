@@ -1,5 +1,6 @@
 package com.example.zippick.ui.composable
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Divider
 import androidx.compose.material3.NavigationBar
@@ -34,6 +35,7 @@ val bottomNavItems = listOf(
 @Composable
 fun BottomBar(navController: NavHostController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    Log.d("NavDebug", "currentRoute = $currentRoute")
 
     val selectedTab = when {
         currentRoute == null -> ""
