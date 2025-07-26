@@ -51,7 +51,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
         ) {
             NavHost(
                 navController = navController,
-                startDestination = "Function…",
+                startDestination = "home",
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen(navController) }
