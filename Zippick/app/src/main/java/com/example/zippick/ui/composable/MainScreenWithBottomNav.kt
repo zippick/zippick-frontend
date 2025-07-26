@@ -26,7 +26,6 @@ import com.example.zippick.ui.screen.PhotoScreen
 import com.example.zippick.ui.screen.SizeSearchResultScreen
 import com.example.zippick.ui.screen.SearchScreen
 import com.example.zippick.ui.screen.SizeInputScreen
-import com.example.zippick.ui.screen.SizeScreen
 
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
