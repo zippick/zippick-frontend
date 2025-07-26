@@ -17,10 +17,19 @@ import com.example.zippick.ui.composable.category.ProductGrid
 import com.example.zippick.ui.model.SizeSearchResultHolder
 import com.example.zippick.ui.model.SortOption
 import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.viewmodel.ProductViewModel
 
 @Composable
-fun SizeSearchResultScreen(navController: NavHostController) {
-    val selectedCategory = "책상" // 혹은 전달받는 값으로 처리 가능
+fun SizeSearchResultScreen(
+    navController: NavHostController,
+    viewModel: ProductViewModel
+) {
+    val products by viewModel.products.collectAsState()
+    val totalCount by viewModel.totalCount.collectAsState()
+    val loading by viewModel.loading.collectAsState()
+    val error by viewModel.errorMessage.collectAsState()
+
+    val selectedCategory = selectedCategoryGlobal
     var selectedSort by remember { mutableStateOf(SortOption.NEWEST) }
 
     Scaffold(
@@ -34,7 +43,7 @@ fun SizeSearchResultScreen(navController: NavHostController) {
             Text(
                 text = buildAnnotatedString {
                     withStyle(style = androidx.compose.ui.text.SpanStyle(color = MainBlue, fontWeight = FontWeight.Bold)) {
-                        append("\"$selectedCategory\"")
+                        append("\"$selectedCategory\" ")
                     }
                     append("카테고리에 대한 사이즈 기반 검색 결과입니다.")
                 },
@@ -44,12 +53,21 @@ fun SizeSearchResultScreen(navController: NavHostController) {
             )
 
             ProductSorterForSize(
-                productCount = SizeSearchResultHolder.totalCount,
+                productCount = totalCount,
                 selectedSort = selectedSort,
                 onSortChange = { selectedSort = it }
             )
 
-            ProductGrid(products = SizeSearchResultHolder.products, navController = navController)
+            when {
+                loading -> Text("로딩 중...")
+                error != null -> Text("에러: $error")
+                products.isEmpty() -> Text("결과가 없습니다.")
+                else -> ProductGrid(
+                    products = products,
+                    navController = navController
+                )
+            }
         }
     }
 }
+

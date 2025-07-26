@@ -19,17 +19,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import com.example.zippick.R
-import com.example.zippick.network.FakeProductsBySizeApi
 import com.example.zippick.ui.composable.BottomBar
 import com.example.zippick.ui.model.SizeSearchResultHolder
 import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.viewmodel.ProductViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun SizeInputScreen(navController: NavHostController, category: String) {
+fun SizeInputScreen(navController: NavHostController, category: String, viewModel: ProductViewModel) {
     var width by remember { mutableStateOf("") }
     var depth by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
+
     val coroutineScope = rememberCoroutineScope()
 
     val imageRes = when (category) {
@@ -39,7 +40,7 @@ fun SizeInputScreen(navController: NavHostController, category: String) {
         "식탁" -> R.drawable.size_sample_table
         "옷장" -> R.drawable.size_sample_closet
         "침대" -> R.drawable.size_sample_bed
-        else -> R.drawable.size_sample_chair // 기본값
+        else -> R.drawable.size_sample_chair
     }
 
     Scaffold(
@@ -51,8 +52,8 @@ fun SizeInputScreen(navController: NavHostController, category: String) {
                 .padding(padding)
                 .padding(horizontal = 20.dp)
                 .fillMaxSize()
-                .imePadding() // 키보드 올라왔을 때 하단 영역 확보
-                .verticalScroll(rememberScrollState()), // 스크롤 가능하게
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))
@@ -84,7 +85,6 @@ fun SizeInputScreen(navController: NavHostController, category: String) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 사이즈 입력
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -100,15 +100,15 @@ fun SizeInputScreen(navController: NavHostController, category: String) {
                 onClick = {
                     if (width.isNotBlank() && depth.isNotBlank() && height.isNotBlank()) {
                         coroutineScope.launch {
-                            val (result, totalCount) = FakeProductsBySizeApi.getProductsBySize(
+                            viewModel.loadBySize(
                                 width = width.toInt(),
                                 depth = depth.toInt(),
                                 height = height.toInt(),
                                 sort = "price_asc",
                                 offset = 0
                             )
-                            SizeSearchResultHolder.products = result
-                            SizeSearchResultHolder.totalCount = totalCount
+                            SizeSearchResultHolder.products = viewModel.products.value
+                            SizeSearchResultHolder.totalCount = viewModel.totalCount.value
                             navController.navigate("sizeSearchResult")
                         }
                     }
@@ -154,11 +154,7 @@ fun SizeInputRow(
         )
         OutlinedTextField(
             value = value,
-            onValueChange = { input ->
-                if (input.all { it.isDigit() }) {
-                    onValueChange(input)
-                }
-            },
+            onValueChange = { input -> if (input.all { it.isDigit() }) onValueChange(input) },
             modifier = Modifier
                 .weight(1f)
                 .height(48.dp),
