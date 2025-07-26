@@ -1,6 +1,5 @@
 package com.example.zippick.ui.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,8 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import com.example.zippick.R
-
+import coil.compose.AsyncImage
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -33,20 +30,21 @@ class OrderCompleteActivity : ComponentActivity() {
         val orderNumber = intent.getStringExtra("orderNumber")?:""
         val orderDate = intent.getStringExtra("orderDate")?: ""
         val productName = intent.getStringExtra("productName") ?: ""
+        val productImage = intent.getStringExtra("productImage") ?: ""
         val productPrice = intent.getIntExtra("productPrice", 0)
         val productAmount = intent.getIntExtra("productAmount", 0)
         val totalPrice = intent.getIntExtra("totalPrice", 0)
 
         super.onCreate(savedInstanceState)
         setContent {
-            OrderCompleteScreen(orderNumber, orderDate, productName, productPrice,  productAmount, totalPrice)
+            OrderCompleteScreen(orderNumber, orderDate, productName, productImage, productPrice,  productAmount, totalPrice)
         }
     }
 }
 
 @Composable
-fun OrderCompleteScreen(orderNumber: String, orderDate: String, productName: String, productPrice: Int, productAmount: Int, totalPrice: Int) {
-    val productImage = R.drawable.chair // 샘플 상품 이미지
+fun OrderCompleteScreen(orderNumber: String, orderDate: String, productName: String, productImage: String, productPrice: Int, productAmount: Int, totalPrice: Int) {
+//    val productImage = R.drawable.chair // 샘플 상품 이미지
 
     Box(
         modifier = Modifier
@@ -95,8 +93,8 @@ fun OrderCompleteScreen(orderNumber: String, orderDate: String, productName: Str
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(id = productImage),
+                AsyncImage(
+                    model = productImage,
                     contentDescription = "상품 이미지",
                     modifier = Modifier
                         .size(56.dp)

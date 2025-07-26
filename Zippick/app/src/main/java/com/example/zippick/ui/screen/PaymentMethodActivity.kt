@@ -31,6 +31,7 @@ class PaymentMethodActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // PaymentComposeActivity에서 전달받은 데이터
         val productName = intent.getStringExtra("productName") ?: ""
+        val productImage = intent.getStringExtra("productImage") ?: ""
         val productPrice = intent.getIntExtra("productPrice", 0)
         val productAmount = intent.getIntExtra("productAmount", 1)
 
@@ -38,13 +39,13 @@ class PaymentMethodActivity : AppCompatActivity() {
         widget = PaymentWidget(this, clientKey, UUID.randomUUID().toString())
 
         setContent {
-            PaymentMethodScreen(widget, productName, productPrice, productAmount)
+            PaymentMethodScreen(widget, productName, productImage, productPrice, productAmount)
         }
     }
 }
 
 @Composable
-fun PaymentMethodScreen(widget: PaymentWidget, productName: String, productPrice: Int, productAmount: Int) {
+fun PaymentMethodScreen(widget: PaymentWidget, productName: String, productImage: String, productPrice: Int, productAmount: Int) {
     val context = LocalContext.current
     val orderId = "order_${System.currentTimeMillis()}"
     val totalPrice = productPrice * productAmount // 총가격
@@ -104,6 +105,7 @@ fun PaymentMethodScreen(widget: PaymentWidget, productName: String, productPrice
                             intent.putExtra("orderNumber", success.paymentKey)
                             intent.putExtra("orderDate", orderDate)
                             intent.putExtra("productName", productName)
+                            intent.putExtra("productImage", productImage)
                             intent.putExtra("productPrice", productPrice)
                             intent.putExtra("productAmount", productAmount)
                             intent.putExtra("totalPrice", totalPrice)

@@ -173,6 +173,7 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                         onClick = {
                             val intent = Intent(context, PaymentMethodActivity::class.java).apply {
                                 putExtra("productName", product.name)
+                                putExtra("productImage", product.mainImageUrl)
                                 putExtra("productPrice", product.price)
                                 putExtra("productAmount", productAmount)
                             }
