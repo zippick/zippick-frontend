@@ -1,5 +1,8 @@
 package com.example.zippick.ui.composable
 
+import android.util.Log
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.Divider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Icon
@@ -8,6 +11,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.zippick.R
@@ -30,39 +35,56 @@ val bottomNavItems = listOf(
 @Composable
 fun BottomBar(navController: NavHostController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    Log.d("NavDebug", "currentRoute = $currentRoute")
 
-    NavigationBar(containerColor = Color.White) {
-        bottomNavItems.forEach { item ->
-            NavigationBarItem(
-                selected = item.route == currentRoute,
-                onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+    val selectedTab = when {
+        currentRoute == null -> ""
+        currentRoute.startsWith("size") -> "size"
+        currentRoute.startsWith("category") -> "category"
+        currentRoute.startsWith("photo") -> "photo"
+        currentRoute.startsWith("my") -> "my"
+        currentRoute.startsWith("home") -> "home"
+        else -> ""
+    }
+
+    Column {
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp
+        )
+        NavigationBar(containerColor = Color.White) {
+            bottomNavItems.forEach { item ->
+                NavigationBarItem(
+                    selected = item.route == selectedTab, // ← 이 줄만 바뀜
+                    onClick = {
+                        if (selectedTab != item.route) {
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(
-                            id = if (item.route == currentRoute) item.selectedIcon else item.unselectedIcon
-                        ),
-                        contentDescription = item.label
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(
+                                id = if (item.route == selectedTab) item.selectedIcon else item.unselectedIcon
+                            ),
+                            contentDescription = item.label
+                        )
+                    },
+                    label = { Text(item.label, fontWeight = FontWeight.SemiBold) },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent,
+                        selectedIconColor = MainBlue,
+                        unselectedIconColor = Color.Gray,
+                        selectedTextColor = MainBlue,
+                        unselectedTextColor = Color.Gray
                     )
-                },
-                label = { Text(item.label) },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.Transparent,
-                    selectedIconColor = MainBlue,
-                    unselectedIconColor = Color.Gray,
-                    selectedTextColor = MainBlue,
-                    unselectedTextColor = Color.Gray
                 )
-            )
+            }
         }
     }
 }

@@ -20,6 +20,8 @@ import com.example.zippick.R
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,17 +42,23 @@ fun TopBar(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = when (currentRoute) {
-                        "home" -> "홈"
-                        "category" -> "카테고리"
-                        "size" -> "사이즈"
-                        "photo" -> "사진"
-                        "my" -> "마이페이지"
-                        "search" -> "검색"
-                        "notifications" -> "알림함"
+                    text = when {
+                        currentRoute == "home" -> "홈"
+                        currentRoute == "category" -> "카테고리"
+                        currentRoute == "size" -> "사이즈 검색"
+                        currentRoute == "photo" -> "사진"
+                        currentRoute == "my" -> "마이페이지"
+                        currentRoute == "search" -> "검색"
+                        currentRoute == "notifications" -> "알림함"
+                        currentRoute == "aiLayout" -> "AI 가구 배치"
+                        currentRoute.startsWith("sizeInput") -> "사이즈 검색"
+                        currentRoute == "sizeSearchResult" -> "검색 결과"
+                        currentRoute.startsWith("photoAnalysis") -> "분석 결과"
                         else -> "상세페이지"
                     },
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 20.sp
                 )
             }
         },

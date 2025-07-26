@@ -35,6 +35,9 @@ replay_pid*
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+.idea
+**/.idea/
+Zippick/.idea/
 .DS_Store
 /build
 /captures
