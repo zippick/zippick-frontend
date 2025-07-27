@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import com.example.zippick.ui.composable.category.CompareFloatingButton
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.model.dummy.sampleProducts
 
@@ -51,59 +53,75 @@ fun CategoryScreen(
         }
     }
 
-    // 검색어 또는 정렬이 바뀔 때 API 호출
-    LaunchedEffect(keyword, selectedSort) {
-        if (isSearchMode) {
-            productViewModel.searchProductsByKeyword(
-                keyword = keyword ?: "",
-                sort = selectedSort.code,
-                offset = 0,
-                append = false
-            )
-        }
-    }
-
-    // 무한스크롤 감지 시 추가 로딩
-    LaunchedEffect(shouldLoadMore.value) {
-        if (isSearchMode && shouldLoadMore.value && !isLoading) {
-            productViewModel.loadMoreProducts()
-        }
-    }
-
-    Column {
-        if (!isSearchMode) {
-            CategoryFilterBar(
-                categories = categories,
-                selectedCategory = selectedCategory,
-                onCategorySelected = { selectedCategory = it }
-            )
-        } else {
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = MainBlue, fontWeight = FontWeight.Bold)) {
-                        append("‘$keyword’")
-                    }
-                    append("에 대한 검색 결과입니다.")
-                },
-                modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 4.dp),
-                style = MaterialTheme.typography.bodyMedium
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // 검색어 또는 정렬이 바뀔 때 API 호출
+        LaunchedEffect(keyword, selectedSort) {
+            if (isSearchMode) {
+                productViewModel.searchProductsByKeyword(
+                    keyword = keyword ?: "",
+                    sort = selectedSort.code,
+                    offset = 0,
+                    append = false
+                )
+            }
         }
 
-        ProductFilterHeader(
-            productCount = totalCount, // 검색 결과 수
-            selectedSort = selectedSort,
-            onSortChange = { selectedSort = it },
-            minPrice = minPrice,
-            maxPrice = maxPrice,
-            onMinPriceChange = { minPrice = it },
-            onMaxPriceChange = { maxPrice = it }
-        )
+        // 무한스크롤 감지 시 추가 로딩
+        LaunchedEffect(shouldLoadMore.value) {
+            if (isSearchMode && shouldLoadMore.value && !isLoading) {
+                productViewModel.loadMoreProducts()
+            }
+        }
 
-        ProductGrid(
-            products = products,
-            navController = navController,
-            listState = listState
+        Column {
+            if (!isSearchMode) {
+                CategoryFilterBar(
+                    categories = categories,
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { selectedCategory = it }
+                )
+            } else {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                color = MainBlue,
+                                fontWeight = FontWeight.Bold
+                            )
+                        ) {
+                            append("‘$keyword’")
+                        }
+                        append("에 대한 검색 결과입니다.")
+                    },
+                    modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 4.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            ProductFilterHeader(
+                productCount = totalCount, // 검색 결과 수
+                selectedSort = selectedSort,
+                onSortChange = { selectedSort = it },
+                minPrice = minPrice,
+                maxPrice = maxPrice,
+                onMinPriceChange = { minPrice = it },
+                onMaxPriceChange = { maxPrice = it }
+            )
+
+            ProductGrid(
+                products = products,
+                navController = navController,
+                listState = listState
+            )
+        }
+
+        CompareFloatingButton(
+            onClick = {
+                navController.navigate("categoryCompare")
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(20.dp)
         )
     }
 }

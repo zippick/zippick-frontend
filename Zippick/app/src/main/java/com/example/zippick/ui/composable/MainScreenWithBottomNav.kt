@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zippick.ui.viewmodel.ProductViewModel
 import androidx.core.net.toUri
 import com.example.zippick.ui.model.AiLayoutProduct
+import com.example.zippick.ui.screen.CategoryCompareScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import kotlinx.serialization.json.Json
 
@@ -121,6 +122,11 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 ) { backStackEntry ->
                     val keyword = backStackEntry.arguments?.getString("keyword") ?: ""
                     CategoryScreen(navController, keyword)
+                }
+
+                // 찜 목록 및 상품 비교
+                composable(route="categoryCompare"){
+                    CategoryCompareScreen(navController)
                 }
 
             }
