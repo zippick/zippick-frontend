@@ -27,4 +27,8 @@ object LikedPreferences {
 
         prefs.edit().putStringSet(KEY_LIKED_ITEMS, currentSet).apply()
     }
+
+    fun getLikedIds(context: Context): Set<String> {
+        return getPrefs(context).getStringSet(KEY_LIKED_ITEMS, emptySet()) ?: emptySet()
+    }
 }

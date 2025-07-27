@@ -1,5 +1,6 @@
 package com.example.zippick.ui.composable.detail
 
+import android.net.Uri
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -101,8 +102,15 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 AIVirtualPlacementButton {
-                    navController.navigate("aiLayout")
+                    val encodedName = Uri.encode(product.name)
+                    val encodedCategory = Uri.encode(product.category)
+                    val encodedImageUrl = Uri.encode(product.mainImageUrl)
+
+                    navController.navigate(
+                        "aiLayout/$encodedName/${product.price}/$encodedCategory/$encodedImageUrl"
+                    )
                 }
+
                 // 상세 이미지
                 Image(
                     painter = painterResource(id = R.drawable.product_detail),
