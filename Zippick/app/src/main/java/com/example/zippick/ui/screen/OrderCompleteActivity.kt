@@ -24,9 +24,12 @@ import coil.compose.AsyncImage
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.SnackbarHostState
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -94,12 +97,25 @@ fun OrderCompleteScreen(
     navController: NavHostController, // BottomBar에서 쓰는 네비게이터 주입
     onHomeClick: () -> Unit = {}
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 결제 완료시 알럿 한 번만 뜨게
+    LaunchedEffect(Unit) {
+        snackbarHostState.showSnackbar("결제 완료! 주문이 정상 처리되었습니다.")
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.TopCenter
     ) {
+        // 상단에 SnackbarHost 추가
+        androidx.compose.material.SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 40.dp), // 상단에 띄우기
+        )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
