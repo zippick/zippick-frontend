@@ -55,12 +55,12 @@ fun BottomBar(navController: NavHostController) {
         NavigationBar(containerColor = Color.White) {
             bottomNavItems.forEach { item ->
                 NavigationBarItem(
-                    selected = item.route == selectedTab, // ← 이 줄만 바뀜
+                    selected = item.route == selectedTab,
                     onClick = {
                         if (selectedTab != item.route) {
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
+                                popUpTo(item.route) {
+                                    inclusive = true
                                 }
                                 launchSingleTop = true
                                 restoreState = true
