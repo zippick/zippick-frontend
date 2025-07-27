@@ -117,7 +117,7 @@ fun CategoryScreen(
 
         CompareFloatingButton(
             onClick = {
-                navController.navigate("compare")
+                navController.navigate("likedList")
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)

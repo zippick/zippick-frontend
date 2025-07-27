@@ -31,8 +31,10 @@ import com.example.zippick.ui.screen.SizeInputScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zippick.ui.viewmodel.ProductViewModel
 import androidx.core.net.toUri
+import androidx.navigation.NavType
 import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.CategoryCompareScreen
+import com.example.zippick.ui.screen.LikedListScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import kotlinx.serialization.json.Json
 
@@ -125,8 +127,20 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 }
 
                 // 찜 목록 및 상품 비교
-                composable(route="compare"){
-                    CategoryCompareScreen(navController)
+                composable(route="likedList"){
+                    LikedListScreen(navController)
+                }
+                composable(
+                    route = "categoryCompareResult?id1={id1}&id2={id2}",
+                    arguments = listOf(
+                        navArgument("id1") { type = NavType.IntType },
+                        navArgument("id2") { type = NavType.IntType }
+                    )
+                ) { backStackEntry ->
+                    val id1 = backStackEntry.arguments?.getInt("id1") ?: -1
+                    val id2 = backStackEntry.arguments?.getInt("id2") ?: -1
+
+                    CategoryCompareScreen(navController, id1, id2)
                 }
 
             }

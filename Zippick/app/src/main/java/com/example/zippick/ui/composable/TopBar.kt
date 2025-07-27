@@ -54,7 +54,8 @@ fun TopBar(
                         currentRoute.startsWith("sizeInput") -> "사이즈 검색"
                         currentRoute == "sizeSearchResult" -> "검색 결과"
                         currentRoute.startsWith("photoAnalysis") -> "분석 결과"
-                        currentRoute  == "compare" -> "상품 비교"
+                        currentRoute  == "likedList" -> "찜 목록"
+                        currentRoute.startsWith("categoryCompareResult") -> "상품 비교"
                         else -> "상세페이지"
                     },
                     textAlign = TextAlign.Center,
