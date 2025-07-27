@@ -44,3 +44,6 @@ Zippick/.idea/
 .externalNativeBuild
 .cxx
 local.properties
+
+# Android Studio device selector conflict 방지
+/.idea/deploymentTargetSelector.xml
