@@ -28,6 +28,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.zippick.ui.composable.BottomBar
 
@@ -44,8 +46,38 @@ class OrderCompleteActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            OrderCompleteScreen(orderNumber, orderDate, productName, productImage,
-                productPrice,  productAmount, totalPrice, navController = navController)
+            Scaffold(
+                bottomBar = { BottomBar(navController) }
+            ) { innerPadding ->
+                NavHost(
+                    navController = navController,
+                    startDestination = "orderComplete",
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    composable("orderComplete") {
+                        OrderCompleteScreen(
+                            orderNumber, orderDate, productName, productImage,
+                            productPrice,  productAmount, totalPrice, navController = navController
+                        )
+                    }
+                    // BottomBar
+                    composable("home") {
+                        HomeScreen(navController)
+                    }
+                    composable("category") {
+                        CategoryScreen(navController)
+                    }
+                    composable("size") {
+                        SizeScreen(navController)
+                    }
+                    composable("photo") {
+                        PhotoScreen(navController)
+                    }
+                    composable("my") {
+                        MyScreen(navController)
+                    }
+                }
+            }
         }
     }
 }
@@ -62,86 +94,79 @@ fun OrderCompleteScreen(
     navController: NavHostController, // BottomBar에서 쓰는 네비게이터 주입
     onHomeClick: () -> Unit = {}
 ) {
-    Scaffold(
-        bottomBar = {
-            BottomBar(navController)
-        }
-    ) { innerPadding ->
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 24.dp),
-            contentAlignment = Alignment.TopCenter
+                .fillMaxWidth()
+                .padding(top = 200.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            // 체크 아이콘 (Circle + Check)
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 200.dp)
+                    .size(64.dp)
+                    .background(color = Color(0xFF1574AF), shape = CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                // 체크 아이콘 (Circle + Check)
-                Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .background(color = Color(0xFF1574AF), shape = CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "완료",
-                        tint = Color.White,
-                        modifier = Modifier.size(36.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = "주문이 완료되었습니다",
-                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                    modifier = Modifier.padding(bottom = 8.dp)
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "완료",
+                    tint = Color.White,
+                    modifier = Modifier.size(36.dp)
                 )
-                Text(
-                    text = "주문 일시 : $orderDate",
-                    style = TextStyle(fontSize = 13.sp, color = Color.Gray)
-                )
-                Text(
-                    text = "주문 번호 : $orderNumber",
-                    style = TextStyle(fontSize = 13.sp, color = Color.Gray)
-                )
-                Spacer(modifier = Modifier.height(36.dp))
-                Divider()
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    AsyncImage(
-                        model = productImage,
-                        contentDescription = "상품 이미지",
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(productName, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("${productPrice}원 / ${productAmount}개", fontSize = 14.sp, color = Color.Gray)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "결제 완료",
-                            color = Color(0xFF1574AF),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.clickable { /* 결제 상세로 이동 등 */ }
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Divider()
             }
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "주문이 완료되었습니다",
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "주문 일시 : $orderDate",
+                style = TextStyle(fontSize = 13.sp, color = Color.Gray)
+            )
+            Text(
+                text = "주문 번호 : $orderNumber",
+                style = TextStyle(fontSize = 13.sp, color = Color.Gray)
+            )
+            Spacer(modifier = Modifier.height(36.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                AsyncImage(
+                    model = productImage,
+                    contentDescription = "상품 이미지",
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(productName, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("${productPrice}원 / ${productAmount}개", fontSize = 14.sp, color = Color.Gray)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "결제 완료",
+                        color = Color(0xFF1574AF),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clickable { /* 결제 상세로 이동 등 */ }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Divider()
         }
     }
 }
