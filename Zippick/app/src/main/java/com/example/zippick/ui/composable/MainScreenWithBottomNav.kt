@@ -125,7 +125,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 }
 
                 // 찜 목록 및 상품 비교
-                composable(route="categoryCompare"){
+                composable(route="compare"){
                     CategoryCompareScreen(navController)
                 }
 
