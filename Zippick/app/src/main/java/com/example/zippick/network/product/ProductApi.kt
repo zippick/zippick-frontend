@@ -26,6 +26,16 @@ interface ProductApi {
         @Query("offset") offset: Int
     ): ProductResponse
 
+    // 카테고리 & 가격 기반 목록 조회
+    @GET("api/products")
+    suspend fun getProductsByCategoryAndPrice(
+        @Query("category") category: String,
+        @Query("min_price") minPrice: Long?,
+        @Query("max_price") maxPrice: Long?,
+        @Query("sort") sort: String,
+        @Query("offset") offset: Int
+    ): ProductResponse
+
     // AI 가구 배치 (이미지 URL 반환)
     @Multipart
     @POST("api/products/ai-layout")

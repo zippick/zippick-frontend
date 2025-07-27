@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import com.example.zippick.ui.composable.category.CompareFloatingButton
 import com.example.zippick.ui.theme.MainBlue
-import com.example.zippick.ui.model.dummy.sampleProducts
 
 @Composable
 fun CategoryScreen(
@@ -38,9 +37,9 @@ fun CategoryScreen(
     var maxPrice by remember { mutableStateOf("") }
 
     val productViewModel: ProductViewModel = viewModel()
-    val products = sampleProducts
+//    val products = sampleProducts
     // TODO: 백엔드 API 수정되면 아래로 교체
-    //  val products by productViewModel.products.collectAsState()
+    val products by productViewModel.products.collectAsState()
     val totalCount by productViewModel.totalCount.collectAsState()
     val isLoading by productViewModel.loading.collectAsState()
 
@@ -53,26 +52,52 @@ fun CategoryScreen(
         }
     }
 
+    // 검색어 또는 정렬이 바뀔 때 API 호출
+    LaunchedEffect(keyword, selectedSort) {
+        println("🔍 검색 모드 API 호출됨: $keyword / 정렬: $selectedSort")
+        if (isSearchMode) {
+            productViewModel.searchProductsByKeyword(
+                keyword = keyword ?: "",
+                sort = selectedSort.code,
+                offset = 0,
+                append = false
+            )
+        } else {
+            productViewModel.loadByCategoryAndPrice(
+                category = selectedCategory,
+                minPrice = minPrice,
+                maxPrice = maxPrice,
+                sort = selectedSort.code,
+                offset = 0,
+                append = false
+            )
+        }
+    }
+
+    // 카테고리, 가격, 정렬 변경 시 API 호출
+    LaunchedEffect(selectedCategory, minPrice, maxPrice, selectedSort) {
+        println("📦 카테고리 모드 API 호출됨: $selectedCategory / $minPrice~$maxPrice")
+        if (!isSearchMode) {
+            productViewModel.loadByCategoryAndPrice(
+                category = selectedCategory,
+                minPrice = minPrice,
+                maxPrice = maxPrice,
+                sort = selectedSort.code,
+                offset = 0,
+                append = false
+            )
+        }
+    }
+
+    // 무한스크롤 감지 시 추가 로딩
+    LaunchedEffect(shouldLoadMore.value) {
+        if (isSearchMode && shouldLoadMore.value && !isLoading) {
+            productViewModel.loadMoreProducts()
+        } else if (!isSearchMode && shouldLoadMore.value && !isLoading) {
+            productViewModel.loadMoreByCategoryAndPrice()
+        }
+    }
     Box(modifier = Modifier.fillMaxSize()) {
-        // 검색어 또는 정렬이 바뀔 때 API 호출
-        LaunchedEffect(keyword, selectedSort) {
-            if (isSearchMode) {
-                productViewModel.searchProductsByKeyword(
-                    keyword = keyword ?: "",
-                    sort = selectedSort.code,
-                    offset = 0,
-                    append = false
-                )
-            }
-        }
-
-        // 무한스크롤 감지 시 추가 로딩
-        LaunchedEffect(shouldLoadMore.value) {
-            if (isSearchMode && shouldLoadMore.value && !isLoading) {
-                productViewModel.loadMoreProducts()
-            }
-        }
-
         Column {
             if (!isSearchMode) {
                 CategoryFilterBar(
@@ -99,13 +124,25 @@ fun CategoryScreen(
             }
 
             ProductFilterHeader(
-                productCount = totalCount, // 검색 결과 수
+                productCount = totalCount,
                 selectedSort = selectedSort,
                 onSortChange = { selectedSort = it },
-                minPrice = minPrice,
-                maxPrice = maxPrice,
-                onMinPriceChange = { minPrice = it },
-                onMaxPriceChange = { maxPrice = it }
+                minPrice = if (!isSearchMode) minPrice else null,
+                maxPrice = if (!isSearchMode) maxPrice else null,
+                onMinPriceChange = if (!isSearchMode) ({ minPrice = it }) else null,
+                onMaxPriceChange = if (!isSearchMode) ({ maxPrice = it }) else null,
+                onPriceFilterApply = if (!isSearchMode) {
+                    {
+                        productViewModel.loadByCategoryAndPrice(
+                            category = selectedCategory,
+                            minPrice = minPrice,
+                            maxPrice = maxPrice,
+                            sort = selectedSort.code,
+                            offset = 0,
+                            append = false
+                        )
+                    }
+                } else null
             )
 
             ProductGrid(
