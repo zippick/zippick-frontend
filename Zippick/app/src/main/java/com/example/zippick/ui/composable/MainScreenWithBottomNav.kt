@@ -31,7 +31,9 @@ import com.example.zippick.ui.screen.SizeInputScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zippick.ui.viewmodel.ProductViewModel
 import androidx.core.net.toUri
+import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
+import kotlinx.serialization.json.Json
 
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
@@ -80,7 +82,17 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 }
 
                 // ai 가구 배치
-                composable("aiLayout") { AiLayoutScreen(navController) }
+                composable(
+                    route = "aiLayout/{product}",
+                    arguments = listOf(navArgument("product") { defaultValue = "" })
+                ) { backStackEntry ->
+                    val productJson = backStackEntry.arguments?.getString("product") ?: ""
+                    val decodedJson = Uri.decode(productJson)
+                    val product = Json.decodeFromString<AiLayoutProduct>(decodedJson)
+
+                    val viewModel: ProductViewModel = viewModel(backStackEntry)
+                    AiLayoutScreen(navController, product, viewModel)
+                }
 
                 // 사이즈 기반 검색
                 composable("sizeInput/{category}") { backStackEntry ->
@@ -101,6 +113,16 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                     PhotoAnalysisResultScreen(navController, decodedUri)
                 }
+
+                // 키워드 기반 검색
+                composable(
+                    route = "searchResult/{keyword}",
+                    arguments = listOf(navArgument("keyword") { defaultValue = "" })
+                ) { backStackEntry ->
+                    val keyword = backStackEntry.arguments?.getString("keyword") ?: ""
+                    CategoryScreen(navController, keyword)
+                }
+
             }
         }
     }

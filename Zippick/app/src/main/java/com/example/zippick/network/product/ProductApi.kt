@@ -1,6 +1,8 @@
 package com.example.zippick.network.product
 
 import com.example.zippick.ui.model.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface ProductApi {
@@ -25,8 +27,12 @@ interface ProductApi {
     ): ProductResponse
 
     // AI 가구 배치 (이미지 URL 반환)
+    @Multipart
     @POST("api/products/ai-layout")
     suspend fun postAiLayout(
-        @Body request: AiLayoutRequest
+        @Part roomImage: MultipartBody.Part,
+        @Part("furnitureImageUrl") furnitureImageUrl: RequestBody,
+        @Part("category") category: RequestBody
     ): AiLayoutImageResponse
+
 }

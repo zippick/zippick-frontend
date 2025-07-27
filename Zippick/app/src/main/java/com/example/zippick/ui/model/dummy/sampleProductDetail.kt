@@ -6,7 +6,7 @@ val dummyProductDetail =
     ProductDetail(
         name = "원목 의자",
         price = 12000,
-        mainImageUrl = "https://example.com/image/101_main.jpg",
+        mainImageUrl = "https://godomall.speedycdn.net/459016870fd2f31463cab2e8092f5b5f/goods/397/image/detail/1559901804499m0.jpg",
         width = 45,
         depth = 50,
         height = 90,

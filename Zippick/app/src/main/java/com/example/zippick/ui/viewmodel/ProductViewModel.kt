@@ -1,5 +1,7 @@
 package com.example.zippick.ui.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zippick.network.product.ProductRepository
@@ -8,6 +10,10 @@ import com.example.zippick.ui.screen.selectedCategoryGlobal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class ProductViewModel : ViewModel() {
     private val repository = ProductRepository()
@@ -31,6 +37,9 @@ class ProductViewModel : ViewModel() {
     private var currentOffset: Int = 0
     private var lastRequest: Triple<Int, Int, Int>? = null
 
+    private var currentKeyword: String? = null
+
+    // 사이즈 기반 조회
     fun loadBySize(width: Int, depth: Int, height: Int, sort: String, offset: Int, append: Boolean = false) {
         viewModelScope.launch {
             _loading.value = true
@@ -67,18 +76,82 @@ class ProductViewModel : ViewModel() {
         }
     }
 
-    fun requestAiLayout(request: AiLayoutRequest) {
+    // AI 배치 요청 함수
+    fun requestAiLayout(
+        imageUri: Uri,
+        furnitureImageUrl: String,
+        category: String,
+        context: Context
+    ) {
         viewModelScope.launch {
             _loading.value = true
             _errorMessage.value = null
+
             try {
-                val response = repository.postAiLayout(request)
+                val contentResolver = context.contentResolver
+                val inputStream = contentResolver.openInputStream(imageUri)
+                val fileBytes = inputStream?.readBytes()
+                inputStream?.close()
+
+                val requestFile = fileBytes?.let {
+                    RequestBody.create("image/*".toMediaTypeOrNull(), it)
+                }
+
+                val multipartImage = requestFile?.let {
+                    MultipartBody.Part.createFormData("roomImage", "photo.jpg", it)
+                } ?: throw IllegalArgumentException("사진을 선택해주세요")
+
+                val imageUrlPart = furnitureImageUrl.toRequestBody("text/plain".toMediaTypeOrNull())
+                val categoryPart = category.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                val response = repository.postAiLayout(
+                    roomImage = multipartImage,
+                    furnitureImageUrl = imageUrlPart,
+                    category = categoryPart
+                )
+
                 _aiImageUrl.value = response.resultImageUrl
+
             } catch (e: Exception) {
                 _errorMessage.value = "AI 배치 실패: ${e.message}"
             } finally {
                 _loading.value = false
             }
+        }
+    }
+
+    // 키워드 기반 검색 함수
+    fun searchProductsByKeyword(keyword: String, sort: String, offset: Int, append: Boolean = false) {
+        viewModelScope.launch {
+            _loading.value = true
+            _errorMessage.value = null
+            try {
+                val response = repository.getProductsByKeyword(keyword, sort, offset)
+                if (append) {
+                    _products.value = _products.value + response.products
+                } else {
+                    _products.value = response.products
+                }
+                _totalCount.value = response.totalCount
+                currentKeyword = keyword
+                currentSort = sort
+                currentOffset = offset + response.products.size
+            } catch (e: Exception) {
+                _errorMessage.value = "검색 실패: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun loadMoreProducts() {
+        currentKeyword?.let {
+            searchProductsByKeyword(
+                keyword = it,
+                sort = currentSort,
+                offset = currentOffset,
+                append = true
+            )
         }
     }
 }

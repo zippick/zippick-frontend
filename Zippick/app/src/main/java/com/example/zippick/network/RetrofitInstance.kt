@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object TokenManager {
     //var token: String? = null
     //TODO: 아래는 임시로 하드코딩한 토큰값입니다. 배포시엔 바꿔주세요
-    var token: String? = "여기에 넣어주세요"
+    var token: String? = ""
 }
 
 class TokenInterceptor : Interceptor {

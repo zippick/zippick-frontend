@@ -2,6 +2,7 @@ package com.example.zippick.ui.screen
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,7 +61,7 @@ fun SearchScreen(navController: NavController) {
             saveSearchQuery(prefs, query)
             history = getSearchHistory(prefs)
             focusManager.clearFocus()
-            // TODO: 검색 결과 화면으로 이동 or 결과 처리 로직 추가
+            navController.navigate("searchResult/${Uri.encode(query)}")
         }
     }
 
