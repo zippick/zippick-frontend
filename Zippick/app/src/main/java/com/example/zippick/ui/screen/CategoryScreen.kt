@@ -119,12 +119,12 @@ fun CategoryScreen(
             productCount = totalCount,
             selectedSort = selectedSort,
             onSortChange = { selectedSort = it },
-            minPrice = minPrice,
-            maxPrice = maxPrice,
-            onMinPriceChange = { minPrice = it },
-            onMaxPriceChange = { maxPrice = it },
-            onPriceFilterApply = {
-                if (!isSearchMode) {
+            minPrice = if (!isSearchMode) minPrice else null,
+            maxPrice = if (!isSearchMode) maxPrice else null,
+            onMinPriceChange = if (!isSearchMode) ({ minPrice = it }) else null,
+            onMaxPriceChange = if (!isSearchMode) ({ maxPrice = it }) else null,
+            onPriceFilterApply = if (!isSearchMode) {
+                {
                     productViewModel.loadByCategoryAndPrice(
                         category = selectedCategory,
                         minPrice = minPrice,
@@ -134,7 +134,7 @@ fun CategoryScreen(
                         append = false
                     )
                 }
-            }
+            } else null
         )
 
         ProductGrid(
