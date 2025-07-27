@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.zippick.ui.model.OrderRequest
+import com.example.zippick.ui.viewmodel.OrderViewModel
 import com.tosspayments.paymentsdk.PaymentWidget
 import com.tosspayments.paymentsdk.model.PaymentCallback
 import com.tosspayments.paymentsdk.model.TossPaymentResult
@@ -30,6 +33,7 @@ class PaymentMethodActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // PaymentComposeActivity에서 전달받은 데이터
+        val productId = intent.getLongExtra("productId",  0)
         val productName = intent.getStringExtra("productName") ?: ""
         val productImage = intent.getStringExtra("productImage") ?: ""
         val productPrice = intent.getIntExtra("productPrice", 0)
@@ -39,16 +43,25 @@ class PaymentMethodActivity : AppCompatActivity() {
         widget = PaymentWidget(this, clientKey, UUID.randomUUID().toString())
 
         setContent {
-            PaymentMethodScreen(widget, productName, productImage, productPrice, productAmount)
+            PaymentMethodScreen(widget, productId, productName, productImage, productPrice, productAmount)
         }
     }
 }
 
 @Composable
-fun PaymentMethodScreen(widget: PaymentWidget, productName: String, productImage: String, productPrice: Int, productAmount: Int) {
+fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: String, productImage: String, productPrice: Int, productAmount: Int) {
     val context = LocalContext.current
     val orderId = "order_${System.currentTimeMillis()}"
     val totalPrice = productPrice * productAmount // 총가격
+    val orderViewModel: OrderViewModel = viewModel() // Activity나 Composable에서 선언
+
+    val orderResult by orderViewModel.orderResult.collectAsState()
+    LaunchedEffect(orderResult) {
+        orderResult?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            orderViewModel.clearOrderResult()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -93,8 +106,14 @@ fun PaymentMethodScreen(widget: PaymentWidget, productName: String, productImage
                     paymentCallback = object : PaymentCallback {
                         override fun onPaymentSuccess(success: TossPaymentResult.Success) {
                             Toast.makeText(context, "결제 성공: ${success.paymentKey}", Toast.LENGTH_SHORT).show()
-                            // 1. 서버에 요청 보내기
-
+                            // 1. 서버에 주문 요청 보내기
+                            val request = OrderRequest(
+                                totalPrice = productPrice * productAmount,
+                                count = productAmount,
+                                merchantOrderId = success.paymentKey, // Toss 결제 결과에서 paymentKey 사용
+                                productId = productId // 해당 상품 id (화면에 이미 보유 중이어야 함)
+                            )
+                            orderViewModel.postOrder(request)
 
                             // 2. 결제 완료 페이지로 이동
                             val now = System.currentTimeMillis()
