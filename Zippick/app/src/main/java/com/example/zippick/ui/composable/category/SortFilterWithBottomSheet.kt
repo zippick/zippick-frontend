@@ -25,7 +25,7 @@ fun SortFilterBottomSheet(
             Text("정렬 기준 선택", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(16.dp))
 
-            SortOption.values().forEach { option ->
+            SortOption.entries.forEach { option ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier

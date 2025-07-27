@@ -18,7 +18,7 @@ import androidx.navigation.NavHostController
 import com.example.zippick.ui.composable.BottomBar
 import com.example.zippick.ui.composable.sizeSearch.ProductSorterForSize
 import com.example.zippick.ui.composable.sizeSearch.InfiniteProductGrid
-import com.example.zippick.ui.model.SizeSortOption
+import com.example.zippick.ui.model.SortOption
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.viewmodel.ProductViewModel
 
@@ -33,7 +33,7 @@ fun SizeSearchResultScreen(
     val error by viewModel.errorMessage.collectAsState()
 
     val selectedCategory = selectedCategoryGlobal
-    var selectedSort by remember { mutableStateOf(SizeSortOption.NEWEST) }
+    var selectedSort by remember { mutableStateOf(SortOption.NEWEST) }
 
     val listState = rememberLazyGridState()
 
@@ -72,7 +72,7 @@ fun SizeSearchResultScreen(
                 selectedSort = selectedSort,
                 onSortChange = {
                     selectedSort = it
-                    viewModel.reloadWithSort(it.value) // 정렬 시 API 재호출
+                    viewModel.reloadWithSort(it.code) // 정렬 시 API 재호출
                 }
             )
 

@@ -37,6 +37,9 @@ class ProductViewModel : ViewModel() {
     private var currentOffset: Int = 0
     private var lastRequest: Triple<Int, Int, Int>? = null
 
+    private var currentKeyword: String? = null
+
+    // 사이즈 기반 조회
     fun loadBySize(width: Int, depth: Int, height: Int, sort: String, offset: Int, append: Boolean = false) {
         viewModelScope.launch {
             _loading.value = true
@@ -114,6 +117,41 @@ class ProductViewModel : ViewModel() {
             } finally {
                 _loading.value = false
             }
+        }
+    }
+
+    // 키워드 기반 검색 함수
+    fun searchProductsByKeyword(keyword: String, sort: String, offset: Int, append: Boolean = false) {
+        viewModelScope.launch {
+            _loading.value = true
+            _errorMessage.value = null
+            try {
+                val response = repository.getProductsByKeyword(keyword, sort, offset)
+                if (append) {
+                    _products.value = _products.value + response.products
+                } else {
+                    _products.value = response.products
+                }
+                _totalCount.value = response.totalCount
+                currentKeyword = keyword
+                currentSort = sort
+                currentOffset = offset + response.products.size
+            } catch (e: Exception) {
+                _errorMessage.value = "검색 실패: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun loadMoreProducts() {
+        currentKeyword?.let {
+            searchProductsByKeyword(
+                keyword = it,
+                sort = currentSort,
+                offset = currentOffset,
+                append = true
+            )
         }
     }
 }

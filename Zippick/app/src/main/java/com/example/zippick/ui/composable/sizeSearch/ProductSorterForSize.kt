@@ -11,7 +11,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.zippick.ui.composable.category.FilterToggle
-import com.example.zippick.ui.model.SizeSortOption
+import com.example.zippick.ui.model.SortOption
 import com.example.zippick.ui.theme.MainBlue
 import kotlinx.coroutines.launch
 
@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProductSorterForSize(
     productCount: Int,
-    selectedSort: SizeSortOption,
-    onSortChange: (SizeSortOption) -> Unit
+    selectedSort: SortOption,
+    onSortChange: (SortOption) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)

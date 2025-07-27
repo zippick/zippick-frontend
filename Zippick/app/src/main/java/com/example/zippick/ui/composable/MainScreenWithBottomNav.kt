@@ -113,6 +113,16 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                     PhotoAnalysisResultScreen(navController, decodedUri)
                 }
+
+                // 키워드 기반 검색
+                composable(
+                    route = "searchResult/{keyword}",
+                    arguments = listOf(navArgument("keyword") { defaultValue = "" })
+                ) { backStackEntry ->
+                    val keyword = backStackEntry.arguments?.getString("keyword") ?: ""
+                    CategoryScreen(navController, keyword)
+                }
+
             }
         }
     }

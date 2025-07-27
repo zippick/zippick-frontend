@@ -7,14 +7,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.zippick.ui.model.SizeSortOption
+import com.example.zippick.ui.model.SortOption
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SortFilterForSizeBottomSheet(
     sheetState: SheetState,
-    selectedSort: SizeSortOption,
-    onSortChange: (SizeSortOption) -> Unit,
+    selectedSort: SortOption,
+    onSortChange: (SortOption) -> Unit,
     onDismiss: () -> Unit
 ) {
     ModalBottomSheet(
@@ -25,7 +25,7 @@ fun SortFilterForSizeBottomSheet(
             Text("정렬 기준 선택", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(16.dp))
 
-            SizeSortOption.values().forEach { option ->
+            SortOption.entries.forEach { option ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
