@@ -1,9 +1,6 @@
 package com.example.zippick.ui.screen
 
-import android.app.Activity
-import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -88,7 +85,8 @@ fun PhotoScreen(navController: NavController) {
                 label = "분석하기",
                 onClick = {
                 val imageUriEncoded = Uri.encode(selectedImageUri.value.toString())
-                navController.navigate("photoAnalysis/$imageUriEncoded")
+                val categoryEncoded = Uri.encode(selectedCategory.value ?: "")
+                navController.navigate("photoAnalysis/$imageUriEncoded/$categoryEncoded")
             })
 
             Spacer(modifier = Modifier.height(24.dp))
