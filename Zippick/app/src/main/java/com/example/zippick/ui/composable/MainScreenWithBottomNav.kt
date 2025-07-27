@@ -116,13 +116,18 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                 // 사진 기반 검색 결과
                 composable(
-                    route = "photoAnalysis/{imageUri}",
-                    arguments = listOf(navArgument("imageUri") { defaultValue = "" })
+                    route = "photoAnalysis/{imageUri}/{category}",
+                    arguments = listOf(
+                        navArgument("imageUri") { type = NavType.StringType },
+                        navArgument("category") { type = NavType.StringType }
+                    )
                 ) { backStackEntry ->
                     val uriStr = backStackEntry.arguments?.getString("imageUri") ?: ""
+                    val category = backStackEntry.arguments?.getString("category") ?: ""
+
                     val decodedUri = Uri.decode(uriStr).toUri()
 
-                    PhotoAnalysisResultScreen(navController, decodedUri)
+                    PhotoAnalysisResultScreen(navController, decodedUri, category)
                 }
 
                 // 키워드 기반 검색
