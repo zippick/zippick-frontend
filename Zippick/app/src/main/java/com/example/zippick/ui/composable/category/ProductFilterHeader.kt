@@ -23,7 +23,8 @@ fun ProductFilterHeader(
     minPrice: String,
     maxPrice: String,
     onMinPriceChange: (String) -> Unit,
-    onMaxPriceChange: (String) -> Unit
+    onMaxPriceChange: (String) -> Unit,
+    onPriceFilterApply: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val priceSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -92,6 +93,7 @@ fun ProductFilterHeader(
                 coroutineScope.launch { priceSheetState.hide() }
                 showPriceSheet = false
                 isPriceFilterChecked = true
+                onPriceFilterApply()
             }
         )
     }

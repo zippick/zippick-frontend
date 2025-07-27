@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -52,6 +53,7 @@ fun AiLayoutScreen(
     val isLoading by viewModel.loading.collectAsState()
 
     fun uploadImage(uri: Uri) {
+        Log.d("AI_LAYOUT", "uploadImage() called with URI: $uri")
         coroutineScope.launch {
             viewModel.requestAiLayout(
                 imageUri = uri,
@@ -76,8 +78,10 @@ fun AiLayoutScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
+        Log.d("AI_LAYOUT", "사진 선택 결과 코드: ${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data ?: cameraImageUri
+            Log.d("AI_LAYOUT", "선택된 이미지 URI: $uri")
             if (uri != null) {
                 selectedImageUri = uri
                 uploadImage(uri)
@@ -146,6 +150,7 @@ fun AiLayoutScreen(
                 }
 
                 resultImageUrl != null -> {
+                    Log.d("AI_LAYOUT", "결과 이미지 도착! URL = $resultImageUrl")
                     Box(
                         modifier = Modifier
                             .fillMaxSize()

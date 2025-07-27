@@ -83,12 +83,20 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                 // ai 가구 배치
                 composable(
-                    route = "aiLayout/{product}",
-                    arguments = listOf(navArgument("product") { defaultValue = "" })
+                    route = "aiLayout/{name}/{price}/{category}/{imageUrl}",
+                    arguments = listOf(
+                        navArgument("name") { defaultValue = "" },
+                        navArgument("price") { defaultValue = 0 },
+                        navArgument("category") { defaultValue = "" },
+                        navArgument("imageUrl") { defaultValue = "" }
+                    )
                 ) { backStackEntry ->
-                    val productJson = backStackEntry.arguments?.getString("product") ?: ""
-                    val decodedJson = Uri.decode(productJson)
-                    val product = Json.decodeFromString<AiLayoutProduct>(decodedJson)
+                    val name = backStackEntry.arguments?.getString("name") ?: ""
+                    val price = backStackEntry.arguments?.getString("price")?.toIntOrNull() ?: 0
+                    val category = backStackEntry.arguments?.getString("category") ?: ""
+                    val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+
+                    val product = AiLayoutProduct(name, price, category, imageUrl)
 
                     val viewModel: ProductViewModel = viewModel(backStackEntry)
                     AiLayoutScreen(navController, product, viewModel)

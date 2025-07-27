@@ -94,15 +94,15 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 AIVirtualPlacementButton {
-                    val aiProduct = AiLayoutProduct(
-                        name = product.name,
-                        price = product.price,
-                        category = product.category,
-                        imageUrl = product.mainImageUrl
+                    val encodedName = Uri.encode(product.name)
+                    val encodedCategory = Uri.encode(product.category)
+                    val encodedImageUrl = Uri.encode(product.mainImageUrl)
+
+                    navController.navigate(
+                        "aiLayout/$encodedName/${product.price}/$encodedCategory/$encodedImageUrl"
                     )
-                    val json = Uri.encode(Json.encodeToString(aiProduct))
-                    navController.navigate("aiLayout/$json")
                 }
+
                 // 상세 이미지
                 Image(
                     painter = painterResource(id = R.drawable.product_detail),

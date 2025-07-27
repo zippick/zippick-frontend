@@ -27,6 +27,16 @@ class ProductRepository {
         return api.getProductsByKeyword(keyword, sort, offset)
     }
 
+    suspend fun getProductsByCategoryAndPrice(
+        category: String,
+        minPrice: Long?,
+        maxPrice: Long?,
+        sort: String,
+        offset: Int
+    ): ProductResponse {
+        return api.getProductsByCategoryAndPrice(category, minPrice, maxPrice, sort, offset)
+    }
+
     suspend fun postAiLayout(
         roomImage: MultipartBody.Part,
         furnitureImageUrl: RequestBody,
