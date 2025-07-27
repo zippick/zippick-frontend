@@ -8,6 +8,7 @@ interface ProductApi {
     // 사이즈 기반 목록 조회
     @GET("api/products")
     suspend fun getProductsBySize(
+        @Query("category") category: String,
         @Query("width") width: Int,
         @Query("depth") depth: Int,
         @Query("height") height: Int,

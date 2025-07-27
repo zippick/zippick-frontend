@@ -101,7 +101,7 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 AIVirtualPlacementButton {
-                    // AI 가상배치 클릭 시 동작
+                    navController.navigate("aiLayout")
                 }
                 // 상세 이미지
                 Image(
