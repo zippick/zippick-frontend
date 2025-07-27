@@ -2,6 +2,8 @@ package com.example.zippick.network.product
 
 import com.example.zippick.network.RetrofitInstance
 import com.example.zippick.ui.model.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 class ProductRepository {
     private val api = RetrofitInstance.retrofit.create(ProductApi::class.java)
@@ -25,7 +27,12 @@ class ProductRepository {
         return api.getProductsByKeyword(keyword, sort, offset)
     }
 
-    suspend fun postAiLayout(request: AiLayoutRequest): AiLayoutImageResponse {
-        return api.postAiLayout(request)
+    suspend fun postAiLayout(
+        roomImage: MultipartBody.Part,
+        furnitureImageUrl: RequestBody,
+        category: RequestBody
+    ): AiLayoutImageResponse {
+        return api.postAiLayout(roomImage, furnitureImageUrl, category)
     }
+
 }

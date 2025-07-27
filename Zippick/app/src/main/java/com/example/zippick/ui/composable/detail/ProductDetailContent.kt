@@ -1,5 +1,6 @@
 package com.example.zippick.ui.composable.detail
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,7 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.zippick.R
+import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.model.ProductDetail
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun ProductDetailContent(product: ProductDetail, navController: NavController) {
@@ -90,7 +94,14 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 AIVirtualPlacementButton {
-                    navController.navigate("aiLayout")
+                    val aiProduct = AiLayoutProduct(
+                        name = product.name,
+                        price = product.price,
+                        category = product.category,
+                        imageUrl = product.mainImageUrl
+                    )
+                    val json = Uri.encode(Json.encodeToString(aiProduct))
+                    navController.navigate("aiLayout/$json")
                 }
                 // 상세 이미지
                 Image(

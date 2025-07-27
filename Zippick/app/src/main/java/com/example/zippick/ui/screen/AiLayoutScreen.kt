@@ -31,16 +31,19 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.zippick.R
 import com.example.zippick.ui.composable.BottomBar
-import com.example.zippick.ui.model.AiLayoutRequest
+import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.viewmodel.ProductViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun AiLayoutScreen(navController: NavHostController) {
+fun AiLayoutScreen(
+    navController: NavHostController,
+    product: AiLayoutProduct,
+    viewModel: ProductViewModel
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val viewModel: ProductViewModel = viewModel()
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -50,11 +53,12 @@ fun AiLayoutScreen(navController: NavHostController) {
 
     fun uploadImage(uri: Uri) {
         coroutineScope.launch {
-            val request = AiLayoutRequest(
-                furnitureImageUrl = "https://example.com/images/chair.png", // 실제 이미지 URL로 대체
-                category = "의자"
+            viewModel.requestAiLayout(
+                imageUri = uri,
+                furnitureImageUrl = product.imageUrl,
+                category = product.category,
+                context = context
             )
-            viewModel.requestAiLayout(request)
         }
     }
 
@@ -83,6 +87,7 @@ fun AiLayoutScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = {
+            // 상단에 상품 정보 표시
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -93,7 +98,7 @@ fun AiLayoutScreen(navController: NavHostController) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     AsyncImage(
-                        model = R.drawable.closet,
+                        model = product.imageUrl,
                         contentDescription = "제품 이미지",
                         modifier = Modifier
                             .size(80.dp)
@@ -102,11 +107,11 @@ fun AiLayoutScreen(navController: NavHostController) {
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("리바트 뉴 테크닉 의자", fontSize = 16.sp)
+                        Text(product.name, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("150,000원", fontSize = 14.sp)
+                        Text("${product.price}원", fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("의자", color = MainBlue, fontSize = 14.sp)
+                        Text(product.category, color = MainBlue, fontSize = 14.sp)
                     }
                 }
             }
@@ -128,32 +133,39 @@ fun AiLayoutScreen(navController: NavHostController) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator(color = MainBlue)
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("AI로 가구를 배치하는 중입니다...", fontSize = 14.sp)
+                            Text("AI가 가구를 배치하는 중입니다...", fontSize = 14.sp)
+                            Spacer(modifier = Modifier.height(4.dp)) // 간격 조정
+                            Text(
+                                text = "평균 소요 시간 : 약 9초",
+                                fontSize = 12.sp,
+                                color = Color.Gray,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
 
                 resultImageUrl != null -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 100.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Box(
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ai_result_character),
+                                contentDescription = "AI 배치 안내 이미지",
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(30.dp))
-                                    .background(MainBlue.copy(alpha = 0.05f))
-                                    .padding(horizontal = 20.dp, vertical = 10.dp)
-                            ) {
-                                Text(
-                                    text = "이런 느낌은 어떠신가요?",
-                                    color = MainBlue,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
+                                    .fillMaxWidth(0.75f)
+                                    .padding(bottom = 8.dp),
+                                contentScale = ContentScale.Fit
+                            )
 
                             AsyncImage(
                                 model = resultImageUrl,
@@ -168,7 +180,12 @@ fun AiLayoutScreen(navController: NavHostController) {
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text("AI가 가구를 배치해봤어요", fontSize = 14.sp, color = Color.Gray)
+
+                            Text(
+                                text = "AI가 가구를 배치해봤어요",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
                         }
                     }
                 }
@@ -222,14 +239,17 @@ fun AiLayoutScreen(navController: NavHostController) {
                         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
                         launcher.launch(chooser)
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
+                    enabled = !isLoading, // ← 비활성화 조건
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isLoading) Color.LightGray else MainBlue,
+                        contentColor = Color.White
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
                 ) {
                     Text(
-                        text = "방 안의 사진을 업로드 해주세요",
-                        color = Color.White,
+                        text = if (isLoading) "잠시만 기다려주세요..." else "방 안의 사진을 업로드 해주세요",
                         fontSize = 16.sp
                     )
                 }
