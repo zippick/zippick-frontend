@@ -40,7 +40,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
-    val bottomTabs = listOf("home", "category", "size", "photo", "my")
+    val bottomTabs = listOf("home", "category", "size", "photo", "my", "searchResult")
     val productViewModel: ProductViewModel = viewModel()
 
     Scaffold(
