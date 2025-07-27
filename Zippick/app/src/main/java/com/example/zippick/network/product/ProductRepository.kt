@@ -45,4 +45,12 @@ class ProductRepository {
         return api.postAiLayout(roomImage, furnitureImageUrl, category)
     }
 
+    suspend fun getLikedProducts(likedIds: List<Int>): List<Product> {
+        val response = api.getLikedProducts(LikedRequest(likedIds))
+        return response
+    }
+
+    suspend fun getProductDetail(id: Int): ProductDetail {
+        return api.getProductDetail(id)
+    }
 }

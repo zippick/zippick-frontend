@@ -45,4 +45,13 @@ interface ProductApi {
         @Part("category") category: RequestBody
     ): AiLayoutImageResponse
 
+    // 찜 목록 리스트 조회
+    @POST("api/products/liked")
+    suspend fun getLikedProducts(
+        @Body request: LikedRequest
+    ): List<Product>
+
+    // 상품 상세 조회
+    @GET("api/products/{id}")
+    suspend fun getProductDetail(@Path("id") id: Int): ProductDetail
 }
