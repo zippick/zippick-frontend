@@ -35,4 +35,9 @@ interface ProductApi {
         @Part("category") category: RequestBody
     ): AiLayoutImageResponse
 
+    // 찜 목록 리스트 조회
+    @POST("api/products/liked")
+    suspend fun getLikedProducts(
+        @Body request: LikedRequest
+    ): List<Product>
 }

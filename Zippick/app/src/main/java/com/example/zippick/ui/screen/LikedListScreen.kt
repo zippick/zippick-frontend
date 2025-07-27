@@ -19,22 +19,38 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.zippick.R
+import com.example.zippick.network.product.ProductRepository
 import com.example.zippick.ui.composable.compare.SelectableProductItem
-import com.example.zippick.ui.model.dummy.sampleProducts
 import com.example.zippick.util.LikedPreferences
 import com.example.zippick.ui.model.Product
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.theme.MediumGray
+import android.util.Log
 
 @Composable
 fun LikedListScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    val likedIds = remember { LikedPreferences.getLikedIds(context) }
-    val likedProducts = remember { sampleProducts.filter { it.id.toString() in likedIds } }
+    val repository = remember { ProductRepository() }
 
+    var likedProducts by remember { mutableStateOf<List<Product>>(emptyList()) }
     var selectedItems by remember { mutableStateOf<List<Product>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    val likedIds = remember { LikedPreferences.getLikedIds(context).mapNotNull { it.toIntOrNull() } }
+
+    LaunchedEffect(Unit) {
+        try {
+            likedProducts = repository.getLikedProducts(likedIds)
+        } catch (e: Exception) {
+            Log.e("LikedListScreen", "에러 발생: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            isLoading = false
+        }
+    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
 
