@@ -24,12 +24,18 @@ import coil.compose.AsyncImage
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material.SnackbarHostState
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -97,11 +103,12 @@ fun OrderCompleteScreen(
     navController: NavHostController, // BottomBar에서 쓰는 네비게이터 주입
     onHomeClick: () -> Unit = {}
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    // 결제 완료시 알럿 한 번만 뜨게
+    // 결제 완료시 알럿 2초 후 자동으로 사라짐
+    var showAlert by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        snackbarHostState.showSnackbar("결제 완료! 주문이 정상 처리되었습니다.")
+        showAlert = true
+        kotlinx.coroutines.delay(2000)
+        showAlert = false
     }
     Box(
         modifier = Modifier
@@ -109,13 +116,28 @@ fun OrderCompleteScreen(
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.TopCenter
     ) {
-        // 상단에 SnackbarHost 추가
-        androidx.compose.material.SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 40.dp), // 상단에 띄우기
-        )
+        AnimatedVisibility(
+            visible = showAlert,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 0.dp, vertical = 40.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .padding(vertical = 14.dp, horizontal = 28.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "결제 완료! 주문이 정상 처리되었습니다.",
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+            }
+        }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
