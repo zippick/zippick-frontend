@@ -40,4 +40,8 @@ interface ProductApi {
     suspend fun getLikedProducts(
         @Body request: LikedRequest
     ): List<Product>
+
+    // 상품 상세 조회
+    @GET("api/products/{id}")
+    suspend fun getProductDetail(@Path("id") id: Int): ProductDetail
 }

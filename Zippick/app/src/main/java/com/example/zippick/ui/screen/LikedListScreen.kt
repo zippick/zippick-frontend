@@ -105,7 +105,7 @@ fun LikedListScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 80.dp)
+                    .padding(bottom = 100.dp)
             ) {
                 Text(
                     text = "비교를 원하는 상품을 선택해주세요 (최대 2개)",

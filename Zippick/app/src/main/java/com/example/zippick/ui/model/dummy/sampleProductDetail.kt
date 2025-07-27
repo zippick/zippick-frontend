@@ -4,6 +4,7 @@ import com.example.zippick.ui.model.ProductDetail
 
 val dummyProductDetail =
     ProductDetail(
+        id = 1,
         name = "원목 의자",
         price = 12000,
         mainImageUrl = "https://godomall.speedycdn.net/459016870fd2f31463cab2e8092f5b5f/goods/397/image/detail/1559901804499m0.jpg",
