@@ -161,5 +161,12 @@ fun SizeInputRow(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
+        Text(
+            text = "cm",
+            fontSize = 14.sp,
+            color = Color.Gray,
+            modifier = Modifier.padding(start = 4.dp)
+        )
     }
 }
+

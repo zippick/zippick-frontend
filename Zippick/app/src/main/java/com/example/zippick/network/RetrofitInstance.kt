@@ -29,6 +29,10 @@ class TokenInterceptor : Interceptor {
 object RetrofitInstance {
 
     private val client = OkHttpClient.Builder()
+        // 타임아웃은 기본 60초
+        .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
         .addInterceptor(TokenInterceptor()) // 토큰 자동 삽입
         .build()
 
