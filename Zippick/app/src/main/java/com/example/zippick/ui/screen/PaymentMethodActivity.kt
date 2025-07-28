@@ -61,9 +61,10 @@ fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: Str
     * */
     val orderResult by orderViewModel.orderResult.collectAsState()
     LaunchedEffect(orderResult) {
+        println("orderResult: $orderResult")
         orderResult?.let { result ->
             orderViewModel.clearOrderResult()
-            if (result == "success") {
+            if (result == "주문이 정상적으로 완료되었습니다.") {
                 // 결제 완료 페이지로 이동 (OrderCompleteActivity)
                 val now = System.currentTimeMillis()
                 val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())

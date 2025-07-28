@@ -113,6 +113,7 @@ fun OrderCompleteScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.TopCenter
     ) {
