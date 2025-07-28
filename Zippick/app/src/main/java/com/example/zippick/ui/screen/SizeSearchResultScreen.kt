@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -18,8 +17,6 @@ import com.example.zippick.ui.composable.sizeSearch.ProductSorterForSize
 import com.example.zippick.ui.composable.category.ProductGrid
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.viewmodel.ProductViewModel
-import kotlinx.coroutines.flow.collectLatest
-import androidx.compose.runtime.snapshotFlow
 
 @Composable
 fun SizeSearchResultScreen(
@@ -36,11 +33,12 @@ fun SizeSearchResultScreen(
 
     val listState = rememberLazyGridState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo }
-            .collectLatest { layoutInfo ->
-                val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@collectLatest
-                if (lastVisible >= products.size - 4 && !loading && products.size < totalCount) {
+            .collect { layoutInfo ->
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@collect
+                val totalItems = layoutInfo.totalItemsCount
+                if (lastVisibleItem >= totalItems - 4) {
                     viewModel.loadMore()
                 }
             }
@@ -80,7 +78,11 @@ fun SizeSearchResultScreen(
                     products = products,
                     navController = navController,
                     listState = listState,
-                    isLoading = loading // 로딩 인디케이터 표시를 위한 전달
+                    isLoading = loading,
+                    onLoadMore = {
+                        viewModel.loadMore()
+                    },
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

@@ -22,8 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import com.example.zippick.ui.composable.category.CompareFloatingButton
 import com.example.zippick.ui.theme.MainBlue
-import kotlinx.coroutines.flow.collectLatest
-import androidx.compose.runtime.snapshotFlow
 
 @Composable
 fun CategoryScreen(
@@ -48,6 +46,21 @@ fun CategoryScreen(
     val isLoading by productViewModel.loading.collectAsState()
 
     val listState = rememberLazyGridState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo }
+            .collect { layoutInfo ->
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@collect
+                val totalItems = layoutInfo.totalItemsCount
+                if (lastVisibleItem >= totalItems - 4) {
+                    if (isSearchMode) {
+                        productViewModel.loadMoreProducts()
+                    } else {
+                        productViewModel.loadMoreByCategoryAndPrice()
+                    }
+                }
+            }
+    }
 
     // 키워드가 바뀌면 최초 1회만 정렬 초기화
     LaunchedEffect(keyword) {
@@ -90,22 +103,6 @@ fun CategoryScreen(
                 append = false
             )
         }
-    }
-
-    // 무한스크롤 감지 시 추가 로딩
-    LaunchedEffect(Unit) {
-        snapshotFlow { listState.layoutInfo }
-            .collectLatest { layoutInfo ->
-                val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@collectLatest
-                val total = layoutInfo.totalItemsCount
-                if (lastVisible >= total - 4 && !isLoading) {
-                    if (isSearchMode) {
-                        productViewModel.loadMoreProducts()
-                    } else {
-                        productViewModel.loadMoreByCategoryAndPrice()
-                    }
-                }
-            }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -162,7 +159,15 @@ fun CategoryScreen(
                 products = products,
                 navController = navController,
                 listState = listState,
-                isLoading = isLoading // 하단 로딩 표시를 위한 상태 전달
+                isLoading = isLoading,
+                onLoadMore = {
+                    if (isSearchMode) {
+                        productViewModel.loadMoreProducts()
+                    } else {
+                        productViewModel.loadMoreByCategoryAndPrice()
+                    }
+                },
+                modifier = Modifier.weight(1f)
             )
         }
 

@@ -2,7 +2,7 @@ package com.example.zippick.ui.composable
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Divider
+import androidx.compose.material3.Divider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Icon
