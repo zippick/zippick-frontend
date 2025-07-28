@@ -12,4 +12,10 @@ object InteriorRepository {
     ): AiInteriorResponse {
         return api.postAiInterior(roomImage)
     }
+
+    suspend fun postRecommendProduct(
+        request: RecommendRequest
+    ): List<Product> {
+        return api.postRecommendProduct(request)
+    }
 }

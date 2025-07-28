@@ -39,7 +39,7 @@ fun CarouselSection() {
         state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
-            .height(400.dp)
+            .height(345.dp)
     ) { page ->
         Card(
             modifier = Modifier.fillMaxWidth(),
