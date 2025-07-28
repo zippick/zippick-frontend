@@ -1,5 +1,6 @@
 package com.example.zippick.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,13 +8,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.zippick.network.alert.ApiService
 
 data class NotificationItem(
     val title: String,
@@ -23,85 +31,24 @@ data class NotificationItem(
 
 @Composable
 fun NotificationScreen(
-    navController: NavController
+    navController: NavController,
+    apiService: ApiService
 ) {
-    val notifications = listOf(
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.07.10",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.06.1",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.05.17",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.07.10",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.06.1",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.05.17",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.07.10",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.06.1",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.05.17",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.07.10",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.06.1",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.05.17",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.07.10",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.06.1",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        ),
-        NotificationItem(
-            title = "결제 완료",
-            time = "2025.05.17",
-            desc = "리바트 뉴 테크닉 의자 결제가 완료되었습니다."
-        )
-    )
+    var notifications by remember { mutableStateOf<List<NotificationItem>>(emptyList()) }
+    var isLoaded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // TopBar에서 버튼 클릭 시 isLoaded = false로 초기화하고 화면 이동 또는 true로 변경
+    LaunchedEffect(isLoaded) {
+        if (!isLoaded) {
+            try {
+                notifications = apiService.getNotifications() // 서버에서 알림 가져옴
+            } catch (e: Exception) {
+                Toast.makeText(context, "알림을 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
+            }
+            isLoaded = true
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
