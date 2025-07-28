@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.zippick.ui.theme.MainBlue
 
@@ -21,7 +22,11 @@ fun AnalyzeButton(
             .fillMaxWidth()
             .height(48.dp),
         border = BorderStroke(1.8.dp, MainBlue),
-        shape = RoundedCornerShape(13.dp)
+        shape = RoundedCornerShape(13.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MainBlue,
+            contentColor = Color.White
+        )
     ) {
         Text(text = label)
     }
