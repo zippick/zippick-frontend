@@ -1,4 +1,4 @@
-package com.example.zippick.network
+package com.example.zippick.network.auth
 
 import com.example.zippick.ui.model.LoginRequest
 import com.example.zippick.ui.model.LoginResponse

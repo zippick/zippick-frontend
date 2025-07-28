@@ -1,5 +1,11 @@
 package com.example.zippick.ui.screen
 
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,25 +14,60 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.WebViewActivity
+import com.example.zippick.network.RetrofitInstance
+import com.example.zippick.network.member.MemberService
+import com.example.zippick.ui.model.SignUpRequest
 import com.example.zippick.ui.theme.DarkGray
+import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.theme.Typography
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun SignUpScreen() {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     var email by remember { mutableStateOf("") }
+    var isEmailChecked by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+
     var password by remember { mutableStateOf("") }
     var passwordConfirm by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
     var name by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var basicAddress by remember { mutableStateOf("") }
     var detailAddress by remember { mutableStateOf("") }
+
+    val addressLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            address = result.data?.getStringExtra("zipcode") ?: ""
+            basicAddress = (result.data?.getStringExtra("basicAddress") ?: "") +
+                    (result.data?.getStringExtra("extraAddress") ?: "")
+            Log.d("SignUpScreen", "주소 결과 받음: $address, $basicAddress")
+        }
+    }
+
+    val isFormValid = email.isNotBlank() &&
+            password.isNotBlank() &&
+            password == passwordConfirm &&
+            name.isNotBlank() &&
+            address.isNotBlank() &&
+            basicAddress.isNotBlank() &&
+            detailAddress.isNotBlank() &&
+            isEmailChecked
 
     val textFieldColors = OutlinedTextFieldDefaults.colors(
         focusedTextColor = DarkGray,
@@ -49,49 +90,71 @@ fun SignUpScreen() {
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // 이메일
             Column {
-                Text(text = "이메일", style = Typography.bodyLarge.copy(color = DarkGray))
+                Text("이메일", style = Typography.bodyLarge.copy(color = DarkGray))
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
-                    placeholder = { Text("이메일 입력", style = Typography.bodyLarge.copy(color = DarkGray)) },
+                    onValueChange = {
+                        email = it
+                        isEmailChecked = false
+                        emailError = null
+                    },
+                    placeholder = { Text("이메일 입력", style = Typography.bodyLarge) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     shape = RoundedCornerShape(8.dp),
                     colors = textFieldColors,
                     trailingIcon = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(end = 10.dp)
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    try {
+                                        val response = RetrofitInstance.retrofit.create(MemberService::class.java).checkEmail(email)
+                                        if (response.isSuccessful) {
+                                            val isDuplicated = response.body() ?: false
+                                            if (isDuplicated) {
+                                                emailError = "이미 사용 중인 이메일입니다."
+                                            } else {
+                                                emailError = null
+                                                isEmailChecked = true
+                                            }
+                                        } else {
+                                            emailError = "서버 오류 발생"
+                                        }
+                                    } catch (_: Exception) {
+                                        emailError = "오류 발생"
+                                    }
+                                }
+                            },
+                            enabled = email.isNotBlank(),
+                            colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            modifier = Modifier.padding(end = 8.dp)
+
                         ) {
-                            Button(
-                                onClick = { /* 중복 확인 로직 */ },
-                                colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
-                                shape = RoundedCornerShape(8.dp),
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                                modifier = Modifier.height(36.dp)
-                            ) {
-                                Text(
-                                    "중복확인",
-                                    color = Color.White,
-                                    style = Typography.bodyLarge.copy(fontSize = 12.sp)
-                                )
-                            }
+                            Text("중복확인", color = Color.White, fontSize = 12.sp)
                         }
                     }
                 )
+                if (emailError != null) {
+                    Text(emailError!!, color = Color.Red, fontSize = 12.sp)
+                } else if (isEmailChecked) {
+                    Text("사용 가능한 이메일입니다.", color = Color(0xFF2E7D32), fontSize = 12.sp)
+                }
             }
 
-            // 비밀번호
             Column {
-                Text(text = "비밀번호", style = Typography.bodyLarge.copy(color = DarkGray))
+                Text("비밀번호", style = Typography.bodyLarge.copy(color = DarkGray))
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
-                    placeholder = { Text("비밀번호 입력", style = Typography.bodyLarge.copy(color = DarkGray)) },
+                    onValueChange = {
+                        password = it
+                        passwordError = null
+                    },
+                    placeholder = { Text("비밀번호 입력", style = Typography.bodyLarge) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
@@ -101,14 +164,16 @@ fun SignUpScreen() {
                 )
             }
 
-            // 비밀번호 확인
             Column {
-                Text(text = "비밀번호 확인", style = Typography.bodyLarge.copy(color = DarkGray))
+                Text("비밀번호 확인", style = Typography.bodyLarge.copy(color = DarkGray))
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = passwordConfirm,
-                    onValueChange = { passwordConfirm = it },
-                    placeholder = { Text("비밀번호 확인 입력", style = Typography.bodyLarge.copy(color = DarkGray)) },
+                    onValueChange = {
+                        passwordConfirm = it
+                        passwordError = if (password != it) "비밀번호가 일치하지 않습니다." else null
+                    },
+                    placeholder = { Text("비밀번호 확인 입력", style = Typography.bodyLarge) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
@@ -116,87 +181,94 @@ fun SignUpScreen() {
                     shape = RoundedCornerShape(8.dp),
                     colors = textFieldColors
                 )
-            }
-
-            // 이름
-            Column {
-                Text(text = "이름", style = Typography.bodyLarge.copy(color = DarkGray))
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    placeholder = { Text("이름 입력", style = Typography.bodyLarge.copy(color = DarkGray)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
-                    colors = textFieldColors
-                )
-            }
-
-            // 주소
-            Column {
-                Text(text = "주소", style = Typography.bodyLarge.copy(color = DarkGray))
-                Spacer(Modifier.height(8.dp))
-
-                // 우편번호 + 주소검색 버튼
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = address,
-                        onValueChange = { address = it },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = textFieldColors
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = { /* 주소 검색 */ },
-                        colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .height(56.dp)
-                    ) {
-                        Text("주소검색", color = Color.White, fontSize = 16.sp, style = Typography.bodyLarge)
-                    }
+                if (passwordError != null) {
+                    Text(passwordError!!, color = Color.Red, fontSize = 12.sp)
+                } else if (passwordConfirm.isNotBlank() && password == passwordConfirm) {
+                    Text("비밀번호가 일치합니다.", color = Color(0xFF2E7D32), fontSize = 12.sp)
                 }
-
-                Spacer(Modifier.height(8.dp))
-
-                // 기본 주소 입력
-                OutlinedTextField(
-                    value = basicAddress,
-                    onValueChange = { basicAddress = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
-                    colors = textFieldColors
-                )
-
-                Spacer(Modifier.height(8.dp))
-
-                // 상세 주소 입력
-                OutlinedTextField(
-                    value = detailAddress,
-                    onValueChange = { detailAddress = it },
-                    placeholder = { Text("상세 주소 입력", style = Typography.bodyLarge.copy(color = DarkGray)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
-                    colors = textFieldColors
-                )
             }
 
-            // 가입하기 버튼
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("이름", style = Typography.bodyLarge) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(8.dp),
+                colors = textFieldColors
+            )
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = address,
+                    onValueChange = {},
+                    label = { Text("우편번호", style = Typography.bodyLarge) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = textFieldColors,
+                    readOnly = true
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        val intent = Intent(context, WebViewActivity::class.java)
+                        addressLauncher.launch(intent)
+                    },
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("주소검색", color = Color.White)
+                }
+            }
+
+            OutlinedTextField(
+                value = basicAddress,
+                onValueChange = { basicAddress = it },
+                label = { Text("기본 주소", style = Typography.bodyLarge) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(8.dp),
+                colors = textFieldColors
+            )
+            OutlinedTextField(
+                value = detailAddress,
+                onValueChange = { detailAddress = it },
+                label = { Text("상세 주소", style = Typography.bodyLarge) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(8.dp),
+                colors = textFieldColors
+            )
+
             Button(
-                onClick = { /* 가입 처리 */ },
+                onClick = {
+                    coroutineScope.launch {
+                        try {
+                            val request = SignUpRequest(
+                                loginId = email,
+                                password = password,
+                                name = name,
+                                zipcode = address,
+                                basicAddress = basicAddress,
+                                detailAddress = detailAddress
+                            )
+                            RetrofitInstance.retrofit.create(MemberService::class.java).signUp(request)
+                            Toast.makeText(context, "가입이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                        } catch (e: HttpException) {
+                            Toast.makeText(context, "오류 발생: ${e.code()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                enabled = isFormValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MainBlue)
             ) {
-                Text("가입하기", color = Color.White, fontSize = 18.sp, style = Typography.bodyLarge)
+                Text("가입하기", color = Color.White, fontSize = 18.sp)
             }
         }
     }

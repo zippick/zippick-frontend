@@ -18,7 +18,7 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.zippick.network.AuthService
+import com.example.zippick.network.auth.AuthService
 import com.example.zippick.network.RetrofitInstance
 import com.example.zippick.network.TokenManager
 import com.example.zippick.ui.model.LoginRequest
