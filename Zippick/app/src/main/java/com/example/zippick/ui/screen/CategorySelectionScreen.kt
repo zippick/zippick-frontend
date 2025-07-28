@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,15 +33,13 @@ fun CategorySelectionScreen(navController: NavHostController) {
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 40.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
-
             Text(
                 text = "어떤 상품을 찾으시나요?",
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF666666),
                 textAlign = TextAlign.Center,
@@ -108,26 +107,34 @@ fun CategoryItem(
 ) {
     val borderColor = if (selected) MainBlue else Color.LightGray
 
-    Column(
+    Box(
         modifier = modifier
+            .aspectRatio(1f)
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFF8F8F8))
             .border(2.dp, borderColor, RoundedCornerShape(12.dp))
             .clickable { onClick() }
-            .padding(vertical = 20.dp, horizontal = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(8.dp)
     ) {
+        // 좌상단 텍스트
+        Text(
+            text = label,
+            color = borderColor,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .zIndex(1f)
+        )
+
+        // 중앙 이미지
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = label,
-            modifier = Modifier.size(80.dp)
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = label,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxSize(0.7f) // 필요에 따라 이미지 크기 조정
         )
     }
 }
