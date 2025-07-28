@@ -1,6 +1,7 @@
 package com.example.zippick.ui.screen
 
 import android.net.Uri
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,10 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -24,11 +26,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import com.example.zippick.network.product.InteriorRepository
+import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.util.FileUtil
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 @Composable
 fun PhotoAnalysisResultScreen(
     navController: NavController,
-    imageUri: Uri
+    imageUri: Uri,
+    category: String
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -38,49 +49,85 @@ fun PhotoAnalysisResultScreen(
     var tags by remember { mutableStateOf<List<String>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // 임시 데이터 주입
     LaunchedEffect(Unit) {
-        palette = listOf(
-            "#E4D9C2" to "우드 베이지",
-            "#B1956C" to "딥 샌드",
-            "#F5F5F5" to "뉴트럴 화이트"
-        )
+        isLoading = true
 
-        tags = listOf("내추럴", "미니멀", "우드톤")
+        try {
+            val file = FileUtil.getFileFromUri(context, imageUri)
+            val categoryRequest = category.toRequestBody("text/plain".toMediaTypeOrNull())
 
-        isLoading = false
+            val imageRequestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+            val imagePart =
+                MultipartBody.Part.createFormData("roomImage", file.name, imageRequestBody)
+
+            val response = InteriorRepository.postAiInterior(imagePart)
+
+            palette = response.palette.map { it.colorCode to it.colorName }
+            tags = response.tags
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            isLoading = false
+        }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        // 1. 이미지 영역
-        ImageHeader(imageUri)
-
+    if (isLoading) {
+        // 로딩 중 화면
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator(
+                    color = MainBlue,
+                    strokeWidth = 4.dp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "이미지를 분석중입니다",
+                    color = MainBlue
+                )
+                Text(
+                    text = "잠시만 기다려주세요!",
+                    color = MainBlue
+                )
+            }
+        }
+    } else {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 28.dp),
+                .verticalScroll(rememberScrollState()),
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            // 1. 이미지 영역
+            ImageHeader(imageUri)
 
-            // 2. 색상 코드
-            ColorPaletteSection(palette)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 28.dp),
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
 
-            Spacer(modifier = Modifier.height(50.dp))
+                // 2. 색상 코드
+                ColorPaletteSection(palette)
 
-            // 3. 해시태그 스타일
-            StyleTagSection(tags)
+                Spacer(modifier = Modifier.height(50.dp))
 
-            Spacer(modifier = Modifier.height(50.dp))
+                // 3. 해시태그 스타일
+                StyleTagSection(tags)
 
-            // 4. 추천 버튼
-            RecommendButtons(
-                onColorClick = { /* TODO */ },
-                onStyleClick = { /* TODO */ }
-            )
+                Spacer(modifier = Modifier.height(50.dp))
+
+                // 4. 추천 버튼
+                RecommendButtons(
+                    onColorClick = { /* TODO */ },
+                    onStyleClick = { /* TODO */ }
+                )
+            }
         }
     }
 }

@@ -20,10 +20,11 @@ fun ProductFilterHeader(
     productCount: Int,
     selectedSort: SortOption,
     onSortChange: (SortOption) -> Unit,
-    minPrice: String,
-    maxPrice: String,
-    onMinPriceChange: (String) -> Unit,
-    onMaxPriceChange: (String) -> Unit
+    minPrice: String?,
+    maxPrice: String?,
+    onMinPriceChange: ((String) -> Unit)?,
+    onMaxPriceChange: ((String) -> Unit)?,
+    onPriceFilterApply: (() -> Unit)?
 ) {
     val coroutineScope = rememberCoroutineScope()
     val priceSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -57,14 +58,17 @@ fun ProductFilterHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            FilterToggle(
-                label = "가격",
-                isChecked = isPriceFilterChecked,
-                onToggle = {
-                    isPriceFilterChecked = it
-                    showPriceSheet = it
-                }
-            )
+            // 가격 토글은 가격 필터 관련 함수가 있을 때만 표시
+            if (onMinPriceChange != null && onMaxPriceChange != null && onPriceFilterApply != null) {
+                FilterToggle(
+                    label = "가격",
+                    isChecked = isPriceFilterChecked,
+                    onToggle = {
+                        isPriceFilterChecked = it
+                        showPriceSheet = it
+                    }
+                )
+            }
 
             FilterToggle(
                 label = "정렬",
@@ -77,11 +81,12 @@ fun ProductFilterHeader(
         }
     }
 
-    if (showPriceSheet) {
+    // 가격 필터 바텀시트
+    if (showPriceSheet && onMinPriceChange != null && onMaxPriceChange != null && onPriceFilterApply != null) {
         PriceFilterBottomSheet(
             sheetState = priceSheetState,
-            minPrice = minPrice,
-            maxPrice = maxPrice,
+            minPrice = minPrice ?: "",
+            maxPrice = maxPrice ?: "",
             onMinPriceChange = onMinPriceChange,
             onMaxPriceChange = onMaxPriceChange,
             onDismiss = {
@@ -92,6 +97,7 @@ fun ProductFilterHeader(
                 coroutineScope.launch { priceSheetState.hide() }
                 showPriceSheet = false
                 isPriceFilterChecked = true
+                onPriceFilterApply()
             }
         )
     }

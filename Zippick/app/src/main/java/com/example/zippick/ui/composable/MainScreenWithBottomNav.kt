@@ -31,14 +31,19 @@ import com.example.zippick.ui.screen.SizeInputScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zippick.ui.viewmodel.ProductViewModel
 import androidx.core.net.toUri
+import androidx.navigation.NavType
+import com.example.zippick.ui.model.AiLayoutProduct
+import com.example.zippick.ui.screen.CategoryCompareScreen
+import com.example.zippick.ui.screen.LikedListScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
+import kotlinx.serialization.json.Json
 
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
-    val bottomTabs = listOf("home", "category", "size", "photo", "my")
+    val bottomTabs = listOf("home", "category", "size", "photo", "my", "searchResult")
     val productViewModel: ProductViewModel = viewModel()
 
     Scaffold(
@@ -80,7 +85,25 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 }
 
                 // ai 가구 배치
-                composable("aiLayout") { AiLayoutScreen(navController) }
+                composable(
+                    route = "aiLayout/{name}/{price}/{category}/{imageUrl}",
+                    arguments = listOf(
+                        navArgument("name") { defaultValue = "" },
+                        navArgument("price") { defaultValue = 0 },
+                        navArgument("category") { defaultValue = "" },
+                        navArgument("imageUrl") { defaultValue = "" }
+                    )
+                ) { backStackEntry ->
+                    val name = backStackEntry.arguments?.getString("name") ?: ""
+                    val price = backStackEntry.arguments?.getString("price")?.toIntOrNull() ?: 0
+                    val category = backStackEntry.arguments?.getString("category") ?: ""
+                    val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+
+                    val product = AiLayoutProduct(name, price, category, imageUrl)
+
+                    val viewModel: ProductViewModel = viewModel(backStackEntry)
+                    AiLayoutScreen(navController, product, viewModel)
+                }
 
                 // 사이즈 기반 검색
                 composable("sizeInput/{category}") { backStackEntry ->
@@ -93,14 +116,46 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                 // 사진 기반 검색 결과
                 composable(
-                    route = "photoAnalysis/{imageUri}",
-                    arguments = listOf(navArgument("imageUri") { defaultValue = "" })
+                    route = "photoAnalysis/{imageUri}/{category}",
+                    arguments = listOf(
+                        navArgument("imageUri") { type = NavType.StringType },
+                        navArgument("category") { type = NavType.StringType }
+                    )
                 ) { backStackEntry ->
                     val uriStr = backStackEntry.arguments?.getString("imageUri") ?: ""
+                    val category = backStackEntry.arguments?.getString("category") ?: ""
+
                     val decodedUri = Uri.decode(uriStr).toUri()
 
-                    PhotoAnalysisResultScreen(navController, decodedUri)
+                    PhotoAnalysisResultScreen(navController, decodedUri, category)
                 }
+
+                // 키워드 기반 검색
+                composable(
+                    route = "searchResult/{keyword}",
+                    arguments = listOf(navArgument("keyword") { defaultValue = "" })
+                ) { backStackEntry ->
+                    val keyword = backStackEntry.arguments?.getString("keyword") ?: ""
+                    CategoryScreen(navController, keyword)
+                }
+
+                // 찜 목록 및 상품 비교
+                composable(route="likedList"){
+                    LikedListScreen(navController)
+                }
+                composable(
+                    route = "categoryCompareResult?id1={id1}&id2={id2}",
+                    arguments = listOf(
+                        navArgument("id1") { type = NavType.IntType },
+                        navArgument("id2") { type = NavType.IntType }
+                    )
+                ) { backStackEntry ->
+                    val id1 = backStackEntry.arguments?.getInt("id1") ?: -1
+                    val id2 = backStackEntry.arguments?.getInt("id2") ?: -1
+
+                    CategoryCompareScreen(navController, id1, id2)
+                }
+
             }
         }
     }
