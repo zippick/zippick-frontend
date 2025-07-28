@@ -70,7 +70,13 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen(navController) }
-                composable("category") { CategoryScreen(navController) }
+                composable(
+                    route = "category/{category}",
+                    arguments = listOf(navArgument("category") { defaultValue = "전체" })
+                ) { backStackEntry ->
+                    val category = backStackEntry.arguments?.getString("category") ?: "전체"
+                    CategoryScreen(navController, initialCategory = category)
+                }
                 composable("size") { CategorySelectionScreen(navController) }
                 composable("photo") { PhotoScreen(navController) }
                 composable("my") { MyScreen(navController) }

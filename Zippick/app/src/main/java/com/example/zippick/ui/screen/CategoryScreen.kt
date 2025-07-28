@@ -25,20 +25,19 @@ import com.example.zippick.ui.theme.MainBlue
 @Composable
 fun CategoryScreen(
     navController: NavController,
-    keyword: String? = null // 검색어가 있으면 검색 모드
+    keyword: String? = null, // 검색어가 있으면 검색 모드
+    initialCategory: String = "전체"
 ) {
     val isSearchMode = keyword != null
 
-    var selectedCategory by remember { mutableStateOf("전체") }
+    var selectedCategory by remember { mutableStateOf(initialCategory) }
     val categories = listOf("전체", "의자", "소파", "책상", "식탁", "옷장", "침대")
 
     var selectedSort by remember { mutableStateOf(SortOption.NEWEST) }
-    var minPrice by remember { mutableStateOf("") }
+    var minPrice by remember { mutableStateOf("0") }
     var maxPrice by remember { mutableStateOf("") }
 
     val productViewModel: ProductViewModel = viewModel()
-//    val products = sampleProducts
-    // TODO: 백엔드 API 수정되면 아래로 교체
     val products by productViewModel.products.collectAsState()
     val totalCount by productViewModel.totalCount.collectAsState()
     val isLoading by productViewModel.loading.collectAsState()

@@ -22,7 +22,7 @@ import com.example.zippick.ui.theme.MainBlue
 val bottomNavItems = listOf(
     BottomNavItem("home", "홈", R.drawable.ic_home_selected, R.drawable.ic_home_unselected),
     BottomNavItem(
-        "category",
+        "category/전체",
         "카테고리",
         R.drawable.ic_category_selected,
         R.drawable.ic_category_unselected
