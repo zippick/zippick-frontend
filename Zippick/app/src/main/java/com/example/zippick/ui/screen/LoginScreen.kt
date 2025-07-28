@@ -13,20 +13,29 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.zippick.network.AuthService
+import com.example.zippick.network.RetrofitInstance
+import com.example.zippick.network.TokenManager
+import com.example.zippick.ui.model.LoginRequest
 import com.example.zippick.ui.theme.DarkGray
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.theme.Typography
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
 fun LoginScreen(
-    onLoginClick: (String, String, (Boolean) -> Unit) -> Unit = { _, _, _ -> },
+    onLoginSuccess: () -> Unit = {},
     onSignUpClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     var userId by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -40,7 +49,6 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 아이디 + 비밀번호 입력 박스
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -49,17 +57,13 @@ fun LoginScreen(
             shadowElevation = 6.dp,
             color = Color.White
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // 아이디 입력
                     TextField(
                         value = userId,
                         onValueChange = {
@@ -68,7 +72,7 @@ fun LoginScreen(
                         },
                         placeholder = { Text("아이디", style = Typography.bodyLarge) },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(
+                        keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next
                         ),
@@ -77,7 +81,6 @@ fun LoginScreen(
                     )
                     Divider(color = Color.Gray, thickness = 1.dp)
 
-                    // 비밀번호 입력
                     TextField(
                         value = password,
                         onValueChange = {
@@ -87,7 +90,7 @@ fun LoginScreen(
                         placeholder = { Text("비밀번호", style = Typography.bodyLarge) },
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(
+                        keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done
                         ),
@@ -98,7 +101,7 @@ fun LoginScreen(
             }
         }
 
-        // 🔹 에러 메시지 표시 영역
+        // 에러 메시지
         if (errorMessage != null) {
             Row(
                 modifier = Modifier
@@ -126,9 +129,21 @@ fun LoginScreen(
         // 로그인 버튼
         Button(
             onClick = {
-                // 로그인 요청 후 콜백으로 성공 여부 판단
-                onLoginClick(userId.text, password.text) { success ->
-                    errorMessage = if (success) null else "아이디 또는 비밀번호를 확인해주세요."
+                coroutineScope.launch {
+                    try {
+                        val request = LoginRequest(userId.text, password.text)
+                        val response = RetrofitInstance.retrofit
+                            .create(AuthService::class.java)
+                            .login(request)
+
+                        // SharedPreferences 저장
+                        TokenManager.saveToken(response.token)
+
+                        errorMessage = null
+                        onLoginSuccess()
+                    } catch (e: Exception) {
+                        errorMessage = "아이디 또는 비밀번호를 확인해주세요."
+                    }
                 }
             },
             modifier = Modifier
@@ -151,7 +166,6 @@ fun LoginScreen(
     }
 }
 
-// 🔹 밑줄 제거 TextField 스타일
 @Composable
 fun noLineTextFieldColors() = TextFieldDefaults.colors(
     focusedTextColor = DarkGray,
