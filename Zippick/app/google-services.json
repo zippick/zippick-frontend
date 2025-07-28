@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "372164244615",
+    "project_id": "zippick-fb",
+    "storage_bucket": "zippick-fb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:372164244615:android:4f66148a1cedda55cb7422",
+        "android_client_info": {
+          "package_name": "com.example.zippick"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxI3Dh18KFZIwj-lJLjOG7_P_g-WDQK1Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

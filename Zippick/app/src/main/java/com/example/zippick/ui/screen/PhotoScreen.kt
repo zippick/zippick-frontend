@@ -1,6 +1,8 @@
 package com.example.zippick.ui.screen
 
+import android.content.ContentValues
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -29,17 +31,41 @@ fun PhotoScreen(navController: NavController) {
     val selectedCategory = remember { mutableStateOf<String?>("의자") }
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
     val categoryList = listOf("의자", "소파", "식탁", "책상", "옷장", "침대")
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
 
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            selectedImageUri.value = it
+    // 갤러리/파일 탐색기 런처
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { selectedImageUri.value = it }
+    }
+
+    // 카메라 런처
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            cameraImageUri?.let { selectedImageUri.value = it }
         }
     }
 
-    fun launchGallery() {
+    fun launchImageChooser() {
+        val options = listOf("카메라", "갤러리", "파일 탐색기")
+
+        // 예: 간단한 AlertDialog 또는 BottomSheet로 선택 UI 표시
+        // 여기서는 임시로 갤러리 런처 실행만 예시로
         galleryLauncher.launch("image/*")
+    }
+
+    fun launchCamera() {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.TITLE, "새 사진")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        }
+
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        if (uri != null) {
+            cameraImageUri = uri
+            cameraLauncher.launch(uri)
+        }
     }
 
     Column(
@@ -76,7 +102,7 @@ fun PhotoScreen(navController: NavController) {
 
             PhotoUploadSection(
                 selectedImageUri = selectedImageUri.value,
-                onPickImageClick = { launchGallery() }
+                onPickImageClick = { launchImageChooser() }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
