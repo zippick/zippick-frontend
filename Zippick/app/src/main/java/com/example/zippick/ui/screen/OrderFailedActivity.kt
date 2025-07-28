@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.navigation.compose.composable
 
 class OrderFailedActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +28,36 @@ class OrderFailedActivity : ComponentActivity() {
         val failReason = intent.getStringExtra("failReason") ?: "알 수 없는 이유로 결제에 실패했습니다."
 
         setContent {
-            OrderFailedScreen(failReason)
+            val navController = androidx.navigation.compose.rememberNavController()
+            androidx.compose.material3.Scaffold(
+                containerColor = Color.White,
+                bottomBar = { com.example.zippick.ui.composable.BottomBar(navController) }
+            ) { innerPadding ->
+                androidx.navigation.compose.NavHost(
+                    navController = navController,
+                    startDestination = "orderFailed",
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    composable("orderFailed") {
+                        OrderFailedScreen(failReason)
+                    }
+                    composable("home") {
+                        HomeScreen(navController)
+                    }
+                    composable("category") {
+                        CategoryScreen(navController)
+                    }
+                    composable("size") {
+                        SizeScreen(navController)
+                    }
+                    composable("photo") {
+                        PhotoScreen(navController)
+                    }
+                    composable("my") {
+                        MyScreen(navController)
+                    }
+                }
+            }
         }
     }
 }
@@ -45,7 +75,7 @@ fun OrderFailedScreen(failReason: String) {
                 .padding(horizontal = 32.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))   // ← 여기!
         ) {
             Column(
                 modifier = Modifier.padding(vertical = 36.dp, horizontal = 28.dp),
