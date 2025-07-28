@@ -6,6 +6,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
@@ -32,7 +33,7 @@ fun SizeSearchResultScreen(
     val error by viewModel.errorMessage.collectAsState()
 
     val selectedCategory = selectedCategoryGlobal
-    var selectedSort by remember { mutableStateOf(SortOption.LATEST) }
+    var selectedSort by rememberSaveable { mutableStateOf(viewModel.selectedSortOption) }
 
     val listState = rememberLazyGridState()
 
@@ -71,6 +72,7 @@ fun SizeSearchResultScreen(
                 selectedSort = selectedSort,
                 onSortChange = {
                     selectedSort = it
+                    viewModel.setSortOption(it)
                     viewModel.reloadWithSort(it.code) // 정렬 시 API 재호출
                 }
             )
