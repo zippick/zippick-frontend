@@ -14,7 +14,7 @@ import com.example.zippick.ui.composable.home.CategoryGrid
 fun HomeScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize()) {
         CarouselSection()
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         CategoryGrid()
     }
 }
