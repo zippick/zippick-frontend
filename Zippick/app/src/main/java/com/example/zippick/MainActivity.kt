@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.zippick.network.TokenManager
 import com.example.zippick.ui.composable.MainScreenWithBottomNav
-import com.example.zippick.ui.screen.SignUpScreen
 import com.example.zippick.ui.theme.AndroidLabTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,9 +18,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AndroidLabTheme {
-                SignUpScreen()
-//                MainScreenWithBottomNav()
-
+                MainScreenWithBottomNav()
             }
         }
     }

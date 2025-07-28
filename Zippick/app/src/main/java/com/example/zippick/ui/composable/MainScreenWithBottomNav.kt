@@ -36,6 +36,7 @@ import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.CategoryCompareScreen
 import com.example.zippick.ui.screen.LikedListScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
+import com.example.zippick.ui.screen.SignUpScreen
 import kotlinx.serialization.json.Json
 
 @Composable
@@ -155,7 +156,9 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                     CategoryCompareScreen(navController, id1, id2)
                 }
-
+                composable("signup") {
+                    SignUpScreen(navController)
+                }
             }
         }
     }
