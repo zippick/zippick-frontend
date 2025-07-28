@@ -54,7 +54,6 @@ fun CategoryScreen(
 
     // 검색어 또는 정렬이 바뀔 때 API 호출
     LaunchedEffect(keyword, selectedSort) {
-        println("🔍 검색 모드 API 호출됨: $keyword / 정렬: $selectedSort")
         if (isSearchMode) {
             productViewModel.searchProductsByKeyword(
                 keyword = keyword ?: "",
@@ -76,7 +75,6 @@ fun CategoryScreen(
 
     // 카테고리, 가격, 정렬 변경 시 API 호출
     LaunchedEffect(selectedCategory, minPrice, maxPrice, selectedSort) {
-        println("📦 카테고리 모드 API 호출됨: $selectedCategory / $minPrice~$maxPrice")
         if (!isSearchMode) {
             productViewModel.loadByCategoryAndPrice(
                 category = selectedCategory,

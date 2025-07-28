@@ -1,5 +1,7 @@
 package com.example.zippick.network
 
+import android.content.Context
+import android.content.SharedPreferences
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -8,14 +10,31 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 // 토큰 관리 객체
 object TokenManager {
-    //var token: String? = null
-    //TODO: 아래는 임시로 하드코딩한 토큰값입니다. 배포시엔 바꿔주세요
-    var token: String? = ""
+    private const val PREFS_NAME = "zippick_prefs"
+    private const val TOKEN_KEY = "auth_token"
+
+    private lateinit var prefs: SharedPreferences
+
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    fun saveToken(token: String) {
+        prefs.edit().putString(TOKEN_KEY, token).apply()
+    }
+
+    fun getToken(): String? {
+        return prefs.getString(TOKEN_KEY, null)
+    }
+
+    fun clearToken() {
+        prefs.edit().remove(TOKEN_KEY).apply()
+    }
 }
 
 class TokenInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val token = TokenManager.token
+        val token = TokenManager.getToken()
         val requestBuilder = chain.request().newBuilder()
 
         if (!token.isNullOrEmpty()) {

@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import com.example.zippick.network.RetrofitInstance
 import com.example.zippick.network.fcm.FcmApi
 import com.example.zippick.network.fcm.dto.FcmTokenRequest
+import com.example.zippick.network.TokenManager
 import com.example.zippick.ui.composable.MainScreenWithBottomNav
 import com.example.zippick.ui.theme.AndroidLabTheme
 import com.google.firebase.messaging.FirebaseMessaging
@@ -20,6 +21,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        TokenManager.init(this)
 
         enableEdgeToEdge()
 
