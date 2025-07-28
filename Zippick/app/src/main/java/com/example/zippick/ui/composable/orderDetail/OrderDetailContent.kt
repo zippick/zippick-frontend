@@ -16,6 +16,10 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +34,8 @@ fun OrderDetailContent(
     orderDetail: OrderDetailResponse,
     onCancelClick: () -> Unit
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+
     Column(modifier = Modifier.padding(24.dp)) {
         Spacer(modifier = Modifier.height(12.dp))
         Divider()
@@ -87,7 +93,7 @@ fun OrderDetailContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = onCancelClick,
+            onClick = { showDialog = true }, // 팝업 띄우기
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -99,6 +105,16 @@ fun OrderDetailContent(
             )
         ) {
             Text(text = "주문 취소")
+        }
+
+        if (showDialog) {
+            CancelOrderDialog(
+                onDismiss = { showDialog = false },
+                onConfirm = {
+                    // 주문 취소 처리
+                    onCancelClick()
+                }
+            )
         }
     }
 }
