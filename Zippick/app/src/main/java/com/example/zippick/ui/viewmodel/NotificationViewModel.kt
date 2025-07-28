@@ -18,16 +18,25 @@ class NotificationViewModel : ViewModel() {
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
-    fun loadNotifications(offset: Int) {
+    fun loadNotifications(
+        offset: Int,
+        append: Boolean = false,
+        onLoaded: ((List<NotificationResponse>) -> Unit)? = null
+    ) {
         viewModelScope.launch {
             _loading.value = true
             try {
                 val response = repository.getNotifications(offset)
-                // response 또는 response.notifications가 null일 수도 있으니 안전하게 처리
-                _notifications.value = response?.notifications ?: emptyList()
+                val list = response?.notifications ?: emptyList()
+                if (append) {
+                    _notifications.value = _notifications.value + list
+                } else {
+                    _notifications.value = list
+                }
+                onLoaded?.invoke(list)
             } catch (e: Exception) {
-                // 에러처리(로깅 등) 필요시 추가
-                _notifications.value = emptyList() // 예외 발생시에도 빈 리스트로 처리
+                if (!append) _notifications.value = emptyList()
+                onLoaded?.invoke(emptyList())
             } finally {
                 _loading.value = false
             }
