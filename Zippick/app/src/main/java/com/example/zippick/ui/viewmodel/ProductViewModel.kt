@@ -20,6 +20,12 @@ import com.example.zippick.util.convertToParam
 class ProductViewModel : ViewModel() {
     private val repository = ProductRepository()
 
+    var selectedSortOption = SortOption.LATEST
+
+    fun setSortOption(sort: SortOption) {
+        selectedSortOption = sort
+    }
+
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> = _products
 

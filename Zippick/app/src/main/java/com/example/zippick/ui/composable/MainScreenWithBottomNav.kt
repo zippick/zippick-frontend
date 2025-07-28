@@ -75,7 +75,11 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                     arguments = listOf(navArgument("category") { defaultValue = "전체" })
                 ) { backStackEntry ->
                     val category = backStackEntry.arguments?.getString("category") ?: "전체"
-                    CategoryScreen(navController, initialCategory = category)
+                    CategoryScreen(
+                        navController = navController,
+                        productViewModel = productViewModel,
+                        initialCategory = category
+                    )
                 }
                 composable("size") { CategorySelectionScreen(navController) }
                 composable("photo") { PhotoScreen(navController) }
@@ -143,7 +147,11 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                     arguments = listOf(navArgument("keyword") { defaultValue = "" })
                 ) { backStackEntry ->
                     val keyword = backStackEntry.arguments?.getString("keyword") ?: ""
-                    CategoryScreen(navController, keyword)
+                    CategoryScreen(
+                        navController = navController,
+                        productViewModel = productViewModel,
+                        keyword = keyword
+                    )
                 }
 
                 // 찜 목록 및 상품 비교

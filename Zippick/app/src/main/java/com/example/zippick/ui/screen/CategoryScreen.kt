@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,7 +26,8 @@ import com.example.zippick.ui.theme.MainBlue
 @Composable
 fun CategoryScreen(
     navController: NavController,
-    keyword: String? = null, // 검색어가 있으면 검색 모드
+    productViewModel: ProductViewModel = viewModel(),
+    keyword: String? = null,
     initialCategory: String = "전체"
 ) {
     val isSearchMode = keyword != null
@@ -33,11 +35,12 @@ fun CategoryScreen(
     var selectedCategory by remember { mutableStateOf(initialCategory) }
     val categories = listOf("전체", "의자", "소파", "책상", "식탁", "옷장", "침대")
 
-    var selectedSort by remember { mutableStateOf(SortOption.NEWEST) }
+    val sortInitKey = rememberSaveable(key = keyword) { mutableStateOf(true) } // 최초 진입 판단 키
+    var selectedSort by rememberSaveable { mutableStateOf(SortOption.LATEST) }
+
     var minPrice by remember { mutableStateOf("0") }
     var maxPrice by remember { mutableStateOf("") }
 
-    val productViewModel: ProductViewModel = viewModel()
     val products by productViewModel.products.collectAsState()
     val totalCount by productViewModel.totalCount.collectAsState()
     val isLoading by productViewModel.loading.collectAsState()
@@ -50,6 +53,16 @@ fun CategoryScreen(
             lastVisible >= totalCount - 2
         }
     }
+    // 키워드가 바뀌면 최초 1회만 정렬 초기화
+    LaunchedEffect(keyword) {
+        if (isSearchMode && sortInitKey.value) {
+            selectedSort = SortOption.LATEST
+            sortInitKey.value = false
+        } else if (!isSearchMode) {
+            selectedSort = productViewModel.selectedSortOption
+        }
+    }
+
 
     // 검색어 또는 정렬이 바뀔 때 API 호출
     LaunchedEffect(keyword, selectedSort) {
@@ -123,7 +136,12 @@ fun CategoryScreen(
             ProductFilterHeader(
                 productCount = totalCount,
                 selectedSort = selectedSort,
-                onSortChange = { selectedSort = it },
+                onSortChange = {
+                    selectedSort = it
+                    if (!isSearchMode) {
+                        productViewModel.setSortOption(it)
+                    }
+                },
                 minPrice = if (!isSearchMode) minPrice else null,
                 maxPrice = if (!isSearchMode) maxPrice else null,
                 onMinPriceChange = if (!isSearchMode) ({ minPrice = it }) else null,

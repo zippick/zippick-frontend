@@ -3,6 +3,7 @@ package com.example.zippick.ui.composable.category
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
@@ -30,11 +31,21 @@ fun ProductFilterHeader(
     val priceSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var isPriceFilterChecked by remember { mutableStateOf(false) } // 토글 상태용
-    var showPriceSheet by remember { mutableStateOf(false) }        // 바텀시트 표시용
+    // 상태 저장: 가격 필터 토글 체크 여부 (0은 기본값으로 간주, 토글 OFF)
+    var isPriceFilterChecked by rememberSaveable {
+        mutableStateOf(
+            (minPrice?.isNotBlank() == true && minPrice != "0") ||
+                    (maxPrice?.isNotBlank() == true && maxPrice != "0")
+        )
+    }
 
-    var isSortFilterChecked by remember { mutableStateOf(false) }
-    var showSortSheet by remember { mutableStateOf(false) }
+    // 가격/정렬 바텀시트 표시 여부
+    var showPriceSheet by rememberSaveable { mutableStateOf(false) }
+    var showSortSheet by rememberSaveable { mutableStateOf(false) }
+
+    // 빈 값으로 선언, 나중에 바텀시트 열릴 때 최신 값으로 덮어씀
+    var tempMinPrice by rememberSaveable { mutableStateOf("") }
+    var tempMaxPrice by rememberSaveable { mutableStateOf("") }
 
     Row(
         modifier = Modifier
@@ -54,54 +65,76 @@ fun ProductFilterHeader(
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 16.sp
         )
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 가격 토글은 가격 필터 관련 함수가 있을 때만 표시
+            // 가격 토글 (필터 기능이 있을 때만 표시)
             if (onMinPriceChange != null && onMaxPriceChange != null && onPriceFilterApply != null) {
                 FilterToggle(
                     label = "가격",
                     isChecked = isPriceFilterChecked,
                     onToggle = {
-                        isPriceFilterChecked = it
-                        showPriceSheet = it
+                        // 바텀시트 열기 전에 항상 최신 min/max 값을 temp에 복사
+                        tempMinPrice = minPrice ?: ""
+                        tempMaxPrice = maxPrice ?: ""
+                        showPriceSheet = true
                     }
                 )
             }
 
+            // 정렬 토글
             FilterToggle(
                 label = "정렬",
-                isChecked = isSortFilterChecked,
+                isChecked = selectedSort != SortOption.LATEST,
                 onToggle = {
-                    isSortFilterChecked = it
-                    showSortSheet = it
+                    showSortSheet = true
                 }
             )
         }
     }
 
-    // 가격 필터 바텀시트
-    if (showPriceSheet && onMinPriceChange != null && onMaxPriceChange != null && onPriceFilterApply != null) {
+    // 가격 필터 바텀시트 표시
+    if (showPriceSheet) {
         PriceFilterBottomSheet(
             sheetState = priceSheetState,
-            minPrice = minPrice ?: "",
-            maxPrice = maxPrice ?: "",
-            onMinPriceChange = onMinPriceChange,
-            onMaxPriceChange = onMaxPriceChange,
+            minPrice = tempMinPrice,
+            maxPrice = tempMaxPrice,
+            onMinPriceChange = { tempMinPrice = it },
+            onMaxPriceChange = { tempMaxPrice = it },
             onDismiss = {
                 coroutineScope.launch { priceSheetState.hide() }
-                showPriceSheet = false
             },
             onApply = {
                 coroutineScope.launch { priceSheetState.hide() }
-                showPriceSheet = false
-                isPriceFilterChecked = true
-                onPriceFilterApply()
+                isPriceFilterChecked =
+                    (tempMinPrice.isNotBlank() && tempMinPrice != "0") ||
+                            (tempMaxPrice.isNotBlank() && tempMaxPrice != "0")
+                onMinPriceChange?.invoke(tempMinPrice)
+                onMaxPriceChange?.invoke(tempMaxPrice)
+                onPriceFilterApply?.invoke()
+            },
+            onReset = {
+                coroutineScope.launch { priceSheetState.hide() }
+                isPriceFilterChecked = false
+                tempMinPrice = ""
+                tempMaxPrice = ""
+                onMinPriceChange?.invoke("")
+                onMaxPriceChange?.invoke("")
+                onPriceFilterApply?.invoke()
             }
         )
     }
 
+    // 바텀시트 닫히면 표시 상태 해제
+    LaunchedEffect(priceSheetState.isVisible) {
+        if (!priceSheetState.isVisible) {
+            showPriceSheet = false
+        }
+    }
+
+    // 정렬 필터 바텀시트
     if (showSortSheet) {
         SortFilterBottomSheet(
             sheetState = sortSheetState,
@@ -110,7 +143,6 @@ fun ProductFilterHeader(
                 onSortChange(it)
                 coroutineScope.launch { sortSheetState.hide() }
                 showSortSheet = false
-                isSortFilterChecked = true
             },
             onDismiss = {
                 coroutineScope.launch { sortSheetState.hide() }
