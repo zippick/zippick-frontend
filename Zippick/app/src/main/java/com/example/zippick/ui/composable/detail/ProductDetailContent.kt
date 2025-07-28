@@ -173,12 +173,6 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
-//                            Spacer(Modifier.height(2.dp))
-//                            Text(
-//                                "아삭 아삭 씹는 재미", // 필요시 설명 수정
-//                                color = Color(0xFFBDBDBD),
-//                                fontSize = 12.sp
-//                            )
                         }
                     }
 
@@ -196,13 +190,6 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF222222)
                         )
-//                        Spacer(Modifier.width(8.dp))
-//                        Text(
-//                            text = "25,900원", // 실제 할인 전 금액으로 변경 필요
-//                            fontSize = 16.sp,
-//                            color = Color(0xFFBDBDBD),
-//                            textDecoration = TextDecoration.LineThrough
-//                        )
                     }
 
                     Spacer(Modifier.height(14.dp))
