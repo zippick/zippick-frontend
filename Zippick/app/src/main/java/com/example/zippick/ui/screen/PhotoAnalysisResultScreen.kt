@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,7 +28,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
 import com.example.zippick.network.product.InteriorRepository
+import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.util.FileUtil
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -88,18 +90,20 @@ fun PhotoAnalysisResultScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CircularProgressIndicator(
-                    color = MainBlue,
-                    strokeWidth = 4.dp
-                )
+                LottieLoading(modifier = Modifier.size(120.dp))
+
                 Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
                     text = "이미지를 분석중입니다",
-                    color = MainBlue
+                    color = MainBlue,
+                    fontSize = 16.sp
                 )
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "잠시만 기다려주세요!",
-                    color = MainBlue
+                    color = MainBlue,
+                    fontSize = 16.sp
                 )
             }
         }
