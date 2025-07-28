@@ -52,11 +52,15 @@ fun TopBar(
                         currentRoute == "notifications" -> "알림함"
                         currentRoute == "aiLayout" -> "AI 가구 배치"
                         currentRoute.startsWith("sizeInput") -> "사이즈 검색"
+
+                        currentRoute.startsWith("category/") -> "검색 결과"
+                        currentRoute.startsWith("searchResult") -> "검색 결과"
                         currentRoute == "sizeSearchResult" -> "검색 결과"
+
                         currentRoute.startsWith("photoAnalysis") -> "분석 결과"
                         currentRoute  == "likedList" -> "찜 목록"
                         currentRoute.startsWith("categoryCompareResult") -> "상품 비교"
-                        currentRoute.startsWith("searchResult") -> "검색 결과"
+
                         currentRoute.startsWith("recommendList") -> "추천 상품"
                         else -> "상세페이지"
                     },
