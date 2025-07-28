@@ -55,11 +55,36 @@ fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: Str
     val totalPrice = productPrice * productAmount // 총가격
     val orderViewModel: OrderViewModel = viewModel() // Activity나 Composable에서 선언
 
+    /*
+    * Toss 결제 완료되고 서버에 저장까지 완료되면 아래 코드 실행됨
+    * postOrder() -> orderViewModel -> 서버요청 -> orderResult 에 response 담김
+    * */
     val orderResult by orderViewModel.orderResult.collectAsState()
     LaunchedEffect(orderResult) {
-        orderResult?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        orderResult?.let { result ->
             orderViewModel.clearOrderResult()
+            if (result == "success") {
+                // 결제 완료 페이지로 이동 (OrderCompleteActivity)
+                val now = System.currentTimeMillis()
+                val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())
+                val orderDate = sdf.format(Date(now))
+
+                val intent = Intent(context, OrderCompleteActivity::class.java)
+                intent.putExtra("orderNumber", orderId)
+                intent.putExtra("orderDate", orderDate)
+                intent.putExtra("productName", productName)
+                intent.putExtra("productImage", productImage)
+                intent.putExtra("productPrice", productPrice)
+                intent.putExtra("productAmount", productAmount)
+                intent.putExtra("totalPrice", totalPrice)
+
+                context.startActivity(intent)
+            } else {
+                // 결제 실패 페이지로 이동
+                val intent = Intent(context, OrderFailedActivity::class.java)
+                intent.putExtra("failReason", "서버 주문 저장에 실패했습니다. (사유 : $result)") // 원하는 실패 메시지로 교체
+                context.startActivity(intent)
+            }
         }
     }
 
@@ -114,25 +139,12 @@ fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: Str
                                 productId = productId // 해당 상품 id (화면에 이미 보유 중이어야 함)
                             )
                             orderViewModel.postOrder(request)
-
-                            // 2. 결제 완료 페이지로 이동
-                            val now = System.currentTimeMillis()
-                            val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())
-                            val orderDate = sdf.format(Date(now))
-
-                            val intent = Intent(context, OrderCompleteActivity::class.java)
-                            intent.putExtra("orderNumber", success.paymentKey)
-                            intent.putExtra("orderDate", orderDate)
-                            intent.putExtra("productName", productName)
-                            intent.putExtra("productImage", productImage)
-                            intent.putExtra("productPrice", productPrice)
-                            intent.putExtra("productAmount", productAmount)
-                            intent.putExtra("totalPrice", totalPrice)
-
-                            context.startActivity(intent)
                         }
                         override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
                             Toast.makeText(context, "결제 실패: ${fail.errorMessage}", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(context, OrderFailedActivity::class.java)
+                            intent.putExtra("failReason", fail.errorMessage ?: "결제 실패(알 수 없는 오류)")
+                            context.startActivity(intent)
                         }
                     }
                 )

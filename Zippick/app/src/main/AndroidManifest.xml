@@ -34,6 +34,7 @@
             android:name=".ui.screen.PaymentMethodActivity"
             android:exported="false"/>
         <activity android:name=".ui.screen.OrderCompleteActivity" />
+        <activity android:name=".ui.screen.OrderFailedActivity" />
     </application>
 
 </manifest>

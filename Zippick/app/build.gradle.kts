@@ -64,6 +64,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.0")
     implementation("androidx.compose.ui:ui:1.4.3")
     implementation("androidx.compose.material:material:1.4.3")
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
     implementation("androidx.compose.ui:ui-tooling-preview:1.4.3")
 
     implementation("com.github.tosspayments:payment-sdk-android:0.1.11")
