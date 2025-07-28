@@ -32,7 +32,7 @@ fun SizeSearchResultScreen(
     val error by viewModel.errorMessage.collectAsState()
 
     val selectedCategory = selectedCategoryGlobal
-    var selectedSort by rememberSaveable { mutableStateOf(viewModel.selectedSortOption) }
+    val selectedSort by viewModel.sizeSearchSortOption.collectAsState()
 
     val listState = rememberLazyGridState()
 
@@ -68,8 +68,7 @@ fun SizeSearchResultScreen(
                 productCount = totalCount,
                 selectedSort = selectedSort,
                 onSortChange = {
-                    selectedSort = it
-                    viewModel.setSortOption(it)
+                    viewModel.setSizeSearchSortOption(it)
                     viewModel.reloadWithSort(it.code)
                 }
             )

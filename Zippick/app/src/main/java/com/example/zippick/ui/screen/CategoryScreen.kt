@@ -38,10 +38,10 @@ fun CategoryScreen(
     val categories = listOf("전체", "의자", "소파", "책상", "식탁", "옷장", "침대")
 
     val sortInitKey = rememberSaveable(key = keyword) { mutableStateOf(true) } // 최초 진입 판단 키
-    var selectedSort by rememberSaveable { mutableStateOf(SortOption.LATEST) }
+    val selectedSort by productViewModel.categorySortOption.collectAsState()
 
-    var minPrice by remember { mutableStateOf("0") }
-    var maxPrice by remember { mutableStateOf("") }
+    var minPrice by rememberSaveable { mutableStateOf("0") }
+    var maxPrice by rememberSaveable { mutableStateOf("") }
 
     val products by productViewModel.products.collectAsState()
     val totalCount by productViewModel.totalCount.collectAsState()
@@ -52,10 +52,8 @@ fun CategoryScreen(
     // 키워드가 바뀌면 최초 1회만 정렬 초기화
     LaunchedEffect(keyword) {
         if (isSearchMode && sortInitKey.value) {
-            selectedSort = SortOption.LATEST
+            productViewModel.setCategorySortOption(SortOption.LATEST)
             sortInitKey.value = false
-        } else if (!isSearchMode) {
-            selectedSort = productViewModel.selectedSortOption
         }
     }
 
@@ -140,10 +138,7 @@ fun CategoryScreen(
                 productCount = totalCount,
                 selectedSort = selectedSort,
                 onSortChange = {
-                    selectedSort = it
-                    if (!isSearchMode) {
-                        productViewModel.setSortOption(it)
-                    }
+                    productViewModel.setCategorySortOption(it)
                 },
                 minPrice = if (!isSearchMode) minPrice else null,
                 maxPrice = if (!isSearchMode) maxPrice else null,
