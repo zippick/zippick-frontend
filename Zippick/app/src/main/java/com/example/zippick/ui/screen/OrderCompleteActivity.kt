@@ -56,6 +56,7 @@ class OrderCompleteActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             Scaffold(
+                containerColor = Color.White,
                 bottomBar = { BottomBar(navController) }
             ) { innerPadding ->
                 NavHost(
@@ -113,7 +114,7 @@ fun OrderCompleteScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFFF5F5F5))
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.TopCenter
     ) {
