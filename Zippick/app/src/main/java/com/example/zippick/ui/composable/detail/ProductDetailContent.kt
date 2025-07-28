@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.zippick.R
 import com.example.zippick.ui.model.ProductDetail
 import com.example.zippick.ui.screen.PaymentMethodActivity
@@ -57,9 +58,9 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                 .background(Color.White)
         ) {
             // 메인 이미지
-            Image(
-                painter = painterResource(id = R.drawable.thumnail), // 예: R.drawable.chair
-                contentDescription = "의자 이미지",
+            AsyncImage(
+                model = product.mainImageUrl,
+                contentDescription = "상품 이미지",
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),
@@ -112,10 +113,9 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                 }
 
                 // 상세 이미지
-                Image(
-                    painter = painterResource(id = R.drawable.product_detail),
+                AsyncImage(
+                    model = product.detailImage,
                     contentDescription = "상세 이미지",
-                    contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
