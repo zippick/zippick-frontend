@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import com.example.zippick.ui.composable.category.CompareFloatingButton
 import com.example.zippick.ui.theme.MainBlue
+import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.runtime.snapshotFlow
 
 @Composable
 fun CategoryScreen(
@@ -46,13 +48,7 @@ fun CategoryScreen(
     val isLoading by productViewModel.loading.collectAsState()
 
     val listState = rememberLazyGridState()
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalCount = listState.layoutInfo.totalItemsCount
-            lastVisible >= totalCount - 2
-        }
-    }
+
     // 키워드가 바뀌면 최초 1회만 정렬 초기화
     LaunchedEffect(keyword) {
         if (isSearchMode && sortInitKey.value) {
@@ -62,7 +58,6 @@ fun CategoryScreen(
             selectedSort = productViewModel.selectedSortOption
         }
     }
-
 
     // 검색어 또는 정렬이 바뀔 때 API 호출
     LaunchedEffect(keyword, selectedSort) {
@@ -100,13 +95,21 @@ fun CategoryScreen(
     }
 
     // 무한스크롤 감지 시 추가 로딩
-    LaunchedEffect(shouldLoadMore.value) {
-        if (isSearchMode && shouldLoadMore.value && !isLoading) {
-            productViewModel.loadMoreProducts()
-        } else if (!isSearchMode && shouldLoadMore.value && !isLoading) {
-            productViewModel.loadMoreByCategoryAndPrice()
-        }
+    LaunchedEffect(Unit) {
+        snapshotFlow { listState.layoutInfo }
+            .collectLatest { layoutInfo ->
+                val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@collectLatest
+                val total = layoutInfo.totalItemsCount
+                if (lastVisible >= total - 4 && !isLoading) {
+                    if (isSearchMode) {
+                        productViewModel.loadMoreProducts()
+                    } else {
+                        productViewModel.loadMoreByCategoryAndPrice()
+                    }
+                }
+            }
     }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
             if (!isSearchMode) {
@@ -163,7 +166,8 @@ fun CategoryScreen(
             ProductGrid(
                 products = products,
                 navController = navController,
-                listState = listState
+                listState = listState,
+                isLoading = isLoading // 하단 로딩 표시를 위한 상태 전달
             )
         }
 
