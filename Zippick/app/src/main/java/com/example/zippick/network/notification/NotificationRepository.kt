@@ -9,4 +9,8 @@ class NotificationRepository {
     suspend fun getNotifications(offset: Int): NotificationListResponse {
         return api.getNotifications(offset)
     }
+
+    suspend fun postNotifications(request: NotificationSendRequest): Unit {
+        api.postNotifications(request)
+    }
 }

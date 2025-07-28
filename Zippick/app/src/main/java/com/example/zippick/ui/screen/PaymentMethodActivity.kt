@@ -14,7 +14,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.zippick.network.notification.NotificationSendRequest
 import com.example.zippick.ui.model.OrderRequest
+import com.example.zippick.ui.viewmodel.NotificationViewModel
 import com.example.zippick.ui.viewmodel.OrderViewModel
 import com.tosspayments.paymentsdk.PaymentWidget
 import com.tosspayments.paymentsdk.model.PaymentCallback
@@ -49,23 +51,25 @@ class PaymentMethodActivity : AppCompatActivity() {
 }
 
 @Composable
-fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: String, productImage: String, productPrice: Int, productAmount: Int) {
+fun PaymentMethodScreen(
+    widget: PaymentWidget,
+    productId: Long,
+    productName: String,
+    productImage: String,
+    productPrice: Int,
+    productAmount: Int
+) {
     val context = LocalContext.current
     val orderId = "order_${System.currentTimeMillis()}"
-    val totalPrice = productPrice * productAmount // 총가격
-    val orderViewModel: OrderViewModel = viewModel() // Activity나 Composable에서 선언
+    val totalPrice = productPrice * productAmount
+    val orderViewModel: OrderViewModel = viewModel()
+    val notificationViewModel: NotificationViewModel = viewModel()
 
-    /*
-    * Toss 결제 완료되고 서버에 저장까지 완료되면 아래 코드 실행됨
-    * postOrder() -> orderViewModel -> 서버요청 -> orderResult 에 response 담김
-    * */
     val orderResult by orderViewModel.orderResult.collectAsState()
     LaunchedEffect(orderResult) {
-        println("orderResult: $orderResult")
         orderResult?.let { result ->
             orderViewModel.clearOrderResult()
             if (result == "주문이 정상적으로 완료되었습니다.") {
-                // 결제 완료 페이지로 이동 (OrderCompleteActivity)
                 val now = System.currentTimeMillis()
                 val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())
                 val orderDate = sdf.format(Date(now))
@@ -78,24 +82,18 @@ fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: Str
                 intent.putExtra("productPrice", productPrice)
                 intent.putExtra("productAmount", productAmount)
                 intent.putExtra("totalPrice", totalPrice)
-
                 context.startActivity(intent)
             } else {
-                // 결제 실패 페이지로 이동
-                val intent = Intent(context, OrderFailedActivity::class.java)
-                intent.putExtra("failReason", "서버 주문 저장에 실패했습니다. (사유 : $result)") // 원하는 실패 메시지로 교체
-                context.startActivity(intent)
+                // 실패 시 화면 이동 없이 Toast로만 안내
+                Toast.makeText(context, "주문 실패: $result", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 결제수단 선택 뷰
         AndroidView(
             factory = { ctx -> PaymentMethod(ctx) },
             update = { view ->
@@ -105,19 +103,13 @@ fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: Str
                     options = null
                 )
             },
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
 
-        // 약관 동의 뷰
         AndroidView(
             factory = { ctx -> Agreement(ctx) },
-            update = { view ->
-                widget.renderAgreement(view)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
+            update = { view -> widget.renderAgreement(view) },
+            modifier = Modifier.fillMaxWidth().height(120.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -132,20 +124,26 @@ fun PaymentMethodScreen(widget: PaymentWidget, productId: Long, productName: Str
                     paymentCallback = object : PaymentCallback {
                         override fun onPaymentSuccess(success: TossPaymentResult.Success) {
                             Toast.makeText(context, "결제 성공: ${success.paymentKey}", Toast.LENGTH_SHORT).show()
-                            // 1. 서버에 주문 요청 보내기
                             val request = OrderRequest(
                                 totalPrice = productPrice * productAmount,
                                 count = productAmount,
-                                merchantOrderId = success.paymentKey, // Toss 결제 결과에서 paymentKey 사용
-                                productId = productId // 해당 상품 id (화면에 이미 보유 중이어야 함)
+                                merchantOrderId = success.paymentKey,
+                                productId = productId
                             )
                             orderViewModel.postOrder(request)
+                            val notificationRequest = NotificationSendRequest(
+                                title = "주문이 완료되었습니다!",
+                                content = "주문번호 ${success.paymentKey}이(가) 정상 처리되었습니다.",
+                                createdAt = SimpleDateFormat(
+                                    "yyyy-MM-dd'T'HH:mm:ss",
+                                    Locale.getDefault()
+                                ).format(Date())
+                            )
+                            notificationViewModel.sendNotification(notificationRequest)
                         }
                         override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
-                            Toast.makeText(context, "결제 실패: ${fail.errorMessage}", Toast.LENGTH_SHORT).show()
-                            val intent = Intent(context, OrderFailedActivity::class.java)
-                            intent.putExtra("failReason", fail.errorMessage ?: "결제 실패(알 수 없는 오류)")
-                            context.startActivity(intent)
+                            // 실패시 화면 이동 없이 Toast만 표시
+                            Toast.makeText(context, "결제 실패: ${fail.errorMessage ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
                         }
                     }
                 )

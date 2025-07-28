@@ -24,7 +24,8 @@ object TokenManager {
     }
 
     fun getToken(): String? {
-        return prefs.getString(TOKEN_KEY, null)
+//        return prefs.getString(TOKEN_KEY, null)
+        return "Bearer 55c5982d-1641-49f3-be64-8231f468e96c"
     }
 
     fun clearToken() {
@@ -57,8 +58,8 @@ object RetrofitInstance {
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://zippick.n-e.kr/")
-//            .baseUrl("http://10.0.2.2:8080/")
+//            .baseUrl("https://zippick.n-e.kr/")
+            .baseUrl("http://10.0.2.2:8080/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
