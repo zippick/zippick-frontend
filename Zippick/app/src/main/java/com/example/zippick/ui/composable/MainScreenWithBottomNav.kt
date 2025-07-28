@@ -35,6 +35,7 @@ import androidx.navigation.NavType
 import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.CategoryCompareScreen
 import com.example.zippick.ui.screen.LikedListScreen
+import com.example.zippick.ui.screen.OrderDetailScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import com.example.zippick.ui.screen.PhotoRecommandListScreen
 
@@ -175,6 +176,15 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                         type = type,
                         values = values
                     )
+                }
+
+                // 주문 상세 페이지
+                composable(
+                    route = "myOrderDetail/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val orderId = backStackEntry.arguments?.getInt("id") ?: 0
+                    OrderDetailScreen(orderId = orderId, navController = navController)
                 }
             }
         }
