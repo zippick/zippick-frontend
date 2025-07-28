@@ -38,6 +38,7 @@ import com.example.zippick.ui.screen.LikedListScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import com.example.zippick.ui.screen.PhotoRecommandListScreen
 
+
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -155,7 +156,6 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                     CategoryCompareScreen(navController, id1, id2)
                 }
-
                 // 인테리어 기반 추천 상품
                 composable(
                     route = "photoRecommendList/{category}/{type}/{values}",
@@ -176,8 +176,6 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                         values = values
                     )
                 }
-
-
             }
         }
     }
