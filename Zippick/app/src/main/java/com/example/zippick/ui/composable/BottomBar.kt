@@ -21,12 +21,7 @@ import com.example.zippick.ui.theme.MainBlue
 
 val bottomNavItems = listOf(
     BottomNavItem("home", "홈", R.drawable.ic_home_selected, R.drawable.ic_home_unselected),
-    BottomNavItem(
-        "category/전체",
-        "카테고리",
-        R.drawable.ic_category_selected,
-        R.drawable.ic_category_unselected
-    ),
+    BottomNavItem("category", "카테고리", R.drawable.ic_category_selected, R.drawable.ic_category_unselected),
     BottomNavItem("size", "사이즈", R.drawable.ic_size_selected, R.drawable.ic_size_unselected),
     BottomNavItem("photo", "사진", R.drawable.ic_photo_selected, R.drawable.ic_photo_unselected),
     BottomNavItem("my", "MY", R.drawable.ic_my_selected, R.drawable.ic_my_unselected),
@@ -57,9 +52,11 @@ fun BottomBar(navController: NavHostController) {
                 NavigationBarItem(
                     selected = item.route == selectedTab,
                     onClick = {
+                        val targetRoute = if (item.route == "category") "category/전체" else item.route
+
                         if (selectedTab != item.route) {
-                            navController.navigate(item.route) {
-                                popUpTo(item.route) {
+                            navController.navigate(targetRoute) {
+                                popUpTo(targetRoute) {
                                     inclusive = true
                                 }
                                 launchSingleTop = true
