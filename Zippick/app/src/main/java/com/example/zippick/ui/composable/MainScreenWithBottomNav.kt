@@ -36,7 +36,7 @@ import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.CategoryCompareScreen
 import com.example.zippick.ui.screen.LikedListScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
-import kotlinx.serialization.json.Json
+import com.example.zippick.ui.screen.PhotoRecommandListScreen
 
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
@@ -155,6 +155,28 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                     CategoryCompareScreen(navController, id1, id2)
                 }
+
+                // 인테리어 기반 추천 상품
+                composable(
+                    route = "photoRecommendList/{category}/{type}/{values}",
+                    arguments = listOf(
+                        navArgument("category") { type = NavType.StringType },
+                        navArgument("type") { type = NavType.StringType },
+                        navArgument("values") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val category = backStackEntry.arguments?.getString("category") ?: ""
+                    val type = backStackEntry.arguments?.getString("type") ?: ""
+                    val values = backStackEntry.arguments?.getString("values") ?: ""
+
+                    PhotoRecommandListScreen(
+                        navController,
+                        category = category,
+                        type = type,
+                        values = values
+                    )
+                }
+
 
             }
         }

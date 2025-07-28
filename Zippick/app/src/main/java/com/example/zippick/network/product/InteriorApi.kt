@@ -10,4 +10,10 @@ interface InteriorApi {
     suspend fun postAiInterior(
         @Part roomImage: MultipartBody.Part,
     ): AiInteriorResponse
+
+
+    @POST("api/products/recommend")
+    suspend fun postRecommendProduct(
+        @Body request: RecommendRequest
+    ): List<Product>
 }
