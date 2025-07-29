@@ -27,10 +27,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.material.SnackbarHostState
 
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,9 +40,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.zippick.ui.composable.BottomBar
-import com.example.zippick.ui.composable.TopBar
-
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import com.example.zippick.MainActivity
+import androidx.compose.material3.ButtonDefaults
 class OrderCompleteActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val orderNumber = intent.getStringExtra("orderNumber")?:""
@@ -60,14 +60,7 @@ class OrderCompleteActivity : ComponentActivity() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route ?: "orderComplete"
             Scaffold(
-                topBar = {
-                    TopBar(
-                        navController = navController,
-                        currentRoute = currentRoute
-                    )
-                },
-                containerColor = Color.White,
-                bottomBar = { BottomBar(navController) }
+                containerColor = Color.White
             ) { innerPadding ->
                 NavHost(
                     navController = navController,
@@ -79,22 +72,6 @@ class OrderCompleteActivity : ComponentActivity() {
                             orderNumber, orderDate, productName, productImage,
                             productPrice,  productAmount, totalPrice, navController = navController
                         )
-                    }
-                    // BottomBar
-                    composable("home") {
-                        HomeScreen(navController)
-                    }
-                    composable("category/전체") {
-                        CategoryScreen(navController)
-                    }
-                    composable("size") {
-                        SizeScreen(navController)
-                    }
-                    composable("photo") {
-                        PhotoScreen(navController)
-                    }
-                    composable("my") {
-                        MyScreen(navController)
                     }
                 }
             }
@@ -111,8 +88,7 @@ fun OrderCompleteScreen(
     productPrice: Int,
     productAmount: Int,
     totalPrice: Int,
-    navController: NavHostController, // BottomBar에서 쓰는 네비게이터 주입
-    onHomeClick: () -> Unit = {}
+    navController: NavHostController
 ) {
     // 결제 완료시 알럿 2초 후 자동으로 사라짐
     var showAlert by remember { mutableStateOf(true) }
@@ -121,6 +97,7 @@ fun OrderCompleteScreen(
         kotlinx.coroutines.delay(2000)
         showAlert = false
     }
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -160,7 +137,7 @@ fun OrderCompleteScreen(
             Box(
                 modifier = Modifier
                     .size(64.dp)
-                    .background(color = Color(0xFF1574AF), shape = CircleShape),
+                    .background(color = Color(0xFF035A7E), shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -217,6 +194,32 @@ fun OrderCompleteScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Divider()
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(90.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 32.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF035A7E), // 진한 보라, 원하는 색상 지정
+                    contentColor = Color.White
+                ),
+                contentPadding = PaddingValues(vertical = 0.dp) // 내부 패딩은 0, 높이로 통일
+            ) {
+                Text(
+                    text = "홈으로 이동하기",
+                    color = Color.White, // 글씨 하얗게 명시
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+            }
         }
     }
 }

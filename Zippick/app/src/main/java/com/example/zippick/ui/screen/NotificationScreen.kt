@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.zippick.ui.viewmodel.NotificationViewModel
-import kotlinx.coroutines.flow.collectLatest
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -29,44 +28,11 @@ fun NotificationScreen(
     val loading by viewModel.loading.collectAsState()
     val context = LocalContext.current
 
-    var offset by remember { mutableStateOf(0) }
-    var isEnd by remember { mutableStateOf(false) }
-    var isPaging by remember { mutableStateOf(false) }
-
     val listState = rememberLazyListState()
 
     // 최초 1회만 로딩
     LaunchedEffect(Unit) {
-        offset = 0
-        isEnd = false
-        isPaging = true
-        viewModel.loadNotifications(offset = 0, append = false) { list ->
-            isEnd = list.isEmpty()
-            isPaging = false
-        }
-    }
-
-    // 무한스크롤 트리거 (맨 아래 2개 도달 시마다)
-    LaunchedEffect(listState, notifications) {
-        snapshotFlow {
-            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-            lastVisible
-        }.collectLatest { lastVisibleIndex ->
-            if (
-                !isEnd && !isPaging &&
-                lastVisibleIndex >= notifications.size - 2 && // 마지막 2개 이내 접근 시
-                notifications.isNotEmpty()
-            ) {
-                isPaging = true
-                val nextOffset = notifications.size // 누적 데이터 크기로 페이지 기준 이동
-                viewModel.loadNotifications(offset = nextOffset, append = true) { list ->
-                    if (list.isEmpty()) {
-                        isEnd = true
-                    }
-                    isPaging = false
-                }
-            }
-        }
+        viewModel.loadNotificationsAll()
     }
 
     Column(
@@ -74,17 +40,22 @@ fun NotificationScreen(
             .fillMaxSize()
             .padding(top = 32.dp)
     ) {
-        if (loading && !isPaging) {
+        if (loading) {
             Text(
                 "로딩 중...",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
+        // 중복 아이템 제거 + 안정적인 키 생성을 위한 표시용 리스트
+        val displayList = remember(notifications) {
+            notifications
+                .distinctBy { it.id to (it.createdAt ?: "") }
+        }
         LazyColumn(
             modifier = Modifier.weight(1f),
             state = listState
         ) {
-            items(notifications, key = { it.id }) { item ->
+            items(displayList, key = { n -> "notif-${n.id}-${n.createdAt ?: ""}" }) { item ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -125,15 +96,6 @@ fun NotificationScreen(
                     }
                 }
             }
-        }
-        // 맨 아래에 페이징 중 안내
-        if (isPaging) {
-            Text(
-                text = "불러오는 중...",
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp),
-                color = Color.Gray,
-                fontSize = 13.sp
-            )
         }
     }
 }

@@ -18,24 +18,18 @@ class NotificationViewModel : ViewModel() {
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
-    fun loadNotifications(
-        offset: Int,
-        append: Boolean = false,
+    fun loadNotificationsAll(
         onLoaded: ((List<NotificationResponse>) -> Unit)? = null
     ) {
         viewModelScope.launch {
             _loading.value = true
             try {
-                val response = repository.getNotifications(offset)
+                val response = repository.getNotifications()
                 val list = response?.notifications ?: emptyList()
-                if (append) {
-                    _notifications.value = _notifications.value + list
-                } else {
-                    _notifications.value = list
-                }
+                _notifications.value = list
                 onLoaded?.invoke(list)
             } catch (e: Exception) {
-                if (!append) _notifications.value = emptyList()
+                _notifications.value = emptyList()
                 onLoaded?.invoke(emptyList())
             } finally {
                 _loading.value = false
