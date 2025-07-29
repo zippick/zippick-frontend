@@ -1,6 +1,7 @@
 package com.example.zippick.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -44,11 +47,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.zippick.R
 import com.example.zippick.network.RetrofitInstance
 import com.example.zippick.network.TokenManager
 import com.example.zippick.network.auth.AuthService
 import com.example.zippick.ui.model.LoginRequest
 import com.example.zippick.ui.theme.DarkGray
+import com.example.zippick.ui.theme.LightGray
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.theme.Typography
 import kotlinx.coroutines.launch
@@ -65,16 +70,24 @@ fun LoginScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .imePadding()
+            .padding(horizontal = 24.dp, vertical = 0.dp)
+            .padding(top = 120.dp)
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(R.drawable.ic_logo_zippick),
+            contentDescription = "앱 로고",
+            modifier = Modifier
+                .size(120.dp)
+        )
+        Spacer(modifier = Modifier.width(100.dp))
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp),
+                .height(170.dp),
             shape = RoundedCornerShape(16.dp),
             shadowElevation = 6.dp,
             color = Color.White
@@ -84,7 +97,7 @@ fun LoginScreen(navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TextField(
                         value = userId,
@@ -101,7 +114,7 @@ fun LoginScreen(navController: NavHostController) {
                         colors = noLineTextFieldColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Divider(color = Color.Gray, thickness = 1.dp)
+                    Divider(color = LightGray, thickness = 1.dp)
 
                     TextField(
                         value = password,
@@ -160,7 +173,7 @@ fun LoginScreen(navController: NavHostController) {
                         TokenManager.saveToken(response.token)
                         errorMessage = null
 
-                        // ✅ 로그인 성공 시 home으로 이동
+                        // 로그인 성공 시 home으로 이동
                         navController.navigate("home") {
                             popUpTo("login") { inclusive = true }
                         }
@@ -172,19 +185,23 @@ fun LoginScreen(navController: NavHostController) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
+                .height(56.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MainBlue)
         ) {
-            Text("로그인", style = Typography.titleLarge, color = Color.White)
+            Text("로그인",
+                fontWeight = FontWeight(500),
+                fontSize = 18.sp,
+                color = Color.White)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = "회원가입",
-            style = Typography.bodyLarge.copy(fontSize = 14.sp),
+            style = Typography.bodyLarge.copy(fontSize = 16.sp),
             color = MainBlue,
+            fontWeight = FontWeight(500),
             modifier = Modifier.clickable {
                 navController.navigate("signup")
             }
