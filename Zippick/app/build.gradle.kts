@@ -81,4 +81,6 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
 
     implementation("com.airbnb.android:lottie-compose:6.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
+
 }
