@@ -6,18 +6,21 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.zippick.R
 import com.example.zippick.ui.model.BottomNavItem
 import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.theme.Pretendard
 
 val bottomNavItems = listOf(
     BottomNavItem("home", "홈", R.drawable.ic_home_selected, R.drawable.ic_home_unselected),
@@ -72,7 +75,16 @@ fun BottomBar(navController: NavHostController) {
                             contentDescription = item.label
                         )
                     },
-                    label = { Text(item.label, fontWeight = FontWeight.SemiBold) },
+                    label = {
+                        Text(
+                            text = item.label,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 13.sp,
+                                fontFamily = Pretendard
+                            )
+                        )
+                    },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = Color.Transparent,
                         selectedIconColor = MainBlue,
