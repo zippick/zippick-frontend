@@ -1,8 +1,11 @@
 package com.example.zippick.network.member
 
+import com.example.zippick.ui.model.MyInfoResponse
+import com.example.zippick.ui.model.OrderHistoryResponse
 import com.example.zippick.ui.model.SignUpRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -12,4 +15,14 @@ interface MemberService {
 
     @GET("/api/members/check-email")
     suspend fun checkEmail(@Query("email") email: String): retrofit2.Response<Boolean>
+
+    @GET("/api/members/myinfo")
+    suspend fun getMyInfo(
+        @Header("token") token: String
+    ): MyInfoResponse
+
+    @GET("/api/members/orders")
+    suspend fun getOrderHistories(
+        @Header("token") token: String
+    ): List<OrderHistoryResponse>
 }

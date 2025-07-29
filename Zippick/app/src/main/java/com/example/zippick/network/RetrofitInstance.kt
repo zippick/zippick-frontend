@@ -24,8 +24,9 @@ object TokenManager {
     }
 
     fun getToken(): String? {
-//        return prefs.getString(TOKEN_KEY, null)
-        return "Bearer 55c5982d-1641-49f3-be64-8231f468e96c"
+        if (!::prefs.isInitialized) return null
+        val token = prefs.getString(TOKEN_KEY, null)
+        return if (token == "null") null else token
     }
 
     fun clearToken() {

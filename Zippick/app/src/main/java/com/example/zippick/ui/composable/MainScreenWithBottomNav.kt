@@ -37,6 +37,7 @@ import androidx.navigation.NavType
 import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.CategoryCompareScreen
 import com.example.zippick.ui.screen.LikedListScreen
+import com.example.zippick.ui.screen.LoginScreen
 import com.example.zippick.ui.screen.OrderDetailScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import com.example.zippick.ui.screen.PhotoRecommandListScreen
@@ -87,6 +88,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 composable("size") { CategorySelectionScreen(navController) }
                 composable("photo") { PhotoScreen(navController) }
                 composable("my") { MyScreen(navController) }
+                composable("login") { LoginScreen(navController) }
 
                 // 검색/알림/상세 페이지 등 추가
                 composable("search") { SearchScreen(navController) }
