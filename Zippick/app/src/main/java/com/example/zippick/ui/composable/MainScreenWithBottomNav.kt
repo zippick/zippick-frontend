@@ -37,6 +37,7 @@ import androidx.navigation.NavType
 import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.CategoryCompareScreen
 import com.example.zippick.ui.screen.LikedListScreen
+import com.example.zippick.ui.screen.OrderDetailScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import com.example.zippick.ui.screen.PhotoRecommandListScreen
 
@@ -72,7 +73,17 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen(navController) }
-                composable("category") { CategoryScreen(navController) }
+                composable(
+                    route = "category/{category}",
+                    arguments = listOf(navArgument("category") { defaultValue = "전체" })
+                ) { backStackEntry ->
+                    val category = backStackEntry.arguments?.getString("category") ?: "전체"
+                    CategoryScreen(
+                        navController = navController,
+                        productViewModel = productViewModel,
+                        initialCategory = category
+                    )
+                }
                 composable("size") { CategorySelectionScreen(navController) }
                 composable("photo") { PhotoScreen(navController) }
                 composable("my") { MyScreen(navController) }
@@ -139,7 +150,11 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                     arguments = listOf(navArgument("keyword") { defaultValue = "" })
                 ) { backStackEntry ->
                     val keyword = backStackEntry.arguments?.getString("keyword") ?: ""
-                    CategoryScreen(navController, keyword)
+                    CategoryScreen(
+                        navController = navController,
+                        productViewModel = productViewModel,
+                        keyword = keyword
+                    )
                 }
 
                 // 찜 목록 및 상품 비교
@@ -180,7 +195,14 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                     )
                 }
 
-
+                // 주문 상세 페이지
+                composable(
+                    route = "myOrderDetail/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val orderId = backStackEntry.arguments?.getInt("id") ?: 0
+                    OrderDetailScreen(orderId = orderId, navController = navController)
+                }
             }
         }
     }

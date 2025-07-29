@@ -15,7 +15,7 @@ fun HomeScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize()) {
         CarouselSection()
         Spacer(modifier = Modifier.height(20.dp))
-        CategoryGrid()
+        CategoryGrid(navController = navController)
     }
 }
 

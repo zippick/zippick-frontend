@@ -53,7 +53,8 @@ fun PhotoRecommandListScreen(
             ProductGrid(
                 products = products,
                 navController = navController,
-                listState = listState
+                listState = listState,
+                onLoadMore = {}
             )
         }
 

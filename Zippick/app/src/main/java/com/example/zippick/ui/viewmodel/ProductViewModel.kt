@@ -20,6 +20,20 @@ import com.example.zippick.util.convertToParam
 class ProductViewModel : ViewModel() {
     private val repository = ProductRepository()
 
+    private val _categorySortOption = MutableStateFlow(SortOption.LATEST)
+    val categorySortOption: StateFlow<SortOption> = _categorySortOption
+
+    private val _sizeSearchSortOption = MutableStateFlow(SortOption.LATEST)
+    val sizeSearchSortOption: StateFlow<SortOption> = _sizeSearchSortOption
+
+    fun setCategorySortOption(option: SortOption) {
+        _categorySortOption.value = option
+    }
+
+    fun setSizeSearchSortOption(option: SortOption) {
+        _sizeSearchSortOption.value = option
+    }
+
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> = _products
 
@@ -77,6 +91,9 @@ class ProductViewModel : ViewModel() {
     }
 
     fun loadMore() {
+        if (_loading.value) return
+        if (_products.value.size >= _totalCount.value) return
+
         lastRequest?.let { (width, depth, height) ->
             loadBySize(width, depth, height, currentSort, offset = currentOffset, append = true)
         }
@@ -129,6 +146,9 @@ class ProductViewModel : ViewModel() {
     }
 
     fun loadMoreByCategoryAndPrice() {
+        if (_loading.value) return
+        if (_products.value.size >= _totalCount.value) return
+
         loadByCategoryAndPrice(
             category = currentCategory,
             minPrice = currentMinPrice,
@@ -216,6 +236,9 @@ class ProductViewModel : ViewModel() {
     }
 
     fun loadMoreProducts() {
+        if (_loading.value) return
+        if (_products.value.size >= _totalCount.value) return
+
         currentKeyword?.let {
             searchProductsByKeyword(
                 keyword = it,
