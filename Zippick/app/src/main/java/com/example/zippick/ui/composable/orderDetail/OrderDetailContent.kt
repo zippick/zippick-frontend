@@ -116,26 +116,28 @@ fun OrderDetailContent(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        Button(
-            onClick = { showDialog = true }, // 팝업 띄우기
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            border = BorderStroke(1.8.dp, MainBlue),
-            shape = RoundedCornerShape(13.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MainBlue,
-                contentColor = Color.White
-            )
-        ) {
-            Text(text = "주문 취소", fontWeight = FontWeight(500), fontSize = 16.sp)
+        // 주문 상태가 취소가 아닌 경우에만 버튼 보여주기
+        if (orderDetail.status != "CANCELED") {
+            Button(
+                onClick = { showDialog = true }, // 팝업 띄우기
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                border = BorderStroke(1.8.dp, MainBlue),
+                shape = RoundedCornerShape(13.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MainBlue,
+                    contentColor = Color.White
+                )
+            ) {
+                Text(text = "주문 취소", fontWeight = FontWeight(500), fontSize = 16.sp)
+            }
         }
 
-        if (showDialog) {
+        if (showDialog && orderDetail.status != "CANCELED") {
             CancelOrderDialog(
                 onDismiss = { showDialog = false },
                 onConfirm = {
-                    // 주문 취소 처리
                     onCancelClick()
                 }
             )

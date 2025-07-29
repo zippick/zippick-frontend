@@ -117,7 +117,7 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                     val encodedImageUrl = Uri.encode(product.mainImageUrl)
 
                     navController.navigate(
-                        "aiLayout/$encodedName/${product.price}/$encodedCategory/$encodedImageUrl"
+                        "categoryAiLayout/$encodedName/${product.price}/$encodedCategory/$encodedImageUrl"
                     )
                 }
 

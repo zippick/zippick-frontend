@@ -120,8 +120,8 @@ fun CategoryItem(
         Text(
             text = label,
             color = borderColor,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            fontWeight = FontWeight(500),
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .zIndex(1f)

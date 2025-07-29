@@ -41,7 +41,7 @@ fun CategoryCard(
             text = categoryName,
             color = Color.Gray,
             fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight(500),
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .zIndex(1f)

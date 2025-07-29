@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.zippick.R
-import com.example.zippick.ui.composable.BottomBar
+import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.viewmodel.ProductViewModel
@@ -113,16 +113,15 @@ fun AiLayoutScreen(
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
+                        Text(product.category, color = MainBlue, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(product.name, fontSize = 16.sp)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("${product.price}원", fontSize = 14.sp)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(product.category, color = MainBlue, fontSize = 14.sp)
+                        Text("${product.price.toPriceFormat()}원", fontSize = 14.sp)
                     }
                 }
             }
         },
-        bottomBar = { BottomBar(navController) },
         containerColor = Color.White
     ) { padding ->
         Box(
@@ -133,19 +132,27 @@ fun AiLayoutScreen(
             when {
                 isLoading -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator(color = MainBlue)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            LottieLoading(modifier = Modifier.size(120.dp))
+
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("AI가 가구를 배치하는 중입니다...", fontSize = 14.sp)
-                            Spacer(modifier = Modifier.height(4.dp)) // 간격 조정
-                            Text(
-                                text = "평균 소요 시간 : 약 9초",
-                                fontSize = 12.sp,
-                                color = Color.Gray,
-                                textAlign = TextAlign.Center
+
+                            androidx.compose.material.Text(
+                                text = "사진을 분석하고 가구를 배치하는 중이에요.",
+                                color = MainBlue,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            androidx.compose.material.Text(
+                                text = "약 15초 정도 소요될 수 있어요.",
+                                color = MainBlue,
+                                fontSize = 16.sp
                             )
                         }
                     }
@@ -227,7 +234,7 @@ fun AiLayoutScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp, start = 20.dp, end = 20.dp)
+                    .padding(start = 20.dp, end = 20.dp)
             ) {
                 Button(
                     onClick = {
@@ -263,4 +270,8 @@ fun AiLayoutScreen(
             }
         }
     }
+}
+
+fun Int.toPriceFormat(): String {
+    return "%,d".format(this)
 }

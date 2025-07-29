@@ -1,5 +1,6 @@
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,10 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.zippick.R
+import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.viewmodel.NotificationViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -38,13 +42,21 @@ fun NotificationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 32.dp)
+            .padding(top = 20.dp)
+            .padding(horizontal = 12.dp)
     ) {
         if (loading) {
-            Text(
-                "로딩 중...",
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LottieLoading(modifier = Modifier.size(120.dp))
+                }
+            }
         }
         // 중복 아이템 제거 + 안정적인 키 생성을 위한 표시용 리스트
         val displayList = remember(notifications) {
@@ -67,31 +79,37 @@ fun NotificationScreen(
                         .padding(horizontal = 20.dp, vertical = 14.dp)
                 ) {
                     Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_alarm_success),
+                                    contentDescription = "체크 아이콘",
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .padding(end = 6.dp)
+                                )
+                                Text(
+                                    text = item.title ?: "",
+                                    fontWeight = FontWeight(500),
+                                    fontSize = 16.sp
+                                )
+                            }
+
                             Text(
-                                text = "✓",
-                                fontSize = 20.sp,
-                                color = Color(0xFF222222),
-                                modifier = Modifier.padding(end = 4.dp)
-                            )
-                            Text(
-                                text = item.title ?: "",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
-                            )
-                            Text(
-                                text = (formatToKST(item.createdAt)).let { if(it.isNotEmpty()) " · $it" else "" },
+                                text = formatToRelativeTime(item.createdAt),
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 14.sp,
                                 color = Color.Gray,
-                                modifier = Modifier.padding(start = 2.dp)
                             )
                         }
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = item.body ?: "",
+                            text = item.body ?: "상품 결제가 완료되었습니다.",
                             fontSize = 15.sp,
-                            color = Color(0xFF222222)
+                            color = Color.Black
                         )
                     }
                 }
@@ -101,21 +119,29 @@ fun NotificationScreen(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun formatToKST(input: String?): String {
+fun formatToRelativeTime(input: String?): String {
     if (input.isNullOrBlank()) return ""
+
     return try {
-        // 1. OffsetDateTime(ISO 8601 with Z or +09:00) 파싱 시도
-        val zdt = java.time.OffsetDateTime.parse(input)
-        val kst = zdt.atZoneSameInstant(java.time.ZoneId.of("Asia/Seoul"))
-        java.time.format.DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").format(kst)
-    } catch (e: Exception) {
-        try {
-            // 2. LocalDateTime(yyyy-MM-ddTHH:mm:ss)로 시도, KST로 변환
-            val ldt = java.time.LocalDateTime.parse(input)
-            val kst = ldt.atZone(java.time.ZoneId.of("Asia/Seoul"))
-            java.time.format.DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").format(kst)
+        val now = java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Seoul"))
+
+        val parsed = try {
+            java.time.OffsetDateTime.parse(input).atZoneSameInstant(java.time.ZoneId.of("Asia/Seoul"))
         } catch (e: Exception) {
-            ""
+            java.time.LocalDateTime.parse(input).atZone(java.time.ZoneId.of("Asia/Seoul"))
         }
+
+        val duration = java.time.Duration.between(parsed, now)
+
+        when {
+            duration.toMinutes() < 1 -> "방금 전"
+            duration.toMinutes() < 60 -> "${duration.toMinutes()}분 전"
+            duration.toHours() < 24 -> "${duration.toHours()}시간 전"
+            duration.toDays() == 1L -> "어제"
+            duration.toDays() <= 7L -> "${duration.toDays()}일 전"
+            else -> java.time.format.DateTimeFormatter.ofPattern("yyyy.MM.dd").format(parsed)
+        }
+    } catch (e: Exception) {
+        ""
     }
 }

@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.compose.rememberNavController
 import com.example.zippick.network.RetrofitInstance
 import com.example.zippick.network.fcm.FcmApi
 import com.example.zippick.network.fcm.dto.FcmTokenRequest
@@ -39,9 +41,23 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AndroidLabTheme {
-                // 알림 클릭 시 "notifications"로 이동
-                val startDestination = intent?.getStringExtra("navigateTo") ?: "home"
-                MainScreenWithBottomNav(startDestination = startDestination)
+                val navController = rememberNavController()
+
+                // 알림 클릭 여부 판단
+                val navigateTo = intent?.getStringExtra("navigateTo")
+
+                // 항상 홈으로 시작
+                MainScreenWithBottomNav(
+                    navController = navController,
+                    startDestination = "home"
+                )
+
+                // 알림 클릭 시, NavHost 초기화 후 알림화면으로 이동
+                LaunchedEffect(Unit) {
+                    if (navigateTo == "notifications") {
+                        navController.navigate("notifications")
+                    }
+                }
             }
         }
     }

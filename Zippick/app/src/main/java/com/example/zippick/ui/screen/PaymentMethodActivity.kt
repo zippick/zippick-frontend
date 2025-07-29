@@ -6,21 +6,27 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zippick.R
 import com.example.zippick.network.notification.NotificationSendRequest
 import com.example.zippick.ui.model.OrderRequest
+import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.viewmodel.NotificationViewModel
 import com.example.zippick.ui.viewmodel.OrderViewModel
 import com.tosspayments.paymentsdk.PaymentWidget
@@ -96,22 +102,29 @@ fun PaymentMethodScreen(
     }
     Scaffold(
         topBar = {
-            IconButton(onClick = {
-                // 액티비티 종료 = 뒤로가기
-                (context as? AppCompatActivity)?.finish()
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_back), // 뒤로가기 버튼
-                    contentDescription = "뒤로가기"
-                )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, top = 8.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        (context as? AppCompatActivity)?.finish()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_back),
+                        contentDescription = "뒤로가기"
+                    )
+                }
             }
         }
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
+                .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AndroidView(
@@ -123,7 +136,7 @@ fun PaymentMethodScreen(
                         options = null
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().height(450.dp)
             )
 
             AndroidView(
@@ -143,7 +156,11 @@ fun PaymentMethodScreen(
                         ),
                         paymentCallback = object : PaymentCallback {
                             override fun onPaymentSuccess(success: TossPaymentResult.Success) {
-                                Toast.makeText(context, "결제 성공: ${success.paymentKey}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "결제 성공: ${success.paymentKey}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 val request = OrderRequest(
                                     totalPrice = productPrice * productAmount,
                                     count = productAmount,
@@ -161,16 +178,33 @@ fun PaymentMethodScreen(
                                 )
                                 notificationViewModel.sendNotification(notificationRequest)
                             }
+
                             override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
                                 // 실패시 화면 이동 없이 Toast만 표시
-                                Toast.makeText(context, "결제 실패: ${fail.errorMessage ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "결제 실패: ${fail.errorMessage ?: "알 수 없는 오류"}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(48.dp)
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(13.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MainBlue,
+                )
             ) {
-                Text("결제하기")
+                Text(
+                    "결제하기",
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight(500)
+                )
             }
         }
     }
