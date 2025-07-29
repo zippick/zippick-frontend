@@ -32,42 +32,57 @@ fun PhotoScreen(navController: NavController) {
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
     val categoryList = listOf("의자", "소파", "식탁", "책상", "옷장", "침대")
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
 
-    // 갤러리/파일 탐색기 런처
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { selectedImageUri.value = it }
-    }
-
-    // 카메라 런처
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) {
-            cameraImageUri?.let { selectedImageUri.value = it }
+    // 사진 선택 결과를 받아 처리할 런처
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val uri = result.data?.data ?: cameraImageUri
+            if (uri != null) {
+                selectedImageUri.value = uri
+            }
         }
     }
 
-    fun launchImageChooser() {
-        val options = listOf("카메라", "갤러리", "파일 탐색기")
-
-        // 예: 간단한 AlertDialog 또는 BottomSheet로 선택 UI 표시
-        // 여기서는 임시로 갤러리 런처 실행만 예시로
-        galleryLauncher.launch("image/*")
-    }
-
-    fun launchCamera() {
+    // 카메라용 이미지 URI 생성 함수
+    fun createImageUri(): Uri {
         val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.TITLE, "새 사진")
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, "camera_photo.jpg")
         }
-
-        val resolver = context.contentResolver
-        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-        if (uri != null) {
-            cameraImageUri = uri
-            cameraLauncher.launch(uri)
-        }
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )!!
     }
 
+    // 카메라 / 갤러리 / 파일 탐색기 선택 창 띄우는 함수
+    fun launchImageChooser() {
+        val imageUri = createImageUri()
+        cameraImageUri = imageUri
+
+        val cameraIntent = android.content.Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        }
+
+        val galleryIntent = android.content.Intent(android.content.Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+
+        val fileExplorerIntent = android.content.Intent(android.content.Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
+        }
+
+        val chooser = android.content.Intent.createChooser(galleryIntent, "사진 업로드")
+        chooser.putExtra(
+            android.content.Intent.EXTRA_INITIAL_INTENTS,
+            arrayOf(cameraIntent, fileExplorerIntent)
+        )
+        launcher.launch(chooser)
+    }
+
+    // UI
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -102,7 +117,7 @@ fun PhotoScreen(navController: NavController) {
 
             PhotoUploadSection(
                 selectedImageUri = selectedImageUri.value,
-                onPickImageClick = { launchImageChooser() }
+                onPickImageClick = { launchImageChooser() } // 이 버튼 클릭 시 chooser 띄움
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -110,12 +125,14 @@ fun PhotoScreen(navController: NavController) {
             AnalyzeButton(
                 label = "분석하기",
                 onClick = {
-                val imageUriEncoded = Uri.encode(selectedImageUri.value.toString())
-                val categoryEncoded = Uri.encode(selectedCategory.value ?: "")
-                navController.navigate("photoAnalysis/$imageUriEncoded/$categoryEncoded")
-            })
+                    val imageUriEncoded = Uri.encode(selectedImageUri.value.toString())
+                    val categoryEncoded = Uri.encode(selectedCategory.value ?: "")
+                    navController.navigate("photoAnalysis/$imageUriEncoded/$categoryEncoded")
+                }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
+

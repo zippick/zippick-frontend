@@ -16,7 +16,8 @@ fun PriceFilterBottomSheet(
     onMinPriceChange: (String) -> Unit,
     onMaxPriceChange: (String) -> Unit,
     onDismiss: () -> Unit,
-    onApply: () -> Unit
+    onApply: () -> Unit,
+    onReset: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -29,13 +30,22 @@ fun PriceFilterBottomSheet(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = minPrice,
-                    onValueChange = onMinPriceChange,
+                    onValueChange = {
+                        // 숫자만 허용 + 0 이상만
+                        if (it.all { ch -> ch.isDigit() } && (it.toIntOrNull() ?: 0) >= 0) {
+                            onMinPriceChange(it)
+                        }
+                    },
                     label = { Text("최소 금액") },
                     modifier = Modifier.weight(1f)
                 )
                 OutlinedTextField(
                     value = maxPrice,
-                    onValueChange = onMaxPriceChange,
+                    onValueChange = {
+                        if (it.all { ch -> ch.isDigit() } && (it.toIntOrNull() ?: 0) >= 0) {
+                            onMaxPriceChange(it)
+                        }
+                    },
                     label = { Text("최대 금액") },
                     modifier = Modifier.weight(1f)
                 )
@@ -45,10 +55,7 @@ fun PriceFilterBottomSheet(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
-                    onClick = {
-                        onMinPriceChange("")
-                        onMaxPriceChange("")
-                    },
+                    onClick = onReset,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                 ) {
                     Text("초기화")
