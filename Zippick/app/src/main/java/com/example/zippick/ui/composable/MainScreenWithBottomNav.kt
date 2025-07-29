@@ -109,7 +109,7 @@ fun MainScreenWithBottomNav(
 
                 // ai 가구 배치
                 composable(
-                    route = "aiLayout/{name}/{price}/{category}/{imageUrl}",
+                    route = "categoryAiLayout/{name}/{price}/{category}/{imageUrl}",
                     arguments = listOf(
                         navArgument("name") { defaultValue = "" },
                         navArgument("price") { defaultValue = 0 },

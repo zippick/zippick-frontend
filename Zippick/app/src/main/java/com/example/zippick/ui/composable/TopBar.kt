@@ -64,6 +64,7 @@ fun TopBar(
                             currentRoute.startsWith("categoryCompareResult") -> "상품 비교"
                             currentRoute.startsWith("photoRecommendList") -> "추천 상품"
                             currentRoute.startsWith("myOrderDetail") -> "주문 상세"
+                            currentRoute.startsWith("categoryAiLayout") -> "가상 배치"
                             else -> "상세페이지"
                         },
                         textAlign = TextAlign.Center,

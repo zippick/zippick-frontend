@@ -122,7 +122,6 @@ fun AiLayoutScreen(
                 }
             }
         },
-        bottomBar = { BottomBar(navController) },
         containerColor = Color.White
     ) { padding ->
         Box(
@@ -227,7 +226,7 @@ fun AiLayoutScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp, start = 20.dp, end = 20.dp)
+                    .padding(start = 20.dp, end = 20.dp)
             ) {
                 Button(
                     onClick = {
