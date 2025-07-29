@@ -26,9 +26,7 @@ data class NotificationSendRequest(
 
 interface NotificationApi {
     @GET("api/notifications")
-    suspend fun getNotifications(
-        @Query("offset") offset: Int
-    ): NotificationListResponse
+    suspend fun getNotifications(): NotificationListResponse
 
     @POST("api/notifications/send")
     suspend fun postNotifications(
