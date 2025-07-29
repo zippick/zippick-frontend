@@ -15,10 +15,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.zippick.R
 
 @Composable
-fun CategoryGrid() {
+fun CategoryGrid(navController: NavController) {
     val categories = listOf(
         "의자" to R.drawable.chair,
         "책상" to R.drawable.desk,
@@ -32,13 +33,18 @@ fun CategoryGrid() {
         for (row in categories.chunked(3)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             ) {
                 row.forEach { (label, image) ->
                     CategoryCard(
                         categoryName = label,
                         imageResId = image,
-                        onClick = { /* TODO: 카테고리 선택 로직 */ }
+                        onClick = {
+                            val categoryParam = label
+                            navController.navigate("category/${categoryParam}")
+                        }
                     )
                 }
             }

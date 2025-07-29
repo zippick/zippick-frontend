@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,30 +26,47 @@ import com.example.zippick.ui.theme.MainBlue
 @Composable
 fun CategoryScreen(
     navController: NavController,
-    keyword: String? = null // 검색어가 있으면 검색 모드
+    productViewModel: ProductViewModel = viewModel(),
+    keyword: String? = null,
+    initialCategory: String = "전체"
 ) {
     val isSearchMode = keyword != null
 
-    var selectedCategory by remember { mutableStateOf("전체") }
+    var selectedCategory by remember { mutableStateOf(initialCategory) }
     val categories = listOf("전체", "의자", "소파", "책상", "식탁", "옷장", "침대")
 
-    var selectedSort by remember { mutableStateOf(SortOption.NEWEST) }
-    var minPrice by remember { mutableStateOf("") }
-    var maxPrice by remember { mutableStateOf("") }
+    val sortInitKey = rememberSaveable(key = keyword) { mutableStateOf(true) } // 최초 진입 판단 키
+    val selectedSort by productViewModel.categorySortOption.collectAsState()
 
-    val productViewModel: ProductViewModel = viewModel()
-//    val products = sampleProducts
-    // TODO: 백엔드 API 수정되면 아래로 교체
+    var minPrice by rememberSaveable { mutableStateOf("0") }
+    var maxPrice by rememberSaveable { mutableStateOf("") }
+
     val products by productViewModel.products.collectAsState()
     val totalCount by productViewModel.totalCount.collectAsState()
     val isLoading by productViewModel.loading.collectAsState()
 
     val listState = rememberLazyGridState()
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalCount = listState.layoutInfo.totalItemsCount
-            lastVisible >= totalCount - 2
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo }
+            .collect { layoutInfo ->
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@collect
+                val totalItems = layoutInfo.totalItemsCount
+                if (lastVisibleItem >= totalItems - 4) {
+                    if (isSearchMode) {
+                        productViewModel.loadMoreProducts()
+                    } else {
+                        productViewModel.loadMoreByCategoryAndPrice()
+                    }
+                }
+            }
+    }
+
+    // 키워드가 바뀌면 최초 1회만 정렬 초기화
+    LaunchedEffect(keyword) {
+        if (isSearchMode && sortInitKey.value) {
+            productViewModel.setCategorySortOption(SortOption.LATEST)
+            sortInitKey.value = false
         }
     }
 
@@ -87,14 +105,6 @@ fun CategoryScreen(
         }
     }
 
-    // 무한스크롤 감지 시 추가 로딩
-    LaunchedEffect(shouldLoadMore.value) {
-        if (isSearchMode && shouldLoadMore.value && !isLoading) {
-            productViewModel.loadMoreProducts()
-        } else if (!isSearchMode && shouldLoadMore.value && !isLoading) {
-            productViewModel.loadMoreByCategoryAndPrice()
-        }
-    }
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
             if (!isSearchMode) {
@@ -124,7 +134,9 @@ fun CategoryScreen(
             ProductFilterHeader(
                 productCount = totalCount,
                 selectedSort = selectedSort,
-                onSortChange = { selectedSort = it },
+                onSortChange = {
+                    productViewModel.setCategorySortOption(it)
+                },
                 minPrice = if (!isSearchMode) minPrice else null,
                 maxPrice = if (!isSearchMode) maxPrice else null,
                 onMinPriceChange = if (!isSearchMode) ({ minPrice = it }) else null,
@@ -146,7 +158,16 @@ fun CategoryScreen(
             ProductGrid(
                 products = products,
                 navController = navController,
-                listState = listState
+                listState = listState,
+                isLoading = isLoading,
+                onLoadMore = {
+                    if (isSearchMode) {
+                        productViewModel.loadMoreProducts()
+                    } else {
+                        productViewModel.loadMoreByCategoryAndPrice()
+                    }
+                },
+                modifier = Modifier.weight(1f)
             )
         }
 

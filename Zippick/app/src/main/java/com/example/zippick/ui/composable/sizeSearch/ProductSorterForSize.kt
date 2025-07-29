@@ -25,7 +25,7 @@ fun ProductSorterForSize(
     val coroutineScope = rememberCoroutineScope()
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var isSortFilterChecked by remember { mutableStateOf(false) } // 처음엔 OFF
+    val isSortFilterChecked = selectedSort != SortOption.LATEST
     var showSortSheet by remember { mutableStateOf(false) }
 
     Row(
@@ -69,7 +69,6 @@ fun ProductSorterForSize(
                 onSortChange(it)
                 coroutineScope.launch { sortSheetState.hide() }
                 showSortSheet = false
-                isSortFilterChecked = true // 여기서 ON 상태로 고정
             },
             onDismiss = {
                 coroutineScope.launch { sortSheetState.hide() }

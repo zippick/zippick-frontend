@@ -1,6 +1,9 @@
 package com.example.zippick.ui.composable
 
+import NotificationScreen
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +26,6 @@ import com.example.zippick.ui.screen.CategorySelectionScreen
 import com.example.zippick.ui.screen.DetailScreen
 import com.example.zippick.ui.screen.HomeScreen
 import com.example.zippick.ui.screen.MyScreen
-import com.example.zippick.ui.screen.NotificationScreen
 import com.example.zippick.ui.screen.PhotoScreen
 import com.example.zippick.ui.screen.SizeSearchResultScreen
 import com.example.zippick.ui.screen.SearchScreen
@@ -36,10 +38,11 @@ import com.example.zippick.ui.model.AiLayoutProduct
 import com.example.zippick.ui.screen.CategoryCompareScreen
 import com.example.zippick.ui.screen.LikedListScreen
 import com.example.zippick.ui.screen.LoginScreen
+import com.example.zippick.ui.screen.OrderDetailScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import com.example.zippick.ui.screen.PhotoRecommandListScreen
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -71,7 +74,17 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen(navController) }
-                composable("category") { CategoryScreen(navController) }
+                composable(
+                    route = "category/{category}",
+                    arguments = listOf(navArgument("category") { defaultValue = "전체" })
+                ) { backStackEntry ->
+                    val category = backStackEntry.arguments?.getString("category") ?: "전체"
+                    CategoryScreen(
+                        navController = navController,
+                        productViewModel = productViewModel,
+                        initialCategory = category
+                    )
+                }
                 composable("size") { CategorySelectionScreen(navController) }
                 composable("photo") { PhotoScreen(navController) }
                 composable("my") { MyScreen(navController) }
@@ -139,7 +152,11 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                     arguments = listOf(navArgument("keyword") { defaultValue = "" })
                 ) { backStackEntry ->
                     val keyword = backStackEntry.arguments?.getString("keyword") ?: ""
-                    CategoryScreen(navController, keyword)
+                    CategoryScreen(
+                        navController = navController,
+                        productViewModel = productViewModel,
+                        keyword = keyword
+                    )
                 }
 
                 // 찜 목록 및 상품 비교
@@ -158,6 +175,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                     CategoryCompareScreen(navController, id1, id2)
                 }
+
                 // 인테리어 기반 추천 상품
                 composable(
                     route = "photoRecommendList/{category}/{type}/{values}",
@@ -177,6 +195,15 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
                         type = type,
                         values = values
                     )
+                }
+
+                // 주문 상세 페이지
+                composable(
+                    route = "myOrderDetail/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val orderId = backStackEntry.arguments?.getInt("id") ?: 0
+                    OrderDetailScreen(orderId = orderId, navController = navController)
                 }
             }
         }

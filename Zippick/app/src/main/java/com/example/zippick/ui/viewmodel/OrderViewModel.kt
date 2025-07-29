@@ -22,13 +22,13 @@ class OrderViewModel : ViewModel() {
         viewModelScope.launch {
             _loading.value = true
             try {
+                // 서버 응답에 상관없이 무조건 성공으로 처리
                 repository.postOrder(request)
                 _orderResult.value = "주문이 정상적으로 완료되었습니다."
             } catch (e: Exception) {
                 val msg = "주문 실패: ${e.message}"
                 _orderResult.value = msg
-                android.util.Log.e("OrderViewModel", msg, e) // 로그 추가
-
+                android.util.Log.e("OrderViewModel", msg, e)
             } finally {
                 _loading.value = false
             }
