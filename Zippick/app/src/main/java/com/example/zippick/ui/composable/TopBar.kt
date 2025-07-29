@@ -32,78 +32,98 @@ fun TopBar(
 ) {
     val bottomTabs = listOf("home", "category", "size", "photo", "my")
     val isBottomTab = currentRoute in bottomTabs
+    val isAuthScreen = currentRoute == "login" || currentRoute == "signup"
 
     TopAppBar(
         title = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 50.dp), // 오른쪽 액션 아이콘 공간만큼 패딩
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = when {
-                        currentRoute == "home" -> "홈"
-                        currentRoute == "category" -> "카테고리"
-                        currentRoute == "size" -> "사이즈 검색"
-                        currentRoute == "photo" -> "사진"
-                        currentRoute == "my" -> "마이페이지"
-                        currentRoute == "search" -> "검색"
-                        currentRoute == "notifications" -> "알림함"
-                        currentRoute == "aiLayout" -> "AI 가구 배치"
-                        currentRoute == "login" -> "로그인"
-                        currentRoute == "signup" -> "회원가입"
-                        currentRoute.startsWith("sizeInput") -> "사이즈 검색"
-
-                        currentRoute.startsWith("category/") -> "검색 결과"
-                        currentRoute.startsWith("searchResult") -> "검색 결과"
-                        currentRoute == "sizeSearchResult" -> "검색 결과"
-
-                        currentRoute.startsWith("photoAnalysis") -> "분석 결과"
-                        currentRoute  == "likedList" -> "찜 목록"
-                        currentRoute.startsWith("categoryCompareResult") -> "상품 비교"
-
-                        currentRoute.startsWith("recommendList") -> "추천 상품"
-                        currentRoute.startsWith("myOrderDetail") -> "주문 상세"
-                        else -> "상세페이지"
-                    },
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 20.sp
-                )
-            }
-        },
-        navigationIcon = {
-            if (isBottomTab) {
-                Image(
-                    painter = painterResource(R.drawable.ic_logo),
-                    contentDescription = "로고",
-                    modifier = Modifier.padding(start = 16.dp).size(32.dp)
-                )
-            } else {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_back),
-                        contentDescription = "뒤로가기",
-                        modifier = Modifier.size(24.dp)
+            if (!isAuthScreen) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 50.dp), // 오른쪽 액션 아이콘 공간만큼 패딩
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when {
+                            currentRoute == "home" -> "홈"
+                            currentRoute == "category" -> "카테고리"
+                            currentRoute == "size" -> "사이즈 검색"
+                            currentRoute == "photo" -> "사진"
+                            currentRoute == "my" -> "마이페이지"
+                            currentRoute == "search" -> "검색"
+                            currentRoute == "notifications" -> "알림함"
+                            currentRoute == "aiLayout" -> "AI 가구 배치"
+                            currentRoute == "login" -> "로그인"
+                            currentRoute == "signup" -> "회원가입"
+                            currentRoute.startsWith("sizeInput") -> "사이즈 검색"
+                            currentRoute.startsWith("category/") -> "검색 결과"
+                            currentRoute.startsWith("searchResult") -> "검색 결과"
+                            currentRoute == "sizeSearchResult" -> "검색 결과"
+                            currentRoute.startsWith("photoAnalysis") -> "분석 결과"
+                            currentRoute == "likedList" -> "찜 목록"
+                            currentRoute.startsWith("categoryCompareResult") -> "상품 비교"
+                            currentRoute.startsWith("recommendList") -> "추천 상품"
+                            currentRoute.startsWith("myOrderDetail") -> "주문 상세"
+                            else -> "상세페이지"
+                        },
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp
                     )
                 }
             }
         },
-        actions = {
-            IconButton(onClick = { navController.navigate("search") }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_search),
-                    contentDescription = "검색",
-                    modifier = Modifier.size(24.dp)
-                )
+        navigationIcon = {
+            when {
+                isBottomTab -> {
+                    Image(
+                        painter = painterResource(R.drawable.ic_logo),
+                        contentDescription = "로고",
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .size(32.dp)
+                    )
+                }
+
+                isAuthScreen -> {
+                    IconButton(onClick = {
+                        navController.popBackStack("home", inclusive = false)
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_close),
+                            contentDescription = "닫기",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                else -> {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_back),
+                            contentDescription = "뒤로가기",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
-            IconButton(onClick = { navController.navigate("notifications") }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_alarm),
-                    contentDescription = "알림함",
-                    modifier = Modifier.size(24.dp)
-                )
+        },
+        actions = {
+            if (!isAuthScreen) {
+                IconButton(onClick = { navController.navigate("search") }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_search),
+                        contentDescription = "검색",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                IconButton(onClick = { navController.navigate("notifications") }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_alarm),
+                        contentDescription = "알림함",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

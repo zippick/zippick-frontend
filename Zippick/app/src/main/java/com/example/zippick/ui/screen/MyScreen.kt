@@ -1,6 +1,7 @@
 package com.example.zippick.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +9,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -27,7 +31,9 @@ import com.example.zippick.network.member.MemberService
 import com.example.zippick.ui.composable.RequireLogin
 import com.example.zippick.ui.model.MyInfoResponse
 import com.example.zippick.ui.model.OrderHistoryResponse
+import com.example.zippick.ui.theme.DarkGray
 import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.theme.MediumGray
 import com.example.zippick.ui.theme.Typography
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -81,7 +87,7 @@ fun MyScreen(navController: NavHostController) {
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp),
+                    .padding(vertical = 16.dp),
                 state = listState,
                 contentPadding = PaddingValues(vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -91,31 +97,46 @@ fun MyScreen(navController: NavHostController) {
                         Log.d("ZIPPICK", "🧾 MyScreen: 사용자 정보 UI 렌더링 / ${info.name}")
 
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = MainBlue,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MainBlue)
+                                .padding(24.dp), // 외부 여백
+                            color = MainBlue
                         ) {
-                            Column(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth()
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color.White,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(info.name, style = Typography.titleLarge, color = Color.White)
-                                Text(info.loginId, style = Typography.bodyLarge, color = Color.White)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "로그아웃",
-                                    color = Color.White,
-                                    style = Typography.bodyLarge.copy(fontSize = 14.sp),
+                                Row(
                                     modifier = Modifier
-                                        .align(Alignment.End)
-                                        .clickable {
-                                            Log.d("ZIPPICK", "🚪 MyScreen: 로그아웃 클릭됨")
+                                        .padding(32.dp)
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = info.name,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.DarkGray
+                                        )
+                                        Text(
+                                            text = info.loginId,
+                                            style = Typography.bodyMedium,
+                                            color = Color.DarkGray
+                                        )
+                                    }
 
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.clickable {
+                                            Log.d("ZIPPICK", "🚪 로그아웃 클릭됨")
                                             coroutineScope.launch {
                                                 val token = TokenManager.getToken() ?: return@launch
                                                 try {
-                                                    val response = authService.logout(token) // Bearer 없이 전달
+                                                    val response = authService.logout(token)
                                                     Log.d("ZIPPICK", "🚪 로그아웃 응답 성공 = ${response.isSuccessful}")
                                                 } catch (e: Exception) {
                                                     Log.e("ZIPPICK", "❌ 로그아웃 요청 실패", e)
@@ -127,17 +148,44 @@ fun MyScreen(navController: NavHostController) {
                                                 }
                                             }
                                         }
-                                )
-
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.ExitToApp,
+                                            contentDescription = "로그아웃",
+                                            tint = MainBlue
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "로그아웃",
+                                            color = MainBlue,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
                             }
                         }
 
+
                         Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            "주문 내역",
-                            style = Typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                            color = Color.Black
-                        )
+                        Column {
+                            Text(
+                                "주문 내역",
+                                modifier = Modifier
+                                    .padding(horizontal = 26.dp)
+                                    .padding(top = 12.dp),
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black,
+                                fontSize = 20.sp
+                            )
+
+                            Divider(
+                                color = MediumGray,
+                                thickness = 1.5.dp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 26.dp, vertical = 8.dp)
+                            )
+                        }
                     }
                 }
                 if (!isLoading && orders.isEmpty()) {
@@ -145,7 +193,8 @@ fun MyScreen(navController: NavHostController) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 32.dp),
+                                .padding(vertical = 32.dp)
+                                .padding(horizontal = 32.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -158,7 +207,12 @@ fun MyScreen(navController: NavHostController) {
                 }
                 items(orders) { order ->
                     Log.d("ZIPPICK", "📦 MyScreen: 주문 항목 렌더링 / ${order.productName}")
-                    OrderItem(order)
+                    OrderItem(
+                        order = order,
+                        modifier = Modifier.padding(horizontal = 26.dp)
+                    ) { orderId ->
+                        navController.navigate("myOrderDetail/${order.id}")
+                    }
                 }
 
                 if (isLoading) {
@@ -177,22 +231,43 @@ fun MyScreen(navController: NavHostController) {
 
 
 @Composable
-fun OrderItem(order: OrderHistoryResponse) {
+fun OrderItem(
+    order: OrderHistoryResponse,
+    modifier: Modifier = Modifier,
+    onClick: (Int) -> Unit) {
     Log.d("ZIPPICK", "🧾 OrderItem: 렌더링 시작 - ${order.productName}")
 
-    Column {
+    val statusText = when (order.status) {
+        "ORDERED" -> "결제 완료"
+        "CANCELED" -> "결제 취소"
+        else -> "알 수 없음"
+    }
+
+    val statusColor = when (order.status) {
+        "ORDERED" -> MainBlue
+        "CANCELED" -> MediumGray
+        else -> Color.Gray
+    }
+
+    Column (
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick(order.id) }
+            .padding(top = 12.dp)
+    ){
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(order.createdAt.substring(0, 10), style = Typography.bodyLarge, color = Color.Black)
-                Text("주문 번호 ${order.merchantOrderId}", style = Typography.bodyLarge.copy(fontSize = 13.sp))
+                Text(order.createdAt.substring(0, 10).toShortDateFormat(), color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight(500))
+                Spacer(modifier = Modifier.height(10.dp))
+                Text("주문번호 ${order.merchantOrderId}", style = Typography.bodyLarge.copy(fontSize = 15.sp))
             }
-            Text(order.status, style = Typography.bodyLarge.copy(color = MainBlue))
+            Text(statusText, style = Typography.bodyLarge.copy(color = statusColor), fontWeight = FontWeight(500))
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -201,17 +276,28 @@ fun OrderItem(order: OrderHistoryResponse) {
             AsyncImage(
                 model = order.productImageUrl,
                 contentDescription = null,
-                modifier = Modifier.size(64.dp),
+                modifier = Modifier.size(84.dp),
                 contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(20.dp))
             Column {
-                Text(order.productName, style = Typography.bodyLarge)
+                Text(order.productName, fontWeight = FontWeight(500))
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Divider(color = Color.LightGray, thickness = 1.dp)
     }
 }
+
+fun String.toShortDateFormat(): String {
+    return try {
+        val parts = this.split(" ")[0].split("-")
+        val year = parts[0].takeLast(2)
+        "$year.${parts[1]}.${parts[2]}"
+    } catch (e: Exception) {
+        this // 실패 시 원본 반환
+    }
+}
+
 

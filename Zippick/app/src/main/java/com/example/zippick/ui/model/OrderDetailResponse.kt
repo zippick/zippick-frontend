@@ -1,14 +1,17 @@
 package com.example.zippick.ui.model
 
 data class OrderDetailResponse(
-    val orderDate: String,
-    val orderNumber: String,
-    val name: String,
-    val address: String,
+    val memberName: String,
+    val basicAddress: String,
+    val detailAddress: String,
     val productId: Int,
+    val productImageUrl: String,
     val productName: String,
-    val thumbnailImageUrl: String,
+    val productPrice: Int,
+    val createdAt: String,
+    val orderId: Int,
+    val merchantOrderId: String,
     val count: Int,
-    val price: Int,
-    val totalPrice: Int
+    val totalPrice: Int,
+    val status: String
 )

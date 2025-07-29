@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.zippick.ui.model.Product
 import androidx.compose.material.CircularProgressIndicator
+import com.example.zippick.ui.composable.photo.LottieLoading
 
 @Composable
 fun ProductGrid(
@@ -35,11 +36,15 @@ fun ProductGrid(
             item(span = { GridItemSpan(2) }) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                        .fillMaxSize()
+                        .padding(top = 100.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieLoading(modifier = Modifier.size(90.dp))
+                    }
                 }
             }
         }

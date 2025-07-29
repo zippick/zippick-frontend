@@ -2,9 +2,11 @@ package com.example.zippick.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -13,6 +15,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -21,7 +24,9 @@ import androidx.navigation.NavHostController
 import com.example.zippick.R
 import com.example.zippick.ui.composable.BottomBar
 import com.example.zippick.ui.model.SizeSearchResultHolder
+import com.example.zippick.ui.theme.DarkGray
 import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.theme.Pretendard
 import com.example.zippick.ui.viewmodel.ProductViewModel
 import kotlinx.coroutines.launch
 
@@ -44,14 +49,13 @@ fun SizeInputScreen(navController: NavHostController, category: String, viewMode
     }
 
     Scaffold(
-        containerColor = Color.White
+        containerColor = Color.White,
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 20.dp)
+                .padding(vertical = 8.dp)
+                .padding(horizontal = 30.dp)
                 .fillMaxSize()
-                .imePadding()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -77,7 +81,7 @@ fun SizeInputScreen(navController: NavHostController, category: String, viewMode
             Text(
                 text = "허용할 수 있는 최대 길이를 입력해주세요",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = DarkGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -155,11 +159,15 @@ fun SizeInputRow(
             value = value,
             onValueChange = { input -> if (input.all { it.isDigit() }) onValueChange(input) },
             modifier = Modifier
-                .weight(1f)
-                .height(48.dp),
-            placeholder = { Text("길이 입력", fontSize = 14.sp) },
+                .weight(1f),
+            placeholder = { Text("길이 입력", fontSize = 14.sp, color = DarkGray) },
+            textStyle = TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                fontFamily = Pretendard
+            ),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
         Text(
             text = "cm",
@@ -169,4 +177,3 @@ fun SizeInputRow(
         )
     }
 }
-
