@@ -42,22 +42,22 @@ fun OrderDetailContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = orderDetail.orderDate,
+            text = orderDetail.createdAt,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,)
         Spacer(modifier = Modifier.height(5.dp))
-        Text(text = "주문 번호 ${orderDetail.orderNumber}")
+        Text(text = "주문 번호 ${orderDetail.merchantOrderId}")
 
         Spacer(modifier = Modifier.height(24.dp))
         Divider()
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = orderDetail.name,
+            text = orderDetail.memberName,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold)
         Spacer(modifier = Modifier.height(5.dp))
-        Text(text = orderDetail.address)
+        Text(text = orderDetail.basicAddress + " " + orderDetail.detailAddress)
 
         Spacer(modifier = Modifier.height(24.dp))
         Divider()
@@ -70,7 +70,7 @@ fun OrderDetailContent(
         Spacer(modifier = Modifier.height(5.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             AsyncImage(
-                model = orderDetail.thumbnailImageUrl,
+                model = orderDetail.productImageUrl,
                 contentDescription = "상품 이미지",
                 modifier = Modifier.size(100.dp)
             )
@@ -78,7 +78,7 @@ fun OrderDetailContent(
             Column {
                 Text(text = orderDetail.productName)
                 Text(text = "${orderDetail.count}개")
-                Text(text = "${orderDetail.price}원")
+                Text(text = "${orderDetail.productPrice}원")
             }
         }
 

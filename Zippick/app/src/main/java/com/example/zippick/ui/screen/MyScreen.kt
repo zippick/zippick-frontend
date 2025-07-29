@@ -158,7 +158,9 @@ fun MyScreen(navController: NavHostController) {
                 }
                 items(orders) { order ->
                     Log.d("ZIPPICK", "📦 MyScreen: 주문 항목 렌더링 / ${order.productName}")
-                    OrderItem(order)
+                    OrderItem(order = order) { orderId ->
+                        navController.navigate("myOrderDetail/${order.id}")
+                    }
                 }
 
                 if (isLoading) {
@@ -177,10 +179,29 @@ fun MyScreen(navController: NavHostController) {
 
 
 @Composable
-fun OrderItem(order: OrderHistoryResponse) {
+fun OrderItem(
+    order: OrderHistoryResponse,
+    onClick: (Int) -> Unit) {
     Log.d("ZIPPICK", "🧾 OrderItem: 렌더링 시작 - ${order.productName}")
 
-    Column {
+    val statusText = when (order.status) {
+        "ORDERED" -> "결제 완료"
+        "CANCELED" -> "결제 취소"
+        else -> "알 수 없음"
+    }
+
+    val statusColor = when (order.status) {
+        "ORDERED" -> MainBlue
+        "CANCELED" -> Color.Red
+        else -> Color.Gray
+    }
+
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick(1)}//onClick(order.orderId) } // ✅ 클릭 시 호출
+            .padding(vertical = 12.dp) // 클릭 영역 확보
+    ){
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -189,7 +210,7 @@ fun OrderItem(order: OrderHistoryResponse) {
                 Text(order.createdAt.substring(0, 10), style = Typography.bodyLarge, color = Color.Black)
                 Text("주문 번호 ${order.merchantOrderId}", style = Typography.bodyLarge.copy(fontSize = 13.sp))
             }
-            Text(order.status, style = Typography.bodyLarge.copy(color = MainBlue))
+            Text(statusText, style = Typography.bodyLarge.copy(color = statusColor), fontWeight = FontWeight.SemiBold)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
