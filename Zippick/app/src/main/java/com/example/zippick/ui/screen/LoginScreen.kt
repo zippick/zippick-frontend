@@ -2,18 +2,7 @@ package com.example.zippick.ui.screen
 
 import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,19 +10,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,7 +34,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     var userId by remember { mutableStateOf(TextFieldValue("")) }
@@ -124,7 +101,6 @@ fun LoginScreen(navController: NavHostController) {
             }
         }
 
-        // 에러 메시지
         if (errorMessage != null) {
             Row(
                 modifier = Modifier
@@ -154,22 +130,18 @@ fun LoginScreen(navController: NavHostController) {
             onClick = {
                 coroutineScope.launch {
                     try {
-                        val id = userId.text
-                        val pw = password.text
-
-                        val request = LoginRequest(id, pw)
+                        val request = LoginRequest(userId.text, password.text)
                         val response = RetrofitInstance.retrofit
                             .create(AuthService::class.java)
                             .login(request)
 
                         TokenManager.saveToken(response.token)
-
                         errorMessage = null
-                        //이전 화면으로 이동 todo: 로그인 후 이전 화면으로 이동할거면 이거 주석 풀기
-                        navController.popBackStack()
-//                        navController.navigate("main"){
-//                            popUpTo("login"){inclusive = true}
-//                        }
+
+                        // ✅ 로그인 성공 시 home으로 이동
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     } catch (e: Exception) {
                         Log.e("LoginError", "예외 발생: ${e.message}", e)
                         errorMessage = "아이디 또는 비밀번호를 확인해주세요."
@@ -182,10 +154,7 @@ fun LoginScreen(navController: NavHostController) {
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MainBlue)
         ) {
-            Text("로그인", style = Typography.titleLarge, color = Color.White,
-                modifier = Modifier.clickable {
-                    navController.navigate("main")
-                })
+            Text("로그인", style = Typography.titleLarge, color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))

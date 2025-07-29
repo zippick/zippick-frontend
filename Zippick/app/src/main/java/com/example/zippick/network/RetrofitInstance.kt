@@ -24,7 +24,9 @@ object TokenManager {
     }
 
     fun getToken(): String? {
-        return prefs.getString(TOKEN_KEY, null)
+        if (!::prefs.isInitialized) return null
+        val token = prefs.getString(TOKEN_KEY, null)
+        return if (token == "null") null else token
     }
 
     fun clearToken() {
