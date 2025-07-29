@@ -1,6 +1,9 @@
 package com.example.zippick.ui.composable
 
+import NotificationScreen
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +26,6 @@ import com.example.zippick.ui.screen.CategorySelectionScreen
 import com.example.zippick.ui.screen.DetailScreen
 import com.example.zippick.ui.screen.HomeScreen
 import com.example.zippick.ui.screen.MyScreen
-import com.example.zippick.ui.screen.NotificationScreen
 import com.example.zippick.ui.screen.PhotoScreen
 import com.example.zippick.ui.screen.SizeSearchResultScreen
 import com.example.zippick.ui.screen.SearchScreen
@@ -39,7 +41,7 @@ import com.example.zippick.ui.screen.OrderDetailScreen
 import com.example.zippick.ui.screen.PhotoAnalysisResultScreen
 import com.example.zippick.ui.screen.PhotoRecommandListScreen
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -171,6 +173,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
 
                     CategoryCompareScreen(navController, id1, id2)
                 }
+
                 // 인테리어 기반 추천 상품
                 composable(
                     route = "photoRecommendList/{category}/{type}/{values}",
