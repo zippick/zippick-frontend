@@ -84,7 +84,7 @@ class OrderCompleteActivity : ComponentActivity() {
                     composable("home") {
                         HomeScreen(navController)
                     }
-                    composable("category") {
+                    composable("category/전체") {
                         CategoryScreen(navController)
                     }
                     composable("size") {
