@@ -80,11 +80,16 @@ fun NotificationScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
+        // 중복 아이템 제거 + 안정적인 키 생성을 위한 표시용 리스트
+        val displayList = remember(notifications) {
+            notifications
+                .distinctBy { it.id to (it.createdAt ?: "") }
+        }
         LazyColumn(
             modifier = Modifier.weight(1f),
             state = listState
         ) {
-            items(notifications, key = { it.id }) { item ->
+            items(displayList, key = { n -> "notif-${n.id}-${n.createdAt ?: ""}" }) { item ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
