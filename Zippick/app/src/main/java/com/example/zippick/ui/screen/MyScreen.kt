@@ -140,7 +140,22 @@ fun MyScreen(navController: NavHostController) {
                         )
                     }
                 }
-
+                if (!isLoading && orders.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "주문 내역이 없습니다",
+                                color = Color.Gray,
+                                style = Typography.bodyLarge.copy(fontSize = 14.sp)
+                            )
+                        }
+                    }
+                }
                 items(orders) { order ->
                     Log.d("ZIPPICK", "📦 MyScreen: 주문 항목 렌더링 / ${order.productName}")
                     OrderItem(order)
