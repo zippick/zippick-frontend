@@ -46,7 +46,11 @@ import com.example.zippick.ui.viewmodel.ProductViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreenWithBottomNav(navController: NavHostController = rememberNavController()) {
+fun MainScreenWithBottomNav(
+    navController: NavHostController = rememberNavController(),
+                            startDestination: String = "home"
+)
+{
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
@@ -72,7 +76,7 @@ fun MainScreenWithBottomNav(navController: NavHostController = rememberNavContro
         ) {
             NavHost(
                 navController = navController,
-                startDestination = "home",
+                startDestination = startDestination,
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen(navController) }

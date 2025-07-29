@@ -2,6 +2,14 @@ package com.example.zippick.network
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import com.example.zippick.network.fcm.FcmApi
+import com.example.zippick.network.fcm.dto.FcmTokenRequest
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -21,7 +29,32 @@ object TokenManager {
 
     fun saveToken(token: String) {
         prefs.edit().putString(TOKEN_KEY, token).apply()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val fcmToken = FirebaseMessaging.getInstance().token.await()
+
+                if (!fcmToken.isNullOrBlank()) {
+                    sendFcmTokenToServer(fcmToken)
+                }
+            } catch (e: Exception) {
+                Log.e("FCM", "FCM 토큰 가져오기 실패: ${e.message}")
+            }
+        }
     }
+
+    private fun sendFcmTokenToServer(fcmToken: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val api = RetrofitInstance.retrofit.create(FcmApi::class.java)
+                val response = api.registerToken(FcmTokenRequest(fcmToken = fcmToken))
+                Log.d("FCM", "로그인 후 FCM 토큰 전송 성공: ${response.success}")
+            } catch (e: Exception) {
+                Log.e("FCM", "로그인 후 FCM 토큰 전송 실패: ${e.message}")
+            }
+        }
+    }
+
 
     fun getToken(): String? {
         if (!::prefs.isInitialized) return null
