@@ -1,5 +1,6 @@
 package com.example.zippick.ui.viewmodel
 
+import android.util.Log
 import com.example.zippick.network.notification.NotificationRepository
 import com.example.zippick.network.notification.NotificationResponse
 import androidx.lifecycle.ViewModel
@@ -27,6 +28,12 @@ class NotificationViewModel : ViewModel() {
                 val response = repository.getNotifications()
                 val list = response?.notifications ?: emptyList()
                 _notifications.value = list
+
+//                Log.d("TAG", "알림 ${list.size}개 수신됨")
+//                list.forEachIndexed { index, item ->
+//                    Log.d("TAG", "[$index] id=${item.id}, title=${item.title}, body=${item.body}, createdAt=${item.createdAt}")
+//                }
+
                 onLoaded?.invoke(list)
             } catch (e: Exception) {
                 _notifications.value = emptyList()
