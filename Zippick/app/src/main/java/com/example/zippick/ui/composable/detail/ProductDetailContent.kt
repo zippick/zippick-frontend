@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -26,6 +25,7 @@ import coil.compose.AsyncImage
 import com.example.zippick.R
 import com.example.zippick.ui.model.ProductDetail
 import com.example.zippick.ui.screen.PaymentMethodActivity
+import com.example.zippick.ui.theme.MainBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,19 +38,27 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            Button(
-                onClick = {
-                    bottomSheetState.value = true // 바텀시트 열기
-                },
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(66.dp)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(12.dp)
+                    .background(Color.White) // 바텀바 전체 배경 흰색 지정
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                Text("구매하기", fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                Button(
+                    onClick = {
+                        bottomSheetState.value = true
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp), // 버튼 자체 높이만 지정
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MainBlue)
+                ) {
+                    Text("구매하기", fontWeight = FontWeight.Medium, fontSize = 16.sp, color = Color.White)
+                }
             }
         }
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -75,16 +83,16 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                     color = Color.Gray,
                     fontSize = 16.sp
                 )
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(10.dp))
                 Text(
                     text = product.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp
                 )
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(10.dp))
                 Text(
                     text = "%,d원".format(product.price),
-                    fontSize = 20.sp
+                    fontSize = 18.sp
                 )
                 Spacer(Modifier.height(16.dp))
 
@@ -101,7 +109,7 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                 DetailRow(title = "색상", value = product.color)
                 DetailRow(title = "스타일", value = product.style)
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(48.dp))
 
                 AIVirtualPlacementButton {
                     val encodedName = Uri.encode(product.name)
@@ -112,6 +120,8 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                         "aiLayout/$encodedName/${product.price}/$encodedCategory/$encodedImageUrl"
                     )
                 }
+
+                Spacer(modifier = Modifier.height(48.dp))
 
                 // 상세 이미지
                 AsyncImage(
@@ -128,22 +138,14 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
             ModalBottomSheet(
                 onDismissRequest = { bottomSheetState.value = false },
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                tonalElevation = 8.dp
+                tonalElevation = 8.dp,
+                containerColor = Color.White
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 10.dp)
                 ) {
-                    // 상단 바
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = 8.dp, bottom = 16.dp)
-                            .size(width = 36.dp, height = 4.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(Color(0xFFE0E0E0))
-                    )
 
                     // 상품 카드
                     Row(
@@ -187,7 +189,7 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                         Text(
                             text = "%,d원".format(product.price),
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF222222)
                         )
                     }
@@ -252,14 +254,14 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                             .fillMaxWidth()
                             .height(54.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7100D3) // 사진처럼 보라색 계열
+                            containerColor = MainBlue
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "%,d원 장바구니 담기".format(product.price * productAmount),
+                            "%,d원 결제하기".format(product.price * productAmount),
                             fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                             color = Color.White
                         )
                     }
