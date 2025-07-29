@@ -6,6 +6,6 @@ import retrofit2.http.POST
 import retrofit2.Response
 
 interface OrderApi {
-    @POST("order")
+    @POST("api/order/save")
     suspend fun postOrder(@Body request: OrderRequest): Response<Unit>
 }

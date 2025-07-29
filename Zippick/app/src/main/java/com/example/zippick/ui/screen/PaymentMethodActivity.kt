@@ -7,13 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.zippick.R
 import com.example.zippick.network.notification.NotificationSendRequest
 import com.example.zippick.ui.model.OrderRequest
 import com.example.zippick.ui.viewmodel.NotificationViewModel
@@ -89,68 +94,84 @@ fun PaymentMethodScreen(
             }
         }
     }
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        AndroidView(
-            factory = { ctx -> PaymentMethod(ctx) },
-            update = { view ->
-                widget.renderPaymentMethods(
-                    method = view,
-                    amount = PaymentMethod.Rendering.Amount(totalPrice),
-                    options = null
+    Scaffold(
+        topBar = {
+            IconButton(onClick = {
+                // 액티비티 종료 = 뒤로가기
+                (context as? AppCompatActivity)?.finish()
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_back), // 뒤로가기 버튼
+                    contentDescription = "뒤로가기"
                 )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        AndroidView(
-            factory = { ctx -> Agreement(ctx) },
-            update = { view -> widget.renderAgreement(view) },
-            modifier = Modifier.fillMaxWidth().height(120.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                widget.requestPayment(
-                    paymentInfo = PaymentMethod.PaymentInfo(
-                        orderId = orderId,
-                        orderName = productName
-                    ),
-                    paymentCallback = object : PaymentCallback {
-                        override fun onPaymentSuccess(success: TossPaymentResult.Success) {
-                            Toast.makeText(context, "결제 성공: ${success.paymentKey}", Toast.LENGTH_SHORT).show()
-                            val request = OrderRequest(
-                                totalPrice = productPrice * productAmount,
-                                count = productAmount,
-                                merchantOrderId = success.paymentKey,
-                                productId = productId
-                            )
-                            orderViewModel.postOrder(request)
-                            val notificationRequest = NotificationSendRequest(
-                                title = "주문이 완료되었습니다!",
-                                content = "주문번호 ${success.paymentKey}이(가) 정상 처리되었습니다.",
-                                createdAt = SimpleDateFormat(
-                                    "yyyy-MM-dd'T'HH:mm:ss",
-                                    Locale.getDefault()
-                                ).format(Date())
-                            )
-                            notificationViewModel.sendNotification(notificationRequest)
-                        }
-                        override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
-                            // 실패시 화면 이동 없이 Toast만 표시
-                            Toast.makeText(context, "결제 실패: ${fail.errorMessage ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("결제하기")
+            AndroidView(
+                factory = { ctx -> PaymentMethod(ctx) },
+                update = { view ->
+                    widget.renderPaymentMethods(
+                        method = view,
+                        amount = PaymentMethod.Rendering.Amount(totalPrice),
+                        options = null
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            AndroidView(
+                factory = { ctx -> Agreement(ctx) },
+                update = { view -> widget.renderAgreement(view) },
+                modifier = Modifier.fillMaxWidth().height(120.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    widget.requestPayment(
+                        paymentInfo = PaymentMethod.PaymentInfo(
+                            orderId = orderId,
+                            orderName = productName
+                        ),
+                        paymentCallback = object : PaymentCallback {
+                            override fun onPaymentSuccess(success: TossPaymentResult.Success) {
+                                Toast.makeText(context, "결제 성공: ${success.paymentKey}", Toast.LENGTH_SHORT).show()
+                                val request = OrderRequest(
+                                    totalPrice = productPrice * productAmount,
+                                    count = productAmount,
+                                    merchantOrderId = success.paymentKey,
+                                    productId = productId
+                                )
+                                orderViewModel.postOrder(request)
+                                val notificationRequest = NotificationSendRequest(
+                                    title = "주문이 완료되었습니다!",
+                                    content = "주문번호 ${success.paymentKey}이(가) 정상 처리되었습니다.",
+                                    createdAt = SimpleDateFormat(
+                                        "yyyy-MM-dd'T'HH:mm:ss",
+                                        Locale.getDefault()
+                                    ).format(Date())
+                                )
+                                notificationViewModel.sendNotification(notificationRequest)
+                            }
+                            override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
+                                // 실패시 화면 이동 없이 Toast만 표시
+                                Toast.makeText(context, "결제 실패: ${fail.errorMessage ?: "알 수 없는 오류"}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("결제하기")
+            }
         }
     }
 }
