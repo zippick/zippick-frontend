@@ -16,4 +16,8 @@ class OrderRepository {
     suspend fun getOrderDetail(orderId: Int, accessToken: String): Response<OrderDetailResponse> {
         return api.getOrderDetail(orderId, accessToken)
     }
+
+    suspend fun cancelOrder(orderId: Int, accessToken: String): Response<Unit> {
+        return api.cancelOrder(orderId, accessToken)
+    }
 }

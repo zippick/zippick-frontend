@@ -18,4 +18,11 @@ interface OrderApi {
         @Path("orderId") orderId: Int,
         @Header("token") token: String
     ): Response<OrderDetailResponse>
+
+    @POST("api/order/cancel/{orderId}")
+    suspend fun cancelOrder(
+        @Path("orderId") orderId: Int,
+        @Header("token") token: String
+    ): Response<Unit>
+
 }

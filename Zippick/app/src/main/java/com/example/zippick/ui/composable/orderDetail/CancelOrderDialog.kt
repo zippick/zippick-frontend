@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.example.zippick.ui.theme.MainBlue
 
 @Composable
@@ -51,9 +52,11 @@ fun CancelOrderDialog(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "취소된 주문은 복구되지 않습니다.",
+                text = "환불은 결제하신 카드사를 통해 \n 최대 7일 이내 처리될 예정입니다.",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = Color.Gray,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -73,7 +76,7 @@ fun CancelOrderDialog(
                         .height(48.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("취소")
+                    Text("뒤로가기")
                 }
 
                 Button(
@@ -90,7 +93,7 @@ fun CancelOrderDialog(
                         .height(48.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("삭제") // 또는 "확인", "주문 취소" 등
+                    Text("주문 취소")
                 }
             }
         }

@@ -23,6 +23,7 @@ import com.example.zippick.network.order.OrderRepository
 import com.example.zippick.ui.composable.orderDetail.OrderDetailContent
 import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.model.OrderDetailResponse
+import kotlinx.coroutines.launch
 
 @Composable
 fun OrderDetailScreen(
@@ -35,25 +36,17 @@ fun OrderDetailScreen(
     var isLoading by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
-    Log.d("ZIPPICK", orderId.toString())
     LaunchedEffect(orderId) {
         try {
             val token = TokenManager.getToken()
-            Log.d("ZIPPICK", "📡 token = $token")
-            Log.d("ZIPPICK", "📡 요청 시작: orderId = $orderId")
-
             val response = repository.getOrderDetail(orderId, "Bearer $token")
 
             if (response.isSuccessful) {
                 orderDetail = response.body()
-                Log.d("ZIPPICK", "✅ 주문 조회 성공: $orderDetail")
             } else {
-                Log.e("ZIPPICK", "❌ 주문 조회 실패: code = ${response.code()}")
-                Log.e("ZIPPICK", "❌ errorBody = ${response.errorBody()?.string()}")
                 Toast.makeText(context, "주문 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Log.e("ZIPPICK", "❌ 네트워크 예외 발생", e)
             Toast.makeText(context, "에러 발생: ${e.message}", Toast.LENGTH_SHORT).show()
         } finally {
             isLoading = false
@@ -74,10 +67,32 @@ fun OrderDetailScreen(
             }
         }
     } else {
+        // 기존 내용 그대로 유지하고 아래 부분만 수정
         orderDetail?.let {
-            OrderDetailContent(orderDetail = it, onCancelClick = {
-                // 주문 취소 처리 로직
-            })
+            OrderDetailContent(
+                orderDetail = it,
+                onCancelClick = {
+                    coroutineScope.launch {
+                        try {
+                            val token = TokenManager.getToken()
+                            val response = repository.cancelOrder(it.orderId, "Bearer $token")
+                            Log.e("CancelOrder", "HTTP ${response.code()} - ${response.errorBody()?.string()}")
+
+                            if (response.isSuccessful) {
+                                Toast.makeText(context, "주문이 취소되었습니다.", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack() // 이전 화면으로 돌아가기
+                            } else {
+                                Toast.makeText(context, "주문 취소에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Log.e("OrderCancel", "에러: ${e.message}", e)
+                            Toast.makeText(context, "에러 발생: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                navController = navController
+            )
         }
+
     }
 }
