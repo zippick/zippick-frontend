@@ -49,7 +49,7 @@ fun OrderDetailContent(
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,)
         Spacer(modifier = Modifier.height(5.dp))
-        Text(text = "주문 번호 ${orderDetail.merchantOrderId}")
+        Text(text = "주문번호 ${orderDetail.merchantOrderId}")
 
         Spacer(modifier = Modifier.height(24.dp))
         Divider()
@@ -109,7 +109,8 @@ fun OrderDetailContent(
             )
             Text(
                 text = "${orderDetail.totalPrice.toPriceFormat()}원",
-                fontWeight = FontWeight.Bold
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
 
@@ -119,7 +120,7 @@ fun OrderDetailContent(
             onClick = { showDialog = true }, // 팝업 띄우기
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
+                .height(52.dp),
             border = BorderStroke(1.8.dp, MainBlue),
             shape = RoundedCornerShape(13.dp),
             colors = ButtonDefaults.buttonColors(
@@ -127,7 +128,7 @@ fun OrderDetailContent(
                 contentColor = Color.White
             )
         ) {
-            Text(text = "주문 취소")
+            Text(text = "주문 취소", fontWeight = FontWeight(500), fontSize = 16.sp)
         }
 
         if (showDialog) {

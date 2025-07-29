@@ -76,7 +76,7 @@ fun CancelOrderDialog(
                         .height(48.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("뒤로가기")
+                    Text("닫기")
                 }
 
                 Button(

@@ -67,7 +67,6 @@ fun OrderDetailScreen(
             }
         }
     } else {
-        // 기존 내용 그대로 유지하고 아래 부분만 수정
         orderDetail?.let {
             OrderDetailContent(
                 orderDetail = it,
