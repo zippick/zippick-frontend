@@ -25,9 +25,9 @@ fun FilterChip(
     Surface(
         color = if (isSelected) MainBlue else Color.White,
         shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.8.dp, MainBlue),
+        border = BorderStroke(1.3.dp, MainBlue),
         onClick = onClick,
-        modifier = Modifier.height(36.dp),
+        modifier = Modifier.height(30.dp),
         shadowElevation = 0.dp
     ) {
         Box(
@@ -37,7 +37,7 @@ fun FilterChip(
             Text(
                 text = text,
                 color = if (isSelected) Color.White else MainBlue,
-                fontSize = 17.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
         }
