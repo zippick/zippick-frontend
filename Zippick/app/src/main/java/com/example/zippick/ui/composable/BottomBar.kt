@@ -26,7 +26,7 @@ val bottomNavItems = listOf(
     BottomNavItem("home", "홈", R.drawable.ic_home_selected, R.drawable.ic_home_unselected),
     BottomNavItem("category", "카테고리", R.drawable.ic_category_selected, R.drawable.ic_category_unselected),
     BottomNavItem("size", "사이즈", R.drawable.ic_size_selected, R.drawable.ic_size_unselected),
-    BottomNavItem("photo", "사진", R.drawable.ic_photo_selected, R.drawable.ic_photo_unselected),
+    BottomNavItem("photo", "AI추천", R.drawable.ic_ai_selected, R.drawable.ic_ai_unselected),
     BottomNavItem("my", "MY", R.drawable.ic_my_selected, R.drawable.ic_my_unselected),
 )
 
