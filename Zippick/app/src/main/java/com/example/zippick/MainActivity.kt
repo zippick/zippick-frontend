@@ -36,9 +36,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AndroidLabTheme {
-                MainScreenWithBottomNav()
+                // 알림 클릭 시 "notifications"로 이동
+                val startDestination = intent?.getStringExtra("navigateTo") ?: "home"
+                MainScreenWithBottomNav(startDestination = startDestination)
             }
         }
     }
+
 }
 
