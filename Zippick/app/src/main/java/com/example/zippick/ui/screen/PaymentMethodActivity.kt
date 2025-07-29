@@ -152,8 +152,8 @@ fun PaymentMethodScreen(
                                 )
                                 orderViewModel.postOrder(request)
                                 val notificationRequest = NotificationSendRequest(
-                                    title = "주문이 완료되었습니다!",
-                                    content = "주문번호 ${success.paymentKey}이(가) 정상 처리되었습니다.",
+                                    title = "결제 완료",
+                                    content = "$productName 결제가 완료되었습니다.",
                                     createdAt = SimpleDateFormat(
                                         "yyyy-MM-dd'T'HH:mm:ss",
                                         Locale.getDefault()
