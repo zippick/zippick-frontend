@@ -62,7 +62,7 @@ fun TopBar(
                             currentRoute.startsWith("photoAnalysis") -> "분석 결과"
                             currentRoute == "likedList" -> "찜 목록"
                             currentRoute.startsWith("categoryCompareResult") -> "상품 비교"
-                            currentRoute.startsWith("recommendList") -> "추천 상품"
+                            currentRoute.startsWith("photoRecommendList") -> "추천 상품"
                             currentRoute.startsWith("myOrderDetail") -> "주문 상세"
                             else -> "상세페이지"
                         },
