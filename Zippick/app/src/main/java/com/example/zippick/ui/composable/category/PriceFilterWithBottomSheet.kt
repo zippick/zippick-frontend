@@ -5,7 +5,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,10 +23,13 @@ fun PriceFilterBottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor = Color.White
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("가격", style = MaterialTheme.typography.titleLarge)
+        Column(modifier =
+            Modifier.padding(horizontal = 30.dp, vertical = 16.dp)
+                .padding(bottom = 30.dp)) {
+            Text("가격 입력", fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
