@@ -62,10 +62,15 @@ fun AiLayoutScreen(
     }
 
     fun createImageUri(context: Context): Uri {
+        val timeStamp = System.currentTimeMillis()
+        val fileName = "camera_photo_$timeStamp.jpg"
+
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.DISPLAY_NAME, "camera_photo.jpg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/Zippick")
         }
+
         return context.contentResolver.insert(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             contentValues
