@@ -112,7 +112,7 @@ fun MainScreenWithBottomNav(
                     route = "categoryAiLayout/{name}/{price}/{category}/{imageUrl}",
                     arguments = listOf(
                         navArgument("name") { defaultValue = "" },
-                        navArgument("price") { defaultValue = 0 },
+                        navArgument("price") { defaultValue = "" },
                         navArgument("category") { defaultValue = "" },
                         navArgument("imageUrl") { defaultValue = "" }
                     )
