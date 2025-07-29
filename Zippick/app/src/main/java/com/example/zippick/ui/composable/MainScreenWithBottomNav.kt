@@ -206,10 +206,10 @@ fun MainScreenWithBottomNav(
 
                 // 주문 상세 페이지
                 composable(
-                    route = "myOrderDetail/{id}",
-                    arguments = listOf(navArgument("id") { type = NavType.IntType })
+                    route = "myOrderDetail/{orderId}",
+                    arguments = listOf(navArgument("orderId") { type = NavType.IntType })
                 ) { backStackEntry ->
-                    val orderId = backStackEntry.arguments?.getInt("id") ?: 0
+                    val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
                     OrderDetailScreen(orderId = orderId, navController = navController)
                 }
             }

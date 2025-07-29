@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -67,6 +70,8 @@ fun SignUpScreen(navController: NavHostController) {
     var basicAddress by remember { mutableStateOf("") }
     var detailAddress by remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
+
     val addressLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -92,7 +97,7 @@ fun SignUpScreen(navController: NavHostController) {
         unfocusedTextColor = DarkGray,
         focusedPlaceholderColor = DarkGray,
         unfocusedPlaceholderColor = DarkGray,
-        focusedBorderColor = DarkGray,
+        focusedBorderColor = MainBlue,
         unfocusedBorderColor = DarkGray,
         cursorColor = DarkGray
     )
@@ -100,6 +105,7 @@ fun SignUpScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .padding(horizontal = 20.dp)
     ) {
         Column(
@@ -109,7 +115,7 @@ fun SignUpScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column {
-                Text("이메일", style = Typography.bodyLarge.copy(color = DarkGray))
+                Text("이메일", fontWeight = FontWeight(500), color = DarkGray)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = email,
@@ -148,7 +154,7 @@ fun SignUpScreen(navController: NavHostController) {
                             enabled = email.isNotBlank(),
                             colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
                             shape = RoundedCornerShape(8.dp),
-                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp),
                             modifier = Modifier.padding(end = 8.dp)
 
                         ) {
@@ -164,7 +170,7 @@ fun SignUpScreen(navController: NavHostController) {
             }
 
             Column {
-                Text("비밀번호", style = Typography.bodyLarge.copy(color = DarkGray))
+                Text("비밀번호", fontWeight = FontWeight(500), color = DarkGray)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = password,
@@ -183,7 +189,7 @@ fun SignUpScreen(navController: NavHostController) {
             }
 
             Column {
-                Text("비밀번호 확인", style = Typography.bodyLarge.copy(color = DarkGray))
+                Text("비밀번호 확인", fontWeight = FontWeight(500), color = DarkGray)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = passwordConfirm,
@@ -205,22 +211,26 @@ fun SignUpScreen(navController: NavHostController) {
                     Text("비밀번호가 일치합니다.", color = Color(0xFF2E7D32), fontSize = 12.sp)
                 }
             }
+            Column {
+                Text("이름", fontWeight = FontWeight(500), color = DarkGray)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    placeholder = { Text("이름", style = Typography.bodyLarge) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = textFieldColors
+                )
+            }
 
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("이름", style = Typography.bodyLarge) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(8.dp),
-                colors = textFieldColors
-            )
-
+            Text("주소", fontWeight = FontWeight(500), color = DarkGray)
             Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = address,
                     onValueChange = {},
-                    label = { Text("우편번호", style = Typography.bodyLarge) },
+                    placeholder = { Text("우편번호", style = Typography.bodyLarge) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     shape = RoundedCornerShape(8.dp),
@@ -233,18 +243,18 @@ fun SignUpScreen(navController: NavHostController) {
                         val intent = Intent(context, WebViewActivity::class.java)
                         addressLauncher.launch(intent)
                     },
-                    modifier = Modifier.align(Alignment.CenterVertically),
+                    modifier = Modifier.align(Alignment.CenterVertically).height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MainBlue),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
                 ) {
-                    Text("주소검색", color = Color.White)
+                    Text("주소검색", color = Color.White, fontSize = 16.sp)
                 }
             }
 
             OutlinedTextField(
                 value = basicAddress,
                 onValueChange = { basicAddress = it },
-                label = { Text("기본 주소", style = Typography.bodyLarge) },
+                placeholder = { Text("기본 주소", style = Typography.bodyLarge) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
@@ -253,7 +263,7 @@ fun SignUpScreen(navController: NavHostController) {
             OutlinedTextField(
                 value = detailAddress,
                 onValueChange = { detailAddress = it },
-                label = { Text("상세 주소", style = Typography.bodyLarge) },
+                placeholder = { Text("상세 주소", style = Typography.bodyLarge) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
