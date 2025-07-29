@@ -134,7 +134,7 @@ fun CategoryItem(
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .align(Alignment.Center)
-                .fillMaxSize(0.7f) // 필요에 따라 이미지 크기 조정
+                .fillMaxSize(0.85f) // 필요에 따라 이미지 크기 조정
         )
     }
 }
