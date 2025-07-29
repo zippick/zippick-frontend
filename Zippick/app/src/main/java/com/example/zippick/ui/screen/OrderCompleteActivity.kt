@@ -40,7 +40,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.zippick.ui.composable.BottomBar
+import com.example.zippick.ui.composable.TopBar
 
 class OrderCompleteActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +57,15 @@ class OrderCompleteActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route ?: "orderComplete"
             Scaffold(
+                topBar = {
+                    TopBar(
+                        navController = navController,
+                        currentRoute = currentRoute
+                    )
+                },
                 containerColor = Color.White,
                 bottomBar = { BottomBar(navController) }
             ) { innerPadding ->
