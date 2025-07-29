@@ -1,7 +1,12 @@
 package com.example.zippick.ui.composable
 
 import android.util.Log
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.example.zippick.network.TokenManager
 
@@ -18,10 +23,9 @@ fun RequireLogin(
         Log.d("ZIPPICK", "🔐 RequireLogin: fetchedToken = $fetchedToken")
         token = fetchedToken
         if (fetchedToken.isNullOrBlank() || fetchedToken == "null") {
-            Log.w("ZIPPICK", "🚨 RequireLogin: Token invalid → navigating to login")
-            navController.navigate("login") {
-                popUpTo("home") { inclusive = true }
-            }
+            Log.w("ZIPPICK", " RequireLogin: Token invalid → navigating to login")
+            navController.popBackStack()
+            navController.navigate("login")
         } else {
             Log.d("ZIPPICK", "✅ RequireLogin: Token is valid")
         }
