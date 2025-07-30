@@ -14,7 +14,7 @@ data class NotificationListResponse(
 data class NotificationResponse(
     val id: Long,
     val title: String,
-    val body: String,
+    val content: String,
     val createdAt: String
 )
 
