@@ -1,7 +1,6 @@
 package com.example.zippick.ui.screen
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,8 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -23,61 +20,28 @@ import com.example.zippick.ui.composable.photo.result.ColorPaletteSection
 import com.example.zippick.ui.composable.photo.result.ImageHeader
 import com.example.zippick.ui.composable.photo.result.RecommendButtons
 import com.example.zippick.ui.composable.photo.result.StyleTagSection
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
-import com.example.zippick.network.product.InteriorRepository
 import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.theme.MainBlue
-import com.example.zippick.util.FileUtil
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
+import com.example.zippick.ui.viewmodel.PhotoAnalysisViewModel
 
 @Composable
 fun PhotoAnalysisResultScreen(
     navController: NavController,
     imageUri: Uri,
-    category: String
+    category: String,
+    viewModel: PhotoAnalysisViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val palette = viewModel.palette
+    val tags = viewModel.tags
+    val isLoading = viewModel.isLoading
 
-    // 응답 상태
-    var palette by remember { mutableStateOf<List<Triple<String, String, String>>>(emptyList()) }
-    var tags by remember { mutableStateOf<List<String>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        isLoading = true
-        Log.d("AI_ANALYZE", "로딩 시작")
-        Log.d("AI_ANALYZE", "카테고리: $category")
-        try {
-            val file = FileUtil.getFileFromUri(context, imageUri)
-            Log.d("AI_ANALYZE", "파일 경로: ${file.absolutePath}")
-
-            val categoryRequest = category.toRequestBody("text/plain".toMediaTypeOrNull())
-            val imageRequestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
-            val imagePart = MultipartBody.Part.createFormData("roomImage", file.name, imageRequestBody)
-
-            val response = InteriorRepository.postAiInterior(imagePart)
-            Log.d("AI_ANALYZE", "서버 응답 palette: ${response.palette}")
-            Log.d("AI_ANALYZE", "서버 응답 tags: ${response.tags}")
-
-            palette = response.palette.map {
-                Triple(it.colorCode, it.colorName, it.toneCategory)
-            }
-            tags = response.tags
-        } catch (e: Exception) {
-            Log.e("AI_ANALYZE", "에러 발생: ${e.message}", e)
-        } finally {
-            isLoading = false
-            Log.d("AI_ANALYZE", "로딩 종료")
-        }
+    // 이전 결과가 없을 경우에만 분석 수행
+    LaunchedEffect(imageUri, category) {
+        viewModel.analyzeImage(context, imageUri, category)
     }
 
     if (isLoading) {
@@ -90,7 +54,7 @@ fun PhotoAnalysisResultScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LottieLoading(modifier = Modifier.size(120.dp))
+                LottieLoading(modifier = Modifier.size(90.dp))
 
                 Spacer(modifier = Modifier.height(16.dp))
 
