@@ -32,7 +32,7 @@ fun CategoryScreen(
 ) {
     val isSearchMode = keyword != null
 
-    var selectedCategory by remember { mutableStateOf(initialCategory) }
+    var selectedCategory by rememberSaveable { mutableStateOf(initialCategory) }
     val categories = listOf("전체", "의자", "소파", "책상", "식탁", "옷장", "침대")
 
     val sortInitKey = rememberSaveable(key = keyword) { mutableStateOf(true) } // 최초 진입 판단 키
