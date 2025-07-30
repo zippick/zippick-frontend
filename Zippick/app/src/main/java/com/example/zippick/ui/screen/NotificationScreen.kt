@@ -18,7 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.zippick.R
+import com.example.zippick.ui.composable.RequireLogin
 import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.viewmodel.NotificationViewModel
 
@@ -28,89 +30,95 @@ fun NotificationScreen(
     navController: NavController,
     viewModel: NotificationViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-    val notifications by viewModel.notifications.collectAsState()
-    val loading by viewModel.loading.collectAsState()
-    val context = LocalContext.current
+    RequireLogin(navController = navController as NavHostController) {
 
-    val listState = rememberLazyListState()
+        val notifications by viewModel.notifications.collectAsState()
+        val loading by viewModel.loading.collectAsState()
+        val context = LocalContext.current
 
-    // 최초 1회만 로딩
-    LaunchedEffect(Unit) {
-        viewModel.loadNotificationsAll()
-    }
+        val listState = rememberLazyListState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 20.dp)
-            .padding(horizontal = 12.dp)
-    ) {
-        if (loading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    LottieLoading(modifier = Modifier.size(120.dp))
-                }
-            }
+        // 최초 1회만 로딩
+        LaunchedEffect(Unit) {
+            viewModel.loadNotificationsAll()
         }
-        // 중복 아이템 제거 + 안정적인 키 생성을 위한 표시용 리스트
-        val displayList = remember(notifications) {
-            notifications
-                .distinctBy { it.id to (it.createdAt ?: "") }
-        }
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            state = listState
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp)
+                .padding(horizontal = 12.dp)
         ) {
-            items(displayList, key = { n -> "notif-${n.id}-${n.createdAt ?: ""}" }) { item ->
+            if (loading) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .background(
-                            color = Color(0xFFEAEAEA),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .padding(horizontal = 20.dp, vertical = 14.dp)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_alarm_success),
-                                    contentDescription = "체크 아이콘",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .padding(end = 6.dp)
-                                )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieLoading(modifier = Modifier.size(120.dp))
+                    }
+                }
+            }
+            // 중복 아이템 제거 + 안정적인 키 생성을 위한 표시용 리스트
+            val displayList = remember(notifications) {
+                notifications
+                    .distinctBy { it.id to (it.createdAt ?: "") }
+            }
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                state = listState
+            ) {
+                items(displayList, key = { n -> "notif-${n.id}-${n.createdAt ?: ""}" }) { item ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .background(
+                                color = Color(0xFFEAEAEA),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                            .padding(horizontal = 20.dp, vertical = 14.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_alarm_success),
+                                        contentDescription = "체크 아이콘",
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .padding(end = 6.dp)
+                                    )
+                                    Text(
+                                        text = item.title ?: "",
+                                        fontWeight = FontWeight(500),
+                                        fontSize = 16.sp
+                                    )
+                                }
+
                                 Text(
-                                    text = item.title ?: "",
-                                    fontWeight = FontWeight(500),
-                                    fontSize = 16.sp
+                                    text = formatToRelativeTime(item.createdAt),
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 14.sp,
+                                    color = Color.Gray,
                                 )
                             }
-
+                            Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = formatToRelativeTime(item.createdAt),
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 14.sp,
-                                color = Color.Gray,
+                                text = item.body ?: "상품 결제가 완료되었습니다.",
+                                fontSize = 15.sp,
+                                color = Color.Black
                             )
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = item.body ?: "상품 결제가 완료되었습니다.",
-                            fontSize = 15.sp,
-                            color = Color.Black
-                        )
                     }
                 }
             }

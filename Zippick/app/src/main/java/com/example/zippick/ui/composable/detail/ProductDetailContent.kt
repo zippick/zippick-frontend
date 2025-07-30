@@ -21,8 +21,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.zippick.R
+import com.example.zippick.ui.composable.RequireLogin
 import com.example.zippick.ui.model.ProductDetail
 import com.example.zippick.ui.screen.PaymentMethodActivity
 import com.example.zippick.ui.theme.MainBlue
@@ -41,16 +43,18 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White) // 바텀바 전체 배경 흰색 지정
+                    .background(Color.White)
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Button(
                     onClick = {
-                        bottomSheetState.value = true
+                        handlePurchaseClick(navController) {
+                            bottomSheetState.value = true
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp), // 버튼 자체 높이만 지정
+                        .height(50.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MainBlue)
                 ) {
@@ -271,3 +275,16 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
         }
     }
 }
+
+fun handlePurchaseClick(
+    navController: NavController,
+    onLoggedIn: () -> Unit
+) {
+    val token = com.example.zippick.network.TokenManager.getToken()
+    if (token.isNullOrBlank() || token == "null") {
+        navController.navigate("login")
+    } else {
+        onLoggedIn()
+    }
+}
+
