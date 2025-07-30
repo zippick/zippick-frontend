@@ -1,16 +1,8 @@
 package com.example.zippick.ui.composable
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +15,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.zippick.R
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
@@ -32,15 +23,16 @@ fun TopBar(
 ) {
     val bottomTabs = listOf("home", "category", "size", "photo", "my")
     val isBottomTab = currentRoute in bottomTabs
-    val isAuthScreen = currentRoute == "login" || currentRoute == "signup"
+    val isLoginScreen = currentRoute == "login"
+    val isSignupScreen = currentRoute == "signup"
 
     TopAppBar(
         title = {
-            if (!isAuthScreen) {
+            if (!isLoginScreen && !isSignupScreen) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 50.dp), // 오른쪽 액션 아이콘 공간만큼 패딩
+                        .padding(start = 50.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -53,8 +45,6 @@ fun TopBar(
                             currentRoute == "search" -> "검색"
                             currentRoute == "notifications" -> "알림함"
                             currentRoute == "aiLayout" -> "AI 가구 배치"
-                            currentRoute == "login" -> "로그인"
-                            currentRoute == "signup" -> "회원가입"
                             currentRoute.startsWith("sizeInput") -> "사이즈 검색"
                             currentRoute.startsWith("category/") -> "검색 결과"
                             currentRoute.startsWith("searchResult") -> "검색 결과"
@@ -86,13 +76,25 @@ fun TopBar(
                     )
                 }
 
-                isAuthScreen -> {
+                isSignupScreen -> {
                     IconButton(onClick = {
                         navController.popBackStack("home", inclusive = false)
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_close),
                             contentDescription = "닫기",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                isLoginScreen -> {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_back),
+                            contentDescription = "뒤로가기",
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -110,7 +112,7 @@ fun TopBar(
             }
         },
         actions = {
-            if (!isAuthScreen) {
+            if (!isLoginScreen && !isSignupScreen) {
                 IconButton(onClick = { navController.navigate("search") }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_search),
@@ -135,4 +137,3 @@ fun TopBar(
         )
     )
 }
-
