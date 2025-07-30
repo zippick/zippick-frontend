@@ -70,13 +70,11 @@ fun ProductFilterHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 가격 토글 (필터 기능이 있을 때만 표시)
             if (onMinPriceChange != null && onMaxPriceChange != null && onPriceFilterApply != null) {
-                FilterToggle(
+                FilterDropdownButton(
                     label = "가격",
-                    isChecked = isPriceFilterChecked,
-                    onToggle = {
-                        // 바텀시트 열기 전에 항상 최신 min/max 값을 temp에 복사
+                    isActive = isPriceFilterChecked,
+                    onClick = {
                         tempMinPrice = minPrice ?: ""
                         tempMaxPrice = maxPrice ?: ""
                         showPriceSheet = true
@@ -84,11 +82,10 @@ fun ProductFilterHeader(
                 )
             }
 
-            // 정렬 토글
-            FilterToggle(
+            FilterDropdownButton(
                 label = "정렬",
-                isChecked = selectedSort != SortOption.LATEST,
-                onToggle = {
+                isActive = selectedSort != SortOption.LATEST,
+                onClick = {
                     showSortSheet = true
                 }
             )
