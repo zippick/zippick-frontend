@@ -34,7 +34,7 @@ fun DetailScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LottieLoading(modifier = Modifier.size(120.dp))
+                LottieLoading(modifier = Modifier.size(90.dp))
             }
         }
     } else {

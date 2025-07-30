@@ -96,8 +96,7 @@ fun PhotoScreen(navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.ai_recommand),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Crop
+            modifier = Modifier.fillMaxWidth()
         )
 
         Column(

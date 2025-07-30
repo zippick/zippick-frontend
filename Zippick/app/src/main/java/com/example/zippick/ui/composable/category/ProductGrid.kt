@@ -28,9 +28,13 @@ fun ProductGrid(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
     ) {
-        items(products) { product ->
-            ProductItem(product, navController = navController)
+        items(
+            items = products,
+            key = { it.id }  // 각 상품의 고유 ID를 key로 지정
+        ) { product ->
+            ProductItem(product = product, navController = navController)
         }
+
 
         if (isLoading) {
             item(span = { GridItemSpan(2) }) {

@@ -53,7 +53,7 @@ fun SizeInputScreen(navController: NavHostController, category: String, viewMode
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(vertical = 8.dp)
+                .padding(bottom = 8.dp)
                 .padding(horizontal = 30.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),

@@ -110,7 +110,7 @@ fun MyScreen(navController: NavHostController) {
                             ) {
                                 Row(
                                     modifier = Modifier
-                                        .padding(32.dp)
+                                        .padding(24.dp)
                                         .fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically

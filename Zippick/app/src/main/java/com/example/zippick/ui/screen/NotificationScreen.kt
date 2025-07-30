@@ -114,7 +114,7 @@ fun NotificationScreen(
                             }
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = item.body ?: "상품 결제가 완료되었습니다.",
+                                text = item.content ?: "상품 결제가 완료되었습니다.",
                                 fontSize = 15.sp,
                                 color = Color.Black
                             )
