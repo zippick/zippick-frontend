@@ -13,7 +13,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.zippick.ui.composable.sizeSearch.ProductSorterForSize
+import com.example.zippick.ui.composable.category.ProductFilterHeader
 import com.example.zippick.ui.composable.category.ProductGrid
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.viewmodel.ProductViewModel
@@ -62,13 +62,18 @@ fun SizeSearchResultScreen(
                     .padding(horizontal = 24.dp, vertical = 12.dp)
             )
 
-            ProductSorterForSize(
+            ProductFilterHeader(
                 productCount = totalCount,
                 selectedSort = selectedSort,
                 onSortChange = {
                     viewModel.setSizeSearchSortOption(it)
                     viewModel.reloadWithSort(it.code)
-                }
+                },
+                minPrice = null,
+                maxPrice = null,
+                onMinPriceChange = null,
+                onMaxPriceChange = null,
+                onPriceFilterApply = null
             )
 
             when {
