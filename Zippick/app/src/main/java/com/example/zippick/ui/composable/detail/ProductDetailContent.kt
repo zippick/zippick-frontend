@@ -111,6 +111,16 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
 
                 Spacer(modifier = Modifier.height(48.dp))
 
+                Text(
+                    text = "내 방에 가구를 미리 배치해보세요",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+
+
                 AIVirtualPlacementButton {
                     val encodedName = Uri.encode(product.name)
                     val encodedCategory = Uri.encode(product.category)
