@@ -71,7 +71,7 @@ fun TopBar(
                     Box(
                         modifier = Modifier
                             .padding(start = 16.dp)
-                            .size(45.dp)
+                            .size(50.dp)
                             .clickable { navController.navigate("home") }
                     ) {
                         Image(
