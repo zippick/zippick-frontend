@@ -139,7 +139,7 @@ fun AiLayoutScreen(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            LottieLoading(modifier = Modifier.size(120.dp))
+                            LottieLoading(modifier = Modifier.size(90.dp))
 
                             Spacer(modifier = Modifier.height(16.dp))
 

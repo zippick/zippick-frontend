@@ -23,7 +23,6 @@ fun CarouselSection() {
     val imageResIds = listOf(
         R.drawable.banner1,
         R.drawable.banner2,
-        R.drawable.banner3,
     )
     val pagerState = rememberPagerState(pageCount = { imageResIds.size })
 

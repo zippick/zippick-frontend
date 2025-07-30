@@ -1,6 +1,7 @@
 package com.example.zippick.ui.composable
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -40,7 +41,7 @@ fun TopBar(
                             currentRoute == "home" -> "홈"
                             currentRoute == "category" -> "카테고리"
                             currentRoute == "size" -> "사이즈 검색"
-                            currentRoute == "photo" -> "사진"
+                            currentRoute == "photo" -> "AI 추천"
                             currentRoute == "my" -> "마이페이지"
                             currentRoute == "search" -> "검색"
                             currentRoute == "notifications" -> "알림함"
@@ -67,13 +68,18 @@ fun TopBar(
         navigationIcon = {
             when {
                 isBottomTab -> {
-                    Image(
-                        painter = painterResource(R.drawable.ic_logo),
-                        contentDescription = "로고",
+                    Box(
                         modifier = Modifier
                             .padding(start = 16.dp)
-                            .size(32.dp)
-                    )
+                            .size(45.dp)
+                            .clickable { navController.navigate("home") }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_new_logo),
+                            contentDescription = "로고",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
 
                 isSignupScreen -> {
