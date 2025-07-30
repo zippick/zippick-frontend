@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
@@ -216,15 +217,16 @@ fun AiLayoutScreen(
                             painter = painterResource(id = R.drawable.ai_layout),
                             contentDescription = "AI 가구 배치 안내 이미지",
                             modifier = Modifier
-                                .fillMaxWidth(0.85f)
+                                .fillMaxWidth(0.65f)
                                 .padding(bottom = 16.dp),
                             contentScale = ContentScale.Fit
                         )
                         Text(
-                            text = "인공 지능을 활용하여 가구가 조화롭게\n배치된 모습을 볼 수 있어요.",
-                            fontSize = 14.sp,
+                            text = "AI를 활용하여 가구가 조화롭게\n배치된 모습을 볼 수 있어요.",
+                            fontSize = 16.sp,
                             color = Color.Gray,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight(500)
                         )
                     }
                 }
@@ -258,12 +260,13 @@ fun AiLayoutScreen(
                         containerColor = if (isLoading) Color.LightGray else MainBlue,
                         contentColor = Color.White
                     ),
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
                 ) {
                     Text(
-                        text = if (isLoading) "잠시만 기다려주세요..." else "방 안의 사진을 업로드 해주세요",
+                        text = if (isLoading) "잠시만 기다려주세요..." else "+ 사진 업로드",
                         fontSize = 16.sp
                     )
                 }
