@@ -2,7 +2,6 @@ package com.example.zippick.ui.composable.detail
 
 import android.net.Uri
 import android.content.Intent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,20 +14,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.zippick.R
-import com.example.zippick.ui.composable.RequireLogin
 import com.example.zippick.ui.model.ProductDetail
 import com.example.zippick.ui.screen.PaymentMethodActivity
 import com.example.zippick.ui.theme.MainBlue
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailContent(product: ProductDetail, navController: NavController) {
@@ -170,8 +164,8 @@ fun ProductDetailContent(product: ProductDetail, navController: NavController) {
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.thumnail),
+                        AsyncImage(
+                            model = product.mainImageUrl,
                             contentDescription = "상품 썸네일",
                             modifier = Modifier
                                 .size(62.dp)
