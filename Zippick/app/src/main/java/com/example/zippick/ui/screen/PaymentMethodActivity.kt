@@ -156,11 +156,6 @@ fun PaymentMethodScreen(
                         ),
                         paymentCallback = object : PaymentCallback {
                             override fun onPaymentSuccess(success: TossPaymentResult.Success) {
-                                Toast.makeText(
-                                    context,
-                                    "결제 성공: ${success.paymentKey}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                                 val request = OrderRequest(
                                     totalPrice = productPrice * productAmount,
                                     count = productAmount,
