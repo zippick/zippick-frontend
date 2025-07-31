@@ -85,17 +85,17 @@ fun PhotoAnalysisResultScreen(
                     .fillMaxSize()
                     .padding(horizontal = 28.dp),
             ) {
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // 2. 색상 코드
                 ColorPaletteSection(palette.map { it.first to it.second })
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 // 3. 해시태그 스타일
                 StyleTagSection(tags)
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 // 4. 추천 버튼
                 val colorToneSet = palette.map { it.third }.toSet()
@@ -112,7 +112,7 @@ fun PhotoAnalysisResultScreen(
                         navController.navigate("photoRecommendList/$encodedCategory/style/$values")
                     }
                 )
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(30.dp))
             }
         }
     }

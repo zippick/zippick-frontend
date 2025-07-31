@@ -132,7 +132,8 @@ fun PhotoScreen(navController: NavController) {
                     val imageUriEncoded = Uri.encode(selectedImageUri.value.toString())
                     val categoryEncoded = Uri.encode(selectedCategory.value ?: "")
                     navController.navigate("photoAnalysis/$imageUriEncoded/$categoryEncoded")
-                }
+                },
+                enabled = selectedImageUri.value != null
             )
 
             Spacer(modifier = Modifier.height(24.dp))

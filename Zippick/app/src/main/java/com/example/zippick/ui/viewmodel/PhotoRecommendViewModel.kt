@@ -15,8 +15,13 @@ class PhotoRecommendViewModel : ViewModel() {
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> = _products
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun fetchRecommendations(category: String, type: String, values: List<String>) {
         viewModelScope.launch {
+            _isLoading.value = true // 로딩 시작
+
             try {
                 val request = if (type.uppercase() == "COLOR") {
                     RecommendRequest(
@@ -42,11 +47,13 @@ class PhotoRecommendViewModel : ViewModel() {
                 Log.d("RECOMMEND", "요청 tags: ${request.tags}")
                 Log.d("RECOMMEND", "서버 응답: ${result}")
 
-
                 _products.value = result
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                _isLoading.value = false // 로딩 종료
             }
         }
     }
+
 }

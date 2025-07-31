@@ -14,19 +14,20 @@ import com.example.zippick.ui.theme.MainBlue
 fun AnalyzeButton(
     label: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
-        border = BorderStroke(1.8.dp, MainBlue),
         shape = RoundedCornerShape(13.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MainBlue,
             contentColor = Color.White
-        )
+        ),
+        enabled = enabled
     ) {
         Text(text = label)
     }
