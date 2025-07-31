@@ -183,7 +183,7 @@ fun PaymentMethodScreen(
                                 // 실패시 화면 이동 없이 Toast만 표시
                                 Toast.makeText(
                                     context,
-                                    "결제 실패: ${fail.errorMessage ?: "알 수 없는 오류"}",
+                                    "결제가 완료되지 않았습니다.",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
