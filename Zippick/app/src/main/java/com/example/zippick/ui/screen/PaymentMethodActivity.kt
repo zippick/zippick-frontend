@@ -1,0 +1,216 @@
+package com.example.zippick.ui.screen
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.zippick.R
+import com.example.zippick.network.notification.NotificationSendRequest
+import com.example.zippick.ui.model.OrderRequest
+import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.viewmodel.NotificationViewModel
+import com.example.zippick.ui.viewmodel.OrderViewModel
+import com.tosspayments.paymentsdk.PaymentWidget
+import com.tosspayments.paymentsdk.model.PaymentCallback
+import com.tosspayments.paymentsdk.model.TossPaymentResult
+import com.tosspayments.paymentsdk.view.Agreement
+import com.tosspayments.paymentsdk.view.PaymentMethod
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
+
+/* 결제 수단 렌더링 페이지 */
+class PaymentMethodActivity : AppCompatActivity() {
+    private val clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm"
+    private lateinit var widget: PaymentWidget
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // PaymentComposeActivity에서 전달받은 데이터
+        val productId = intent.getLongExtra("productId",  0)
+        val productName = intent.getStringExtra("productName") ?: ""
+        val productImage = intent.getStringExtra("productImage") ?: ""
+        val productPrice = intent.getIntExtra("productPrice", 0)
+        val productAmount = intent.getIntExtra("productAmount", 1)
+
+        super.onCreate(savedInstanceState)
+        widget = PaymentWidget(this, clientKey, UUID.randomUUID().toString())
+
+        setContent {
+            PaymentMethodScreen(widget, productId, productName, productImage, productPrice, productAmount)
+        }
+    }
+}
+
+@Composable
+fun PaymentMethodScreen(
+    widget: PaymentWidget,
+    productId: Long,
+    productName: String,
+    productImage: String,
+    productPrice: Int,
+    productAmount: Int
+) {
+    val context = LocalContext.current
+    val orderId = "order_${System.currentTimeMillis()}"
+    val totalPrice = productPrice * productAmount
+    val orderViewModel: OrderViewModel = viewModel()
+    val notificationViewModel: NotificationViewModel = viewModel()
+
+    val orderResult by orderViewModel.orderResult.collectAsState()
+    LaunchedEffect(orderResult) {
+        orderResult?.let { result ->
+            orderViewModel.clearOrderResult()
+            if (result == "주문이 정상적으로 완료되었습니다.") {
+                val now = System.currentTimeMillis()
+                val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.getDefault())
+                val orderDate = sdf.format(Date(now))
+
+                val intent = Intent(context, OrderCompleteActivity::class.java)
+                intent.putExtra("orderNumber", orderId)
+                intent.putExtra("orderDate", orderDate)
+                intent.putExtra("productName", productName)
+                intent.putExtra("productImage", productImage)
+                intent.putExtra("productPrice", productPrice)
+                intent.putExtra("productAmount", productAmount)
+                intent.putExtra("totalPrice", totalPrice)
+                context.startActivity(intent)
+            } else {
+                // 실패 시 화면 이동 없이 Toast로만 안내
+                Toast.makeText(context, "주문 실패: $result", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, top = 8.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        (context as? AppCompatActivity)?.finish()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_back),
+                        contentDescription = "뒤로가기"
+                    )
+                }
+            }
+        }
+
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            AndroidView(
+                factory = { ctx -> PaymentMethod(ctx) },
+                update = { view ->
+                    widget.renderPaymentMethods(
+                        method = view,
+                        amount = PaymentMethod.Rendering.Amount(totalPrice),
+                        options = null
+                    )
+                },
+                modifier = Modifier.fillMaxWidth().height(450.dp)
+            )
+
+            AndroidView(
+                factory = { ctx -> Agreement(ctx) },
+                update = { view -> widget.renderAgreement(view) },
+                modifier = Modifier.fillMaxWidth().height(120.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    widget.requestPayment(
+                        paymentInfo = PaymentMethod.PaymentInfo(
+                            orderId = orderId,
+                            orderName = productName
+                        ),
+                        paymentCallback = object : PaymentCallback {
+                            override fun onPaymentSuccess(success: TossPaymentResult.Success) {
+                                val request = OrderRequest(
+                                    totalPrice = productPrice * productAmount,
+                                    count = productAmount,
+                                    merchantOrderId = success.paymentKey,
+                                    productId = productId
+                                )
+                                orderViewModel.postOrder(request)
+                                val notificationRequest = NotificationSendRequest(
+                                    title = "결제 완료",
+                                    content = "$productName 결제가 완료되었습니다.",
+                                    createdAt = SimpleDateFormat(
+                                        "yyyy-MM-dd'T'HH:mm:ss",
+                                        Locale.getDefault()
+                                    ).format(Date())
+                                )
+                                notificationViewModel.sendNotification(notificationRequest)
+                            }
+
+                            override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
+                                // 실패시 화면 이동 없이 Toast만 표시
+                                Toast.makeText(
+                                    context,
+                                    "결제가 완료되지 않았습니다.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(48.dp)
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(13.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MainBlue,
+                )
+            ) {
+                Text(
+                    "결제하기",
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight(500)
+                )
+            }
+        }
+    }
+}

@@ -1,0 +1,98 @@
+package com.example.zippick.network
+
+import android.content.Context
+import android.content.SharedPreferences
+import com.example.zippick.network.fcm.FcmApi
+import com.example.zippick.network.fcm.dto.FcmTokenRequest
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+// 토큰 관리 객체
+object TokenManager {
+    private const val PREFS_NAME = "zippick_prefs"
+    private const val TOKEN_KEY = "auth_token"
+
+    private lateinit var prefs: SharedPreferences
+
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    fun saveToken(token: String) {
+        prefs.edit().putString(TOKEN_KEY, token).apply()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val fcmToken = FirebaseMessaging.getInstance().token.await()
+
+                if (!fcmToken.isNullOrBlank()) {
+                    sendFcmTokenToServer(fcmToken)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun sendFcmTokenToServer(fcmToken: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val api = RetrofitInstance.retrofit.create(FcmApi::class.java)
+                val response = api.registerToken(FcmTokenRequest(fcmToken = fcmToken))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
+    fun getToken(): String? {
+        if (!::prefs.isInitialized) return null
+        val token = prefs.getString(TOKEN_KEY, null)
+        return if (token == "null") null else token
+    }
+
+    fun clearToken() {
+        prefs.edit().remove(TOKEN_KEY).apply()
+    }
+}
+
+class TokenInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val token = TokenManager.getToken()
+        val requestBuilder = chain.request().newBuilder()
+
+        if (!token.isNullOrEmpty()) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
+        }
+
+        return chain.proceed(requestBuilder.build())
+    }
+}
+
+object RetrofitInstance {
+
+    private val client = OkHttpClient.Builder()
+        // 타임아웃은 기본 60초
+        .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .addInterceptor(TokenInterceptor()) // 토큰 자동 삽입
+        .build()
+
+    val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://zippick.n-e.kr/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+}

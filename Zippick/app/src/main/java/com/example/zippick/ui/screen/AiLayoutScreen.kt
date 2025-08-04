@@ -1,0 +1,296 @@
+package com.example.zippick.ui.screen
+
+import android.app.Activity
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import com.example.zippick.R
+import com.example.zippick.ui.composable.photo.LottieLoading
+import com.example.zippick.ui.model.AiLayoutProduct
+import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.viewmodel.ProductViewModel
+import kotlinx.coroutines.launch
+
+@Composable
+fun AiLayoutScreen(
+    navController: NavHostController,
+    product: AiLayoutProduct,
+    viewModel: ProductViewModel
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val resultImageUrl by viewModel.aiImageUrl.collectAsState()
+    val isLoading by viewModel.loading.collectAsState()
+
+    fun uploadImage(uri: Uri) {
+        coroutineScope.launch {
+            viewModel.requestAiLayout(
+                imageUri = uri,
+                furnitureImageUrl = product.imageUrl,
+                category = product.category,
+                context = context
+            )
+        }
+    }
+
+    fun createImageUri(context: Context): Uri {
+        val timeStamp = System.currentTimeMillis()
+        val fileName = "camera_photo_$timeStamp.jpg"
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/Zippick")
+        }
+
+        return context.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )!!
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data ?: cameraImageUri
+            if (uri != null) {
+                selectedImageUri = uri
+                uploadImage(uri)
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            // 상단에 상품 정보 표시
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    AsyncImage(
+                        model = product.imageUrl,
+                        contentDescription = "제품 이미지",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(product.category, color = MainBlue, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(product.name, fontSize = 16.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("${product.price.toPriceFormat()}원", fontSize = 14.sp)
+                    }
+                }
+            }
+        },
+        containerColor = Color.White
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            LottieLoading(modifier = Modifier.size(90.dp))
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            androidx.compose.material.Text(
+                                text = "사진을 분석하고 가구를 배치하는 중이에요.",
+                                color = MainBlue,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            androidx.compose.material.Text(
+                                text = "약 15초 정도 소요될 수 있어요.",
+                                color = MainBlue,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+                }
+
+                resultImageUrl != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ai_result_character),
+                                contentDescription = "AI 배치 안내 이미지",
+                                modifier = Modifier
+                                    .fillMaxWidth(0.75f)
+                                    .padding(bottom = 8.dp),
+                                contentScale = ContentScale.Fit
+                            )
+
+                            AsyncImage(
+                                model = resultImageUrl,
+                                contentDescription = "AI 합성 결과 이미지",
+                                modifier = Modifier
+                                    .fillMaxWidth(0.9f)
+                                    .height(250.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
+                                    .shadow(4.dp),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text(
+                                text = "AI가 가구를 배치해봤어요",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ai_layout),
+                            contentDescription = "AI 가구 배치 안내 이미지",
+                            modifier = Modifier
+                                .fillMaxWidth(0.65f)
+                                .padding(bottom = 16.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                        Text(
+                            text = "AI를 활용하여 가구가 조화롭게\n배치된 모습을 볼 수 있어요.",
+                            fontSize = 16.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight(500)
+                        )
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(start = 20.dp, end = 20.dp)
+            ) {
+                Button(
+                    onClick = {
+                        val imageUri = createImageUri(context)
+                        cameraImageUri = imageUri
+
+                        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                            putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                        }
+
+                        val galleryIntent = Intent(Intent.ACTION_PICK).apply {
+                            type = "image/*"
+                        }
+
+                        val chooser = Intent.createChooser(galleryIntent, "사진 업로드")
+                        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
+                        launcher.launch(chooser)
+                    },
+                    enabled = !isLoading,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isLoading) Color.LightGray else MainBlue,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                ) {
+                    Text(
+                        text = if (isLoading) "잠시만 기다려주세요..." else "+ 사진 업로드",
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+fun Int.toPriceFormat(): String {
+    return "%,d".format(this)
+}

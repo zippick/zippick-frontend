@@ -1,0 +1,60 @@
+package com.example.zippick.network.product
+
+import com.example.zippick.network.RetrofitInstance
+import com.example.zippick.ui.model.AiLayoutImageResponse
+import com.example.zippick.ui.model.LikedRequest
+import com.example.zippick.ui.model.Product
+import com.example.zippick.ui.model.ProductDetail
+import com.example.zippick.ui.model.ProductResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+
+class ProductRepository {
+    private val api = RetrofitInstance.retrofit.create(ProductApi::class.java)
+
+    suspend fun getProductsBySize(
+        category: String,
+        width: Int,
+        depth: Int,
+        height: Int,
+        sort: String,
+        offset: Int
+    ): ProductResponse {
+        return api.getProductsBySize(category, width, depth, height, sort, offset)
+    }
+
+    suspend fun getProductsByKeyword(
+        keyword: String,
+        sort: String,
+        offset: Int
+    ): ProductResponse {
+        return api.getProductsByKeyword(keyword, sort, offset)
+    }
+
+    suspend fun getProductsByCategoryAndPrice(
+        category: String,
+        minPrice: Long?,
+        maxPrice: Long?,
+        sort: String,
+        offset: Int
+    ): ProductResponse {
+        return api.getProductsByCategoryAndPrice(category, minPrice, maxPrice, sort, offset)
+    }
+
+    suspend fun postAiLayout(
+        roomImage: MultipartBody.Part,
+        furnitureImageUrl: RequestBody,
+        category: RequestBody
+    ): AiLayoutImageResponse {
+        return api.postAiLayout(roomImage, furnitureImageUrl, category)
+    }
+
+    suspend fun getLikedProducts(likedIds: List<Int>): List<Product> {
+        val response = api.getLikedProducts(LikedRequest(likedIds))
+        return response
+    }
+
+    suspend fun getProductDetail(id: Int): ProductDetail {
+        return api.getProductDetail(id)
+    }
+}
