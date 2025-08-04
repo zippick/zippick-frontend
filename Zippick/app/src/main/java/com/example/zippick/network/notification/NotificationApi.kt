@@ -3,7 +3,6 @@ package com.example.zippick.network.notification;
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 // 서버 응답 전체(wrapper)
 data class NotificationListResponse(

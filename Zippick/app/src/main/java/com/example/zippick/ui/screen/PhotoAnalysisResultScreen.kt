@@ -12,18 +12,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.composable.photo.result.ColorPaletteSection
 import com.example.zippick.ui.composable.photo.result.ImageHeader
 import com.example.zippick.ui.composable.photo.result.RecommendButtons
 import com.example.zippick.ui.composable.photo.result.StyleTagSection
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.sp
-import com.example.zippick.ui.composable.photo.LottieLoading
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.viewmodel.PhotoAnalysisViewModel
 
@@ -77,7 +77,7 @@ fun PhotoAnalysisResultScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
         ) {
-            // 1. 이미지 영역
+            // 이미지 영역
             ImageHeader(imageUri)
 
             Column(
@@ -87,17 +87,17 @@ fun PhotoAnalysisResultScreen(
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // 2. 색상 코드
+                // 색상 코드
                 ColorPaletteSection(palette.map { it.first to it.second })
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                // 3. 해시태그 스타일
+                // 해시태그 스타일
                 StyleTagSection(tags)
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                // 4. 추천 버튼
+                // 추천 버튼
                 val colorToneSet = palette.map { it.third }.toSet()
                 val tagList = tags.toSet()
                 RecommendButtons(

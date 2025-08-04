@@ -1,13 +1,12 @@
 package com.example.zippick.ui.viewmodel
 
-import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zippick.network.product.ProductRepository
 import com.example.zippick.ui.model.ProductDetail
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.State
-import androidx.lifecycle.ViewModel
 
 class CompareViewModel : ViewModel() {
     private val repository = ProductRepository()
@@ -24,7 +23,7 @@ class CompareViewModel : ViewModel() {
                 _product1.value = repository.getProductDetail(id1)
                 _product2.value = repository.getProductDetail(id2)
             } catch (e: Exception) {
-                Log.e("CompareViewModel", "에러 발생: ${e.message}")
+                e.printStackTrace()
             }
         }
     }

@@ -2,7 +2,6 @@ package com.example.zippick.ui.screen
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -79,7 +78,6 @@ fun SignUpScreen(navController: NavHostController) {
             address = result.data?.getStringExtra("zipcode") ?: ""
             basicAddress = (result.data?.getStringExtra("basicAddress") ?: "") +
                     (result.data?.getStringExtra("extraAddress") ?: "")
-            Log.d("SignUpScreen", "주소 결과 받음: $address, $basicAddress")
         }
     }
 

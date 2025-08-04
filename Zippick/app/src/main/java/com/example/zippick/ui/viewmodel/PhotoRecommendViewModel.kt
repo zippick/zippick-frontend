@@ -1,6 +1,5 @@
 package com.example.zippick.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zippick.network.product.InteriorRepository
@@ -40,12 +39,6 @@ class PhotoRecommendViewModel : ViewModel() {
                 }
 
                 val result = InteriorRepository.postRecommendProduct(request)
-
-                Log.d("RECOMMEND", "요청 category: ${request.category}")
-                Log.d("RECOMMEND", "요청 type: ${request.recommendType}")
-                Log.d("RECOMMEND", "요청 toneCategories: ${request.toneCategories}")
-                Log.d("RECOMMEND", "요청 tags: ${request.tags}")
-                Log.d("RECOMMEND", "서버 응답: ${result}")
 
                 _products.value = result
             } catch (e: Exception) {

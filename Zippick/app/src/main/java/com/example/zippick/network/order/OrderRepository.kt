@@ -3,7 +3,6 @@ package com.example.zippick.network.order;
 import com.example.zippick.network.RetrofitInstance
 import com.example.zippick.ui.model.OrderDetailResponse
 import com.example.zippick.ui.model.OrderRequest
-import com.example.zippick.ui.model.OrderResponse
 import retrofit2.Response
 
 class OrderRepository {

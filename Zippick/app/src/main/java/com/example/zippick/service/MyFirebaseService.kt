@@ -2,7 +2,6 @@ package com.example.zippick.service
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.zippick.MainActivity
@@ -20,7 +19,6 @@ class MyFirebaseService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("FCM", "새 FCM 토큰 수신됨: $token")
 
         sendTokenToServer(token)
     }
@@ -30,9 +28,8 @@ class MyFirebaseService : FirebaseMessagingService() {
             try {
                 val api = RetrofitInstance.retrofit.create(FcmApi::class.java)
                 val response = api.registerToken(FcmTokenRequest(fcmToken = token))
-                Log.d("FCM", "서버 응답: ${response.success}")
             } catch (e: Exception) {
-                Log.e("FCM", "서버 전송 실패: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
@@ -40,7 +37,6 @@ class MyFirebaseService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        Log.d("FCM", "💬 수신한 알림: ${remoteMessage.notification?.title}")
         val notification = remoteMessage.notification
         if (notification != null) {
             val title = notification.title ?: "제목 없음"
@@ -72,8 +68,6 @@ class MyFirebaseService : FirebaseMessagingService() {
                 with(NotificationManagerCompat.from(this)) {
                     notify(notificationId, builder.build())
                 }
-            } else {
-                Log.w("FCM", "알림 권한이 없어 알림을 표시하지 않음")
             }
         }
     }

@@ -2,12 +2,13 @@ package com.example.zippick.ui.viewmodel
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zippick.network.product.ProductRepository
-import com.example.zippick.ui.model.*
+import com.example.zippick.ui.model.Product
+import com.example.zippick.ui.model.SortOption
 import com.example.zippick.ui.screen.selectedCategoryGlobal
+import com.example.zippick.util.convertToParam
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,7 +16,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import com.example.zippick.util.convertToParam
 
 class ProductViewModel : ViewModel() {
     private val repository = ProductRepository()
@@ -165,7 +165,6 @@ class ProductViewModel : ViewModel() {
         category: String,
         context: Context
     ) {
-        Log.d("AI_LAYOUT", "requestAiLayout() 시작됨")
 
         viewModelScope.launch {
             _loading.value = true
@@ -176,8 +175,6 @@ class ProductViewModel : ViewModel() {
                 val inputStream = contentResolver.openInputStream(imageUri)
                 val fileBytes = inputStream?.readBytes()
                 inputStream?.close()
-
-                Log.d("AI_LAYOUT", "이미지 파일 바이트 읽기 완료")
 
                 val requestFile = fileBytes?.let {
                     RequestBody.create("image/*".toMediaTypeOrNull(), it)
@@ -190,20 +187,15 @@ class ProductViewModel : ViewModel() {
                 val imageUrlPart = furnitureImageUrl.toRequestBody("text/plain".toMediaTypeOrNull())
                 val categoryPart = category.toRequestBody("text/plain".toMediaTypeOrNull())
 
-                Log.d("AI_LAYOUT", "API 호출 직전")
-
                 val response = repository.postAiLayout(
                     roomImage = multipartImage,
                     furnitureImageUrl = imageUrlPart,
                     category = categoryPart
                 )
 
-                Log.d("AI_LAYOUT", "API 응답 성공! resultImageUrl = ${response.resultImageUrl}") // ✅ 3단계 로그
-
                 _aiImageUrl.value = response.resultImageUrl
 
             } catch (e: Exception) {
-                Log.e("AI_LAYOUT", "API 호출 실패: ${e.message}", e)
                 _errorMessage.value = "AI 배치 실패: ${e.message}"
             } finally {
                 _loading.value = false

@@ -1,9 +1,19 @@
 package com.example.zippick.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -14,7 +24,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,7 +47,6 @@ import com.example.zippick.network.member.MemberService
 import com.example.zippick.ui.composable.RequireLogin
 import com.example.zippick.ui.model.MyInfoResponse
 import com.example.zippick.ui.model.OrderHistoryResponse
-import com.example.zippick.ui.theme.DarkGray
 import com.example.zippick.ui.theme.MainBlue
 import com.example.zippick.ui.theme.MediumGray
 import com.example.zippick.ui.theme.Typography
@@ -40,10 +55,8 @@ import retrofit2.HttpException
 
 @Composable
 fun MyScreen(navController: NavHostController) {
-    Log.d("ZIPPICK", "🧭 MyScreen: Composable loaded")
 
     RequireLogin(navController = navController) {
-        Log.d("ZIPPICK", "🔓 MyScreen: RequireLogin 통과")
 
         val listState = rememberLazyListState()
         var myInfo by remember { mutableStateOf<MyInfoResponse?>(null) }
@@ -53,7 +66,6 @@ fun MyScreen(navController: NavHostController) {
         val coroutineScope = rememberCoroutineScope()
         val authService = remember { RetrofitInstance.retrofit.create(AuthService::class.java) }
         val memberService = remember {
-            Log.d("ZIPPICK", "📦 MyScreen: MemberService 초기화")
             RetrofitInstance.retrofit.create(MemberService::class.java)
         }
 
@@ -61,24 +73,18 @@ fun MyScreen(navController: NavHostController) {
             try {
                 isLoading = true
                 val token = "Bearer ${TokenManager.getToken()}"
-                Log.d("ZIPPICK", "📡 MyScreen: myInfo, orderHistories 요청 시작 / token=$token")
 
                 myInfo = memberService.getMyInfo(token)
-                Log.d("ZIPPICK", "✅ MyScreen: myInfo.name = ${myInfo?.name}")
 
                 orders = memberService.getOrderHistories(token)
-                Log.d("ZIPPICK", "✅ MyScreen: 주문 개수 = ${orders.size}")
             } catch (e: Exception) {
-                Log.e("ZIPPICK", "❌ MyScreen: 예외 발생", e)
                 if (e is HttpException && e.code() == 401) {
-                    Log.w("ZIPPICK", "🔐 MyScreen: 토큰 만료 → 로그인 화면 이동")
                     TokenManager.clearToken()
                     navController.navigate("login") {
                         popUpTo("my") { inclusive = true }
                     }
                 }
             } finally {
-                Log.d("ZIPPICK", "🕓 MyScreen: isLoading = false")
                 isLoading = false
             }
         }
@@ -94,7 +100,6 @@ fun MyScreen(navController: NavHostController) {
             ) {
                 item {
                     myInfo?.let { info ->
-                        Log.d("ZIPPICK", "🧾 MyScreen: 사용자 정보 UI 렌더링 / ${info.name}")
 
                         Surface(
                             modifier = Modifier
@@ -132,14 +137,12 @@ fun MyScreen(navController: NavHostController) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.clickable {
-                                            Log.d("ZIPPICK", "🚪 로그아웃 클릭됨")
                                             coroutineScope.launch {
                                                 val token = TokenManager.getToken() ?: return@launch
                                                 try {
                                                     val response = authService.logout(token)
-                                                    Log.d("ZIPPICK", "🚪 로그아웃 응답 성공 = ${response.isSuccessful}")
                                                 } catch (e: Exception) {
-                                                    Log.e("ZIPPICK", "❌ 로그아웃 요청 실패", e)
+                                                    e.printStackTrace()
                                                 } finally {
                                                     TokenManager.clearToken()
                                                     navController.navigate("login") {
@@ -206,7 +209,6 @@ fun MyScreen(navController: NavHostController) {
                     }
                 }
                 items(orders) { order ->
-                    Log.d("ZIPPICK", "📦 MyScreen: 주문 항목 렌더링 / ${order.productName}")
                     OrderItem(
                         order = order,
                         modifier = Modifier.padding(horizontal = 26.dp)
@@ -217,7 +219,6 @@ fun MyScreen(navController: NavHostController) {
 
                 if (isLoading) {
                     item {
-                        Log.d("ZIPPICK", "⏳ MyScreen: 로딩 중 표시")
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                             Text("로딩 중...", style = Typography.bodyLarge)
                         }
@@ -235,7 +236,6 @@ fun OrderItem(
     order: OrderHistoryResponse,
     modifier: Modifier = Modifier,
     onClick: (Int) -> Unit) {
-    Log.d("ZIPPICK", "🧾 OrderItem: 렌더링 시작 - ${order.productName}")
 
     val statusText = when (order.status) {
         "ORDERED" -> "결제 완료"

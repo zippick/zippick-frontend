@@ -1,27 +1,36 @@
 package com.example.zippick.ui.screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.example.zippick.ui.composable.category.CategoryFilterBar
-import com.example.zippick.ui.composable.category.ProductFilterHeader
-import com.example.zippick.ui.composable.category.ProductGrid
-import com.example.zippick.ui.model.SortOption
-import com.example.zippick.ui.viewmodel.ProductViewModel
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.zippick.ui.composable.category.CategoryFilterBar
 import com.example.zippick.ui.composable.category.CompareFloatingButton
+import com.example.zippick.ui.composable.category.ProductFilterHeader
+import com.example.zippick.ui.composable.category.ProductGrid
+import com.example.zippick.ui.model.SortOption
 import com.example.zippick.ui.theme.MainBlue
+import com.example.zippick.ui.viewmodel.ProductViewModel
 
 @Composable
 fun CategoryScreen(

@@ -1,7 +1,9 @@
 package com.example.zippick.network.product
 
 import com.example.zippick.network.RetrofitInstance
-import com.example.zippick.ui.model.*
+import com.example.zippick.ui.model.AiInteriorResponse
+import com.example.zippick.ui.model.Product
+import com.example.zippick.ui.model.RecommendRequest
 import okhttp3.MultipartBody
 
 object InteriorRepository {

@@ -2,10 +2,10 @@
 
     import com.example.zippick.ui.model.LoginRequest
     import com.example.zippick.ui.model.LoginResponse
+    import retrofit2.Response
     import retrofit2.http.Body
     import retrofit2.http.Header
     import retrofit2.http.POST
-    import retrofit2.Response
 
     interface AuthService {
         @POST("/api/auth/login")

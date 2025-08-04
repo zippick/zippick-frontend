@@ -32,7 +32,7 @@ fun StyleTagSection(tags: List<String>) {
         tags.forEach {
             Surface(
                 modifier = Modifier
-                    .border(BorderStroke(1.8.dp, MainBlue), shape = RoundedCornerShape(20.dp)), // <- 여기에 border 추가
+                    .border(BorderStroke(1.8.dp, MainBlue), shape = RoundedCornerShape(20.dp)),
                 shape = RoundedCornerShape(20.dp),
                 color = Color.White
             ) {

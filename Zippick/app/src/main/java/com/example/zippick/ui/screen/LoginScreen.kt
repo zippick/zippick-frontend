@@ -1,6 +1,5 @@
 package com.example.zippick.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -178,7 +176,6 @@ fun LoginScreen(navController: NavHostController) {
                             popUpTo("login") { inclusive = true }
                         }
                     } catch (e: Exception) {
-                        Log.e("LoginError", "예외 발생: ${e.message}", e)
                         errorMessage = "아이디 또는 비밀번호를 확인해주세요."
                     }
                 }

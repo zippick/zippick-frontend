@@ -1,7 +1,11 @@
 package com.example.zippick.network.product
 
 import com.example.zippick.network.RetrofitInstance
-import com.example.zippick.ui.model.*
+import com.example.zippick.ui.model.AiLayoutImageResponse
+import com.example.zippick.ui.model.LikedRequest
+import com.example.zippick.ui.model.Product
+import com.example.zippick.ui.model.ProductDetail
+import com.example.zippick.ui.model.ProductResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 

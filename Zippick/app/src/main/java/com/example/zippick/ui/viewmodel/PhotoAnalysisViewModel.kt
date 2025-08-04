@@ -2,7 +2,6 @@ package com.example.zippick.ui.viewmodel
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -41,7 +40,6 @@ class PhotoAnalysisViewModel : ViewModel() {
                 }
                 tags = response.tags
             } catch (e: Exception) {
-                Log.e("AI_ANALYZE", "에러: ${e.message}")
             } finally {
                 isLoading = false
             }

@@ -1,9 +1,19 @@
 package com.example.zippick.network.product
 
-import com.example.zippick.ui.model.*
+import com.example.zippick.ui.model.AiLayoutImageResponse
+import com.example.zippick.ui.model.LikedRequest
+import com.example.zippick.ui.model.Product
+import com.example.zippick.ui.model.ProductDetail
+import com.example.zippick.ui.model.ProductResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ProductApi {
 

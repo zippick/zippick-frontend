@@ -2,7 +2,6 @@ package com.example.zippick.network
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.example.zippick.network.fcm.FcmApi
 import com.example.zippick.network.fcm.dto.FcmTokenRequest
 import com.google.firebase.messaging.FirebaseMessaging
@@ -38,7 +37,7 @@ object TokenManager {
                     sendFcmTokenToServer(fcmToken)
                 }
             } catch (e: Exception) {
-                Log.e("FCM", "FCM 토큰 가져오기 실패: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
@@ -48,9 +47,8 @@ object TokenManager {
             try {
                 val api = RetrofitInstance.retrofit.create(FcmApi::class.java)
                 val response = api.registerToken(FcmTokenRequest(fcmToken = fcmToken))
-                Log.d("FCM", "로그인 후 FCM 토큰 전송 성공: ${response.success}")
             } catch (e: Exception) {
-                Log.e("FCM", "로그인 후 FCM 토큰 전송 실패: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
@@ -93,7 +91,6 @@ object RetrofitInstance {
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl("https://zippick.n-e.kr/")
-//            .baseUrl("http://10.0.2.2:8080/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -1,6 +1,5 @@
 package com.example.zippick.ui.screen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,7 +74,6 @@ fun OrderDetailScreen(
                         try {
                             val token = TokenManager.getToken()
                             val response = repository.cancelOrder(it.orderId, "Bearer $token")
-                            Log.e("CancelOrder", "HTTP ${response.code()} - ${response.errorBody()?.string()}")
 
                             if (response.isSuccessful) {
                                 Toast.makeText(context, "주문이 취소되었습니다.", Toast.LENGTH_SHORT).show()
@@ -84,7 +82,6 @@ fun OrderDetailScreen(
                                 Toast.makeText(context, "주문 취소에 실패했습니다.", Toast.LENGTH_SHORT).show()
                             }
                         } catch (e: Exception) {
-                            Log.e("OrderCancel", "에러: ${e.message}", e)
                             Toast.makeText(context, "에러 발생: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                     }

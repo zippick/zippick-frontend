@@ -3,7 +3,6 @@ package com.example.zippick
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -28,7 +27,6 @@ class WebViewActivity : AppCompatActivity() {
         webView.addJavascriptInterface(object {
             @JavascriptInterface
             fun onAddressSelected(result: String) {
-                Log.d("WebView", "선택된 주소: $result")
                 val (zipcode, basic, extra) = result.split("|")
                 val intent = Intent().apply {
                     putExtra("zipcode", zipcode)
